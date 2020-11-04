@@ -1,4 +1,4 @@
-# SuperMario
+# SuperMarioBros
 Recreating Super Mario Brothers game by Nintendo but Pusheen as Mario :3
 
 Basic structures of the program are based on Miniventure codes (https://github.com/shylor/miniventure). 
