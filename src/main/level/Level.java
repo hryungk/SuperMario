@@ -167,7 +167,7 @@ public final class Level {
         this.screen = screen;
         for (int i = 0; i < list.size(); i++) { // loops through the entity list
             Sprite sprite = list.get(i);
-            if (sprite.isVisible())
+//            if (sprite.isVisible())
                 sprite.render(screen); // renders the sprite on the screen
         }
     }
@@ -179,6 +179,23 @@ public final class Level {
     public Tile getTile(int x, int y) {
         if (x < 0 || y < 0 || x >= W || y >= H) return null; // If the tile request is outside the world's boundaries (like x = -5), then returns a rock.
         return Tile.tiles[tiles[x + y * W]]; // Returns the tile that is at the position
+    }
+    
+    /** Gets a tile from the world.
+     * @param x x position in the current level
+     * @param y y position in the current level
+     * @param unit The unit of tile (8 px for shot and 16 px for other sprites)
+     * @return A Tile object at position (x, y) in the current level */
+    public Tile getTile(int x, int y, int unit) {
+        switch(unit) {
+            case 4:
+                if (x < 0 || y < 0 || x >= W || y >= H) return null; // If the tile request is outside the world's boundaries (like x = -5), then returns a rock.
+                return Tile.tiles[tiles[x + y * W]]; // Returns the tile that is at the position                
+            case 3:
+                if (x < 0 || y < 0 || x/2 >= W || y/2 >= H) return null; // If the tile request is outside the world's boundaries (like x = -5), then returns a rock.
+                return Tile.tiles[tiles[x/2 + (y/2) * W]]; // Returns the tile that is at the position                
+        }
+        return null;
     }
 
     /** Sets a tile to the world */
