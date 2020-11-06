@@ -22,6 +22,7 @@ public class Player extends Sprite {
     private SuperPusheen game;
     public int invulnerableTime = 0; // the invulnerability time the player has when he is hit
     private double ds;  // y velocity     
+    private boolean crushedAlien;
     
     public Player(InputHandler input, Level level, SuperPusheen board) {                
         super(level);
@@ -54,9 +55,11 @@ public class Player extends Sprite {
         int START_X = Commons.PLAYER_XI;
         setX(START_X);
         
-        int START_Y = Commons.PLAYER_YI;
+        int START_Y = Commons.GROUND - height;
         setY(START_Y);       
         ground = START_Y + height;
+        
+        dir = 3;    // facing right when first created
         
         xSpeed = 2;
         ySpeed = 2;
@@ -65,6 +68,10 @@ public class Player extends Sprite {
         dy = ySpeed;
         ds = 0;
         score = 0;
+        
+        crushedAlien = false;
+        
+        unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
     }    
         
     // Positions the player in horizontal direction.
@@ -90,14 +97,13 @@ public class Player extends Sprite {
 //        if (x < Commons.PLYAER_XMAX && input.right.down) dx = 1;        
         if (input.right.clicked || input.right.down) dx = xSpeed;        
         
-        if (y < Commons.GROUND)        grounded = isGrounded();
-//        if (y + ES < Commons.BOARD_HEIGHT) topped = (y > ES && checkTopped()) || y <= ES;
-        topped = checkTopped();
+//        if (y + height < Commons.GROUND)        grounded = isGrounded();
+//        topped = checkTopped();
     
         
         int g = 8;  // gravitational force        
         
-        if (grounded)
+        if (grounded && y + height == ground)
             ds = 1;
         else if (topped) {
             ds = 1;
@@ -107,10 +113,14 @@ public class Player extends Sprite {
         
         if (input.jump.clicked && grounded)
              ds = -g;
+        if (crushedAlien) {
+            ds = -3;
+            crushedAlien = false;
+        }
         
         dy = (int) ds;
         
-        if (dy > 0  && y < Commons.GROUND && willBeGrounded()) {
+        if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
             int yt1 = y + dy + ES;
             int backoff = yt1 - (yt1 >> 4) * 16;
             if (dy > 1 && backoff > 0)
@@ -135,13 +145,15 @@ public class Player extends Sprite {
         // This is to prevent the player from going out of the frame.
 //        if (x <= ES)    // left end in the beginning
 //            x = ES+1;        
-                
-        int xScroll = level.getOffset();
-        if (x <= xScroll) // left end in the middle of the game
-            x = xScroll;
+              
+//        int xScroll = level.getOffset();
+//        if (x <= xScroll) // left end in the middle of the game
+//            x = xScroll;
         
-        if (x + width + ES >= level.W * Commons.ENTITY_SIZE) // right end of the game
-            x = level.W * Commons.ENTITY_SIZE - width - ES - 1;
+//        if (x + width + ES >= level.W * Commons.ENTITY_SIZE) // right end of the game
+//            x = level.W * Commons.ENTITY_SIZE - width - ES - 1;
+        if (x + width >= level.W * ES) // right end of the game
+            x = level.W * ES - width;
         
 //        if (y <= ES) // top of the game
 //            y = ES+1;
@@ -151,25 +163,49 @@ public class Player extends Sprite {
 //            y = Commons.BOARD_HEIGHT - height - ES -1;
 //            health = 0;
         
-//        if (y > Commons.GROUND)
+//        if (y + height > Commons.GROUND)
 //            System.out.println("below the ground");
         
-        if (y + dy + height < Commons.BOARD_HEIGHT)
-            move(dx, dy);        
-        else
+//        if (y + dy + height < Commons.BOARD_HEIGHT)
+//            move(dx, dy);        
+//        else
+//            hurt(health);
+        move(dx, dy);
+        if (y > Commons.BOARD_HEIGHT)
             hurt(health);
+                
+        int xScroll = level.getOffset();
+        if (x <= xScroll) // left end in the middle of the game
+            x = xScroll;
         
+//        System.out.print("dx = " + dx + ", x = " + x + ", ");
 //        System.out.println("dy = " + dy + ", y = " + y);
         
-        if (input.attack.clicked) 
-            level.add(new Shot(x, y, level));                       
+        // Add a shot
+        if (input.attack.clicked) {
+            Shot shot = new Shot(level);
+            int dxShot = 0;
+            int xShot = 0;
+            int yShot = y + (height-shot.height)/2;
+            if (dir == 2) { // facing left
+                dxShot = -1;
+                xShot = x - shot.width;
+            } 
+            else if (dir == 3) {// facing right 
+                dxShot = 1;
+                xShot = x + width;
+            } 
+            shot.setX(xShot);
+            shot.setY(yShot);
+            shot.setDx(dxShot);
+            level.add(shot);                       
+        }
     }       
     
     /** What happens when the player touches an entity. */
     protected void touchedBy(Sprite sprite) {
         if (sprite instanceof Alien) { // if the entity is not a player.
-            sprite.touchedBy(this); // calls the touchedBy() method in the entity's class
-////            hurt(1);            
+            sprite.touchedBy(this); // calls the touchedBy() method in the entity's class            
         }
     }
     
@@ -211,5 +247,9 @@ public class Player extends Sprite {
     
     public void resetGame() {
         game.resetGame();
+    }
+    
+    public void setCrushedAlien(boolean crushed) {
+        crushedAlien = crushed;
     }
 }
