@@ -2,7 +2,6 @@ package main.entity;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import main.level.Level;
 
 public class Entity {
     private BufferedImage image;
