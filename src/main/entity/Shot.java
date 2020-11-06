@@ -20,34 +20,36 @@ public class Shot extends Sprite {
     
     private final int ES = Commons.ENTITY_SIZE;
     
-    public Shot(int x, int y, Level level) {      
+    public Shot( Level level) {      
         super(level);
         wS = hS = 1;
-        initShot(x, y);
+        initShot();
         xS = 8;
         yS = 2;
     }       
     
     // (x, y) is the position of the player.
-    private void initShot(int x, int y) {
+    private void initShot() {
        
         String shotImg = "src/Retro-Fire-Ball-icon_8px.png";        
        
         try {
 //            BufferedImage source = ImageIO.read(new File(shotImg));
-                BufferedImage source = ImageIO.read(SuperPusheen.class.getResourceAsStream("/Retro-Fire-Ball-icon.png"));
+                BufferedImage source = ImageIO.read(SuperPusheen.class.getResourceAsStream("/Retro-Fire-Ball-icon_8px.png"));
             setImage(source);
         } catch (IOException ex) {
            String msg = String.format("No such file found: %s", ex.getMessage());
             System.out.println(msg);
         }      
         
-        // Initial coordinates of the shot sprite.          
-        setX(x + ES);        
-        setY(y + (ES-height)/2);       
-        
-        dx = 1; 
+//        // Initial coordinates of the shot sprite.          
+//        setX(x + ES);        
+//        setY(y + (ES-height)/2);       
+//        
+//        this.dx = dx; 
         dy = 0;
+        
+        unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
     }    
     
 @Override
@@ -81,13 +83,22 @@ public class Shot extends Sprite {
 
             boolean stopped = false;
             // Update shot's position
-            if (x > level.getOffset() + Commons.BOARD_WIDTH) 
-                die();
-            else 
+//            if (x > level.getOffset() + Commons.BOARD_WIDTH) 
+//                remove();
+//            else 
+//                stopped = !move(dx, dy);
+            
+            int offset = level.getOffset();
+            if (x <= 0)
+                remove();
+            else if (offset < x+width && x < offset + Commons.BOARD_WIDTH )
                 stopped = !move(dx, dy);
+            else
+                remove();
+            
             
             if (stopped)
-                die();            
+                remove();            
 //        }        
     }
     
@@ -98,6 +109,14 @@ public class Shot extends Sprite {
 //            hurt(1); // hurts the player, damage is based on lvl.
 //            sprite.setDying(true);            
 //            setDying(true);
+
+            hurt(health); // hurt the shot
+            if (!((Alien) sprite).shot) {                
+                ((Alien) sprite).shot = true;
+                sprite.dx = 0;
+                level.player.score += Commons.SPE; // gives the player 1000 points of score
+                ((Alien) sprite).score = Integer.toString(Commons.SPE);
+            }
         }
     }
     
