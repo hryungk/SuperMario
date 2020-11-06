@@ -14,7 +14,8 @@ public interface Commons {
     int DELAY = 17;    
     int FONT_Y = 30;
     
-    int GROUND = BOARD_HEIGHT - 3 * ENTITY_SIZE;
+    int NUM_GROUND_ROW = 2; // Number of rows of ground blocks
+    int GROUND = BOARD_HEIGHT - NUM_GROUND_ROW * ENTITY_SIZE;
     int GROUND_TILE = GROUND / ENTITY_SIZE;
     
     int PLAYER_XI = 42;
@@ -31,12 +32,13 @@ public interface Commons {
     };
     
     // Initial positions of aliens.
+    int A_GROUND = GROUND - ENTITY_SIZE;
     int[][] APOS = {
-        {352, GROUND}, {640, GROUND}, {816, GROUND}, {840, GROUND}, 
-        {1280, Y160-ENTITY_SIZE}, {1312, Y160-ENTITY_SIZE}, {1552, GROUND}, 
-        {1576, GROUND}, {1824, GROUND}, {1848, GROUND}, {1984, GROUND},
-        {2008, GROUND}, {2048, GROUND}, {2072, GROUND}, {2784, GROUND}, 
-        {2808, GROUND}
+        {352, A_GROUND}, {640, A_GROUND}, {816, A_GROUND}, {840, A_GROUND}, 
+        {1280, Y160-ENTITY_SIZE}, {1312, Y160-ENTITY_SIZE}, {1552, A_GROUND}, 
+        {1576, A_GROUND}, {1824, A_GROUND}, {1848, A_GROUND}, {1984, A_GROUND},
+        {2008, A_GROUND}, {2048, A_GROUND}, {2072, A_GROUND}, {2784, A_GROUND}, 
+        {2808, A_GROUND}
     };
     // Size and initial (x, y) position of pipes.
     int[][] PPOS = {
