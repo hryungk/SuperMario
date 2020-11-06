@@ -153,12 +153,13 @@ public class SuperPusheen extends JPanel implements Runnable {
         }
         
         /* Add ground. */
-        int h = Commons.BOARD_HEIGHT - ES * 2; // 2 layers of ground blocks.
+        int numGRow = Commons.NUM_GROUND_ROW;
+        int h = Commons.BOARD_HEIGHT - ES * numGRow; // 2 layers of ground blocks.
         int[][] GPOS = Commons.GPOS;
         grounds = new ArrayList<>(GPOS.length);
         int to = 0;
         int from = 0;
-        for (int yi = 2; yi >= 1; yi--) { // Loops twice
+        for (int yi = numGRow; yi >= 1; yi--) { // Loops twice
             for (int[] a : GPOS) {
                 int beg = a[0];
                 int end = a[1];                
@@ -168,7 +169,7 @@ public class SuperPusheen extends JPanel implements Runnable {
                 int y = B_HEIGHT - ES * yi;
                 for (int x = beg; x <= end; x+=ES) { // A loop inside a loop that loops through the width of the map.
                     GBlock gb = new GBlock(x, y);
-                    if (yi == 2 || (x == end && x != source.getWidth()-ES) || (x == beg && x != 0)) // Add only where the player might interact.
+                    if (yi == numGRow || (x == end && x != source.getWidth()-ES) || (x == beg && x != 0)) // Add only where the player might interact.
                         grounds.add(gb);
                     int[][] gBlockPixels = ImageTool.convertTo2D(gb.getImage());
                     // Add the ground block to the background.
@@ -413,24 +414,25 @@ public class SuperPusheen extends JPanel implements Runnable {
         Toolkit.getDefaultToolkit().sync();       
     }
 
-    /** Renders the GUI on the screen used in the main game (hearts, Stamina bolts, name of the current item, etc, etc) */
+    /* Renders the GUI on the screen used in the main game. */
     private void renderGui() {      
         // Show the stats
         int PPS = Commons.PPS;        
         String[] stringList = {"SCORE", "COINS", "WORLD", "TIME", "LIVES"};
         int[] numList = {player.score, 0, level.getWorld(), (level.getTimeLim() - gameTime/60), player.getLives()};
         int secLen = B_WIDTH / stringList.length;  // Width of each section, 300 / 5 = 60 
+        int yGap = 2;
         for (int i = 0; i < stringList.length; i++) {
             // Draw section names.
             String str = stringList[i];
             int strLen = str.length() * PPS;
-            Font.draw(str, screen, (secLen - strLen)/2 + secLen * i, 2, main.gfx.Color.WHITE);
+            Font.draw(str, screen, (secLen - strLen)/2 + secLen * i, yGap, main.gfx.Color.WHITE);
             // Draw corresponding values.
             String numStr = Integer.toString(numList[i]);
-            if (i == 2)
+            if (i == 2) // Adjust world string.
                 numStr += "-" + level.getStage();
             int numStrLen = numStr.length() * PPS;
-            Font.draw(numStr, screen, (secLen - numStrLen)/2 + secLen * i, 2 + PPS + 2, main.gfx.Color.WHITE);
+            Font.draw(numStr, screen, (secLen - numStrLen)/2 + secLen * i, yGap + PPS + yGap, main.gfx.Color.WHITE);
         }
         
         //if there is an active menu, then it will render it.
