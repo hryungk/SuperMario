@@ -34,11 +34,6 @@ public class GroundTile extends Tile {
     }
 
     @Override
-    public void hurt(int x, int y, Sprite source, int dmg, int attackDir) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public void bumpedInto(int xt, int yt, Entity entity) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
