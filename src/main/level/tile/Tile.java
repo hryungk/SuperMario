@@ -25,14 +25,12 @@ public abstract class Tile {
     protected int xS, yS; // Location on the sprite sheet [square, 8 pixels]
     protected int wS, hS; // width and height of tile [squares]
     
-    protected boolean removed;
     
     public Tile(int id) {
             ID = (byte) id; // creates the id
-            if (tiles[id] != null) throw new RuntimeException("Duplicate tile ids!"); // You cannot have over-lapping ids
+//            if (tiles[id] != null) throw new RuntimeException("Duplicate tile ids!"); // You cannot have over-lapping ids
             tiles[id] = this; // Assigns the id
             steppedOn = false;
-            removed = false;
             wS = hS = 2;    // 2-square-long in each side. 
     }
     
@@ -61,11 +59,20 @@ public abstract class Tile {
      * @param level current level
      * @param xt x position of the current level
      * @param yt x position of the current level */
-    public abstract void tick(int xt, int yt, Level levelß);
-
-    /** What happens when you hit the tile (ex: punching a tree) */
-    public abstract void hurt(int x, int y, Sprite source, int dmg, int attackDir);
+    public abstract void tick(int xt, int yt, Level level);
 
     /** What happens when you run into the tile (ex: run into a cactus) */
     public abstract void bumpedInto(int xt, int yt, Entity entity);
+    
+    /** Returns x square position.
+     * @return  The x-position in square (8 px) */
+    public int getXS() {
+        return xS;
+    }
+    
+    /** Returns y square position.
+     * @return  The y-position in square (8 px) */
+    public int getYS() {
+        return yS;
+    }
 }
