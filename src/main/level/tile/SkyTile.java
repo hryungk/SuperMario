@@ -26,13 +26,7 @@ public class SkyTile extends Tile {
     }
 
     @Override
-    public void tick(int xt, int yt, Level level) {
-        
-    }
-
-    @Override
-    public void hurt(int x, int y, Sprite source, int dmg, int attackDir) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void tick(int xt, int yt, Level level) {        
     }
 
     @Override
