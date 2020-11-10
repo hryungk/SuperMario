@@ -4,6 +4,8 @@ import java.util.List;
 import main.Commons;
 import main.gfx.Screen;
 import main.level.Level;
+import main.level.tile.InteractiveTile;
+import main.level.tile.Tile;
 
 /** Represents a sprite.
  *  Keeps the image of the sprite and the coordinates of the sprite.
@@ -196,18 +198,43 @@ public abstract class Sprite extends Entity {
         
         
         int yt0T = (int) (Math.ceil((y - height + dy) / (double)width));
+        Tile tile = null;
         if (y <= 0) topped = true;
         else if (0 < y && y <= ES) topped = false;
         else if (y + dy > Commons.BOARD_HEIGHT) topped = false;
-        else if (x < ES)
-            topped = !(level.getTile(xt1, yt0T, unit).mayPass(xt1, yt0T, this)); 
-        else if (x + width >= level.W * ES) 
-            topped = !(level.getTile(xt1-1, yt0T, unit).mayPass(xt1-1, yt0T, this));
-        else if (level.W * ES - ES <= x + width && x + width < level.W * ES) 
-            topped = !(level.getTile(xto1, yt0T, unit).mayPass(xto1, yt0T, this));
-        else
-            topped = !(level.getTile(xt1-1, yt0T, unit).mayPass(xt1-1, yt0T, this)) ||
-                (((x + dx) % width != 0) && !(level.getTile(xt1, yt0T, unit).mayPass(xt1, yt0T, this)));    
+        else if (x < ES) {
+            tile = level.getTile(xt1, yt0T, unit);
+            topped = !(tile.mayPass(xt1, yt0T, this)); 
+        } else if (x + width >= level.W * ES) {
+            tile = level.getTile(xt1-1, yt0T, unit);
+            topped = !(tile.mayPass(xt1-1, yt0T, this));
+        } else if (level.W * ES - ES <= x + width && x + width < level.W * ES) {
+            tile = level.getTile(xto1, yt0T, unit);
+            topped = !(tile.mayPass(xto1, yt0T, this));
+        } else {
+            Tile tile1 = level.getTile(xt1-1, yt0T, unit);
+            Tile tile2 = level.getTile(xt1, yt0T, unit);
+            boolean topped1 = !(tile1.mayPass(xt1-1, yt0T, this)); // top-left or top
+            boolean topped2 = ((x + dx) % width != 0) && !(tile2.mayPass(xt1, yt0T, this)); // top-right            
+            
+            if (topped1 && topped2) {   // When both top-left and top-right are blocking
+                int xt1T = (int) Math.round((x + dx) / (double)width);  // choose the tile closer to the player.
+                tile = level.getTile(xt1T, yt0T, unit);
+            }
+            else if (topped1) tile = tile1;
+            else if (topped2) tile = tile2;
+            
+            topped = topped1 || topped2;    
+        }
+        if ((tile instanceof InteractiveTile)) {
+            InteractiveTile t = (InteractiveTile) tile;
+            boolean isHit = t.isHitBottom();
+            if (topped && dy < 0) {
+//                t.setHit(true);
+                t.hurt();
+//                System.out.println("Tile's x: " + (xt1-1) + ", Tile's y: " + yt0T);
+            }
+        }
                 
         if (dx < 0) {            
             xto0 = (int) Math.ceil((x - width) / (double)width);
