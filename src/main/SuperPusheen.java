@@ -114,7 +114,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         }
          
         tickCount = 0; 
-        initGame();        
+        initGame();        // will be done in TitleMenu()
         
         setMenu(new TitleMenu());  // Sets the menu to the title menu.
     }
@@ -138,10 +138,10 @@ public class SuperPusheen extends JPanel implements Runnable {
         String path = "src/bg_1-1.png";
         source = ImageIO.read(new File(path));
         sourcePixels = ImageTool.convertTo2D(source);        
-        numTileX = source.getWidth() / ES;
-        numTileY = source.getHeight() / ES;
+        numTileX = source.getWidth() / ES;  // 224
+        numTileY = source.getHeight() / ES; // 15
         /* Create a map for the current level. */
-        tiles =  LevelGen.createAndValidateTopMap(numTileX, numTileY); // create a surface map for the level
+//        tiles =  LevelGen.createAndValidateTopMap(numTileX, numTileY); // create a surface map for the level
         
         // Extract level numbers from the background image name
         Scanner scan = new Scanner(path);
@@ -316,7 +316,8 @@ public class SuperPusheen extends JPanel implements Runnable {
         gameTime = 0;
         hasWon = false;  
         
-        level = new Level(numTileX, numTileY, levelNum, 400); // creates the map                
+        level = new Level(numTileX, numTileY, levelNum, 400); // creates the map        
+        tiles = level.tileIds;        
         player = new Player(input, level, this);
         player.initPlayer();
         level.add(player);
