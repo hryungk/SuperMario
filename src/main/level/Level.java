@@ -15,7 +15,8 @@ public final class Level {
 
     public final int W, H; // width and height of the level
 
-    public byte[] tiles; // an array of all the tiles in the world.    
+    public byte[] tileIds; // an array of all the tiles in the world.    
+    public Tile[] tiles;
     public List<Sprite>[] entitiesInTiles; // An array of each entity in each tile in the world
 
     private int world, stage; // depth level of the level
@@ -43,7 +44,8 @@ public final class Level {
         TIME_LIMIT = time;
                 
         /* Create a map for the current level. */
-        tiles =  LevelGen.createAndValidateTopMap(w, h); // create a surface map for the level   
+        tileIds =  LevelGen.createAndValidateTopMap(w, h); // create a surface map for the level   
+        tiles = LevelGen.tileMap;
         
         /* Initializes entitiesInTiles variable. */
         entitiesInTiles = new ArrayList[w * h]; // Creates a new arrayList with the size of width * height.
@@ -96,7 +98,7 @@ public final class Level {
         for (int xt = 0; xt < W; xt++) { // Loops width
             for (int yt = 0; yt < H; yt++) { // Loops height
                 Tile tile = getTile(xt, yt);
-                if (tile == Tile.brick || tile == Tile.Qbrick) {// only bricks might disappear. 
+                if (tile.ID == Tile.brick.ID || tile.ID == Tile.Qbrick.ID) {// only bricks might disappear. 
                     tile.tick(xt, yt, this); // updates the tile at that location.
 //                    System.out.println("Tile tick");
                 }
@@ -128,10 +130,11 @@ public final class Level {
         int width = (screen.W + 15) >> 4; // width of the screen being rendered [tile]
         int height = (screen.H + 15) >> 4; // height of the screen being rendered [tile]
         screen.setOffset(xScroll, yScroll); // sets the scroll offsets.          
-        for (int y = yo; y <= height + yo; y++) { // loops through the vertical positions
+        for (int y = yo; y < height + yo; y++) { // loops through the vertical positions
             for (int x = xo; x <= width + xo; x++) { // loops through the horizontal positions
                 Tile tile = getTile(x, y);
-                if (tile == Tile.brick || tile == Tile.Qbrick) // only bricks might disappear. 
+//                if (tile == Tile.brick || tile == Tile.Qbrick) // only bricks might disappear. 
+                if (tile.ID == Tile.brick.ID || tile.ID == Tile.Qbrick.ID) // only bricks might disappear. 
                     tile.render(screen, this, x, y); // renders the tile on the screen
             }
         }
@@ -178,7 +181,8 @@ public final class Level {
      * @return A Tile object at position (x, y) in the current level */
     public Tile getTile(int x, int y) {
         if (x < 0 || y < 0 || x >= W || y >= H) return null; // If the tile request is outside the world's boundaries (like x = -5), then returns a rock.
-        return Tile.tiles[tiles[x + y * W]]; // Returns the tile that is at the position
+//        return Tile.tiles[tileIds[x + y * W]]; // Returns the tile that is at the position
+        return tiles[x + y * W];
     }
     
     /** Gets a tile from the world.
@@ -190,10 +194,13 @@ public final class Level {
         switch(unit) {
             case 4:
                 if (x < 0 || y < 0 || x >= W || y >= H) return null; // If the tile request is outside the world's boundaries (like x = -5), then returns a rock.
-                return Tile.tiles[tiles[x + y * W]]; // Returns the tile that is at the position                
+//                return Tile.tiles[tileIds[x + y * W]]; // Returns the tile that is at the position
+                return tiles[x + y * W]; // Returns the tile that is at the position  
+                
             case 3:
-                if (x < 0 || y < 0 || x/2 >= W || y/2 >= H) return null; // If the tile request is outside the world's boundaries (like x = -5), then returns a rock.
-                return Tile.tiles[tiles[x/2 + (y/2) * W]]; // Returns the tile that is at the position                
+                if (x < 0 || y < 0 || x/2 >= W || y/2 >= H) return null; // If the tile request is outside the world's boundaries (like x = -5), then returns a rock.                
+//                return Tile.tiles[tileIds[x/2 + (y/2) * W]]; // Returns the tile that is at the position                
+                return tiles[x/2 + y/2 * W];
         }
         return null;
     }
@@ -201,7 +208,8 @@ public final class Level {
     /** Sets a tile to the world */
     public void setTile(int x, int y, Tile t) {
             if (x < 0 || y < 0 || x >= W || y >= H) return; // If the tile request position is outside the world boundaries (like x = -1337), then stop the method.
-            tiles[x + y * W] = t.ID; // Places the tile at the x & y location
+            tileIds[x + y * W] = t.ID; // Places the tile at the x & y location
+            tiles[x + y * W] = t;
     }
 
     /** Adds an entity to the level
