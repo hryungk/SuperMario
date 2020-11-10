@@ -11,6 +11,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import main.SuperPusheen;
 import main.Commons;
+import main.level.tile.BrickTile;
+import main.level.tile.InteractiveTile;
+import main.level.tile.QuestionBrickTile;
 import main.level.tile.Tile;
 
 public class LevelGen {
@@ -22,13 +25,14 @@ public class LevelGen {
      */
     private final int W; // width of the map
     private final int H; // height of the map
+    public static Tile[] tileMap;
 
     /** This creates noise to create random values for level generation
      * @param w Width of the map [tile]
      * @param h Height of the map [tile] */
     public LevelGen(int w, int h) {
         this.W = w; // assigns the width of the map
-        this.H = h; // assigns the height of the map
+        this.H = h; // assigns the height of the map        
     }	
 
     /** Creates and determines if the surface map is ready to be played.
@@ -58,13 +62,14 @@ public class LevelGen {
     /** Creates the surface map */
     private static byte[] createTopMap(int w, int h) throws IOException {
 
-        byte[] map = new byte[w * h]; // The tiles of the map
-
+        byte[] idMap = new byte[w * h]; // The tile IDs of the map        
+        tileMap = new Tile[w * h];
         /* Add sky. */
-        for (int y = 0; y < h-2; y++) { // Loops through the height of the map
+        for (int y = 0; y < h; y++) { // Loops through the height of the map
             for (int x = 0; x < w; x++) { // A loop inside a loop that loops through the width of the map.
                 int i = x + y * w; // Current tile being edited.
-                map[i] = Tile.sky.ID; // the tile will become sky                            
+                idMap[i] = Tile.sky.ID; // the tile will become sky    
+                tileMap[i] = Tile.sky;
             }
         }
 
@@ -77,7 +82,8 @@ public class LevelGen {
                 int end = a[1]/16;
                 for (int x = beg; x <= end; x++) { // A loop inside a loop that loops through the width of the map.
                     int i = x + y * w; // Current tile being edited.
-                    map[i] = Tile.ground.ID; // the tile will become ground                            
+                    idMap[i] = Tile.ground.ID; // the tile will become ground     
+                    tileMap[i] = Tile.ground;
                 }
             }
         }
@@ -91,7 +97,8 @@ public class LevelGen {
                 int yTop = a[2]/16; // y tile position
                 for (int y = yTop; y < h-2; y++) {
                     int i = x + y * w; // Current tile being edited.
-                    map[i] = Tile.pipe.ID; // the tile will become a pipe.
+                    idMap[i] = Tile.pipe.ID; // the tile will become a pipe.
+                    tileMap[i] = Tile.pipe;
                 }
             }
         }
@@ -110,7 +117,8 @@ public class LevelGen {
                 for (int xi = 0; xi < numX; xi++) {
                     int x = xBeg + xi;
                     int i = x + y * w;
-                    map[i] = Tile.block.ID; // the tile will become a block. 
+                    idMap[i] = Tile.block.ID; // the tile will become a block. 
+                    tileMap[i] = Tile.block;
                 }
                 numX--;
             }
@@ -126,12 +134,14 @@ public class LevelGen {
                 for (int xi = 0; xi < numX; xi++) {
                     int x = x0 + xi;
                     int i = x + y * w;
-                    map[i] = Tile.block.ID; // the tile will become a block. 
+                    idMap[i] = Tile.block.ID; // the tile will become a block. 
+                    tileMap[i] = Tile.block;
                 }
                 numX--;
             }
         }
         
+        int tileId = 6;
         /* Add bricks. */
         int[][] BRPOS = Commons.BRPOS;
         for (int[] a : BRPOS) {
@@ -141,7 +151,10 @@ public class LevelGen {
             int bNum = a[2]; // number of bricks in this row
             for (int x = x0; x < x0+bNum; x++) {
                 int i = x + y * w; // Current tile being edited.
-                map[i] = Tile.brick.ID; // the tile will become a brick.
+                InteractiveTile bt = new BrickTile(4);
+                idMap[i] = bt.ID; // the tile will become a brick.
+                tileMap[i] = bt;
+                tileId++;
             }
         }
         
@@ -154,11 +167,14 @@ public class LevelGen {
             int bNum = a[2]; // number of bricks in this row
             for (int x = x0; x < x0+bNum; x++) {
                 int i = x + y * w; // Current tile being edited.
-                map[i] = Tile.Qbrick.ID; // the tile will become a question brick.
+                InteractiveTile qbt = new QuestionBrickTile(5);
+                idMap[i] = qbt.ID; // the tile will become a question brick.
+                tileMap[i] = qbt;
+                tileId++;
             }
         }
         
-        return map; // returns the map's tiles and data.
+        return idMap; // returns the map's tiles and data.
     }
 
     public static void showMap(byte[] map, Player player) {
