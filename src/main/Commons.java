@@ -19,11 +19,12 @@ public interface Commons {
     int GROUND_TILE = GROUND / ENTITY_SIZE;
     
     int PLAYER_XI = 42;
-    int PLAYER_YI = GROUND;
     int PLYAER_XMAX = BOARD_WIDTH / 2 - 2 * ENTITY_SIZE;    //(150 - 32 = 118)
    
     int Y96 = BOARD_HEIGHT - 96;  // y-position at 240-96 = 144
     int Y160 = BOARD_HEIGHT - 160; // y-position at 240-160 = 80
+    int SPE = 100;  // Score per enemy
+    double ITV0 = -2.5; // beginning speed of the interactive tiles when hit.
     
     // Ground map
     int[][] GPOS = { // {beginning tile, ending tile}
@@ -58,13 +59,31 @@ public interface Commons {
     // Initial position of bricks
     int[][] BRPOS = { //{x position, y position, number of bricks in this row}
         {320, Y96, 1}, {352, Y96, 1}, {384, Y96, 1}, {1232, Y96, 1}, {1264, Y96, 1}, 
-        {1504, Y96, 1}, {1600, Y96, 2}, {1888, Y96, 1}, {2064, Y96, 2}, {2688, Y96, 2}, 
-        {2736, Y96, 1}, {1280, Y160, 8}, {1456, Y160, 3}, {1939, Y160, 3}, {2048, Y160, 1}, {2096, Y160, 1}
+        {1280, Y160, 8}, {1456, Y160, 3}, {1504, Y96, 1}, {1600, Y96, 2}, 
+        {1888, Y96, 1}, {1939, Y160, 3}, {2048, Y160, 1}, {2064, Y96, 2}, 
+        {2096, Y160, 1}, {2688, Y96, 2}, {2736, Y96, 1}
     };
     
     // Initial position of question bricks.
     int[][] QBRPOS = { //{x position, y position, number of bricks in this row}
-        {256, Y96, 1}, {336, Y96, 1}, {368, Y96, 1}, {1248, Y96, 1}, {1696, Y96, 1}, 
-        {1744, Y96, 1}, {1792, Y96, 1}, {2720, Y96, 1}, {352, Y160, 1}, {1504, Y160, 1}, {1744, Y160, 1}, {2064, Y160, 2}
+        {256, Y96, 1}, {336, Y96, 1}, {352, Y160, 1}, {368, Y96, 1}, {1248, Y96, 1}, 
+        {1504, Y160, 1}, {1696, Y96, 1}, {1744, Y96, 1}, {1744, Y160, 1}, 
+        {1792, Y96, 1}, {2064, Y160, 2}, {2720, Y96, 1}
     };  
+    
+    // Initial position of coins.
+    int[][] CPOS = { //{x position, y position}
+        {256, Y96}, {352, Y160}, {368, Y96}, {1504, Y96}, {1504, Y96}, {1504, Y160}, 
+        {1696, Y96}, {1744, Y96}, {1792, Y96}, {2064, Y160}, {2080, Y160}, {2720, Y96}
+    };  
+    
+    // Initial position of mushrooms.
+    int[][] MPOS = { //{x position, y position}
+        {336, Y96}, {1248, Y96}, {1744, Y160}
+    };  
+    
+    // Initial position of starman.
+    int[][] SPOS = { //{x position, y position}
+        {1616, Y96}
+    };   
 }
