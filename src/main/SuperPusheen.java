@@ -28,7 +28,6 @@ import main.entity.GBlock;
 import main.gfx.Font;
 import main.gfx.SpriteSheet;
 import main.level.Level;
-import main.level.levelgen.LevelGen;
 import main.level.tile.Tile;
 import main.screen.*;
 
@@ -74,7 +73,7 @@ public class SuperPusheen extends JPanel implements Runnable {
     private int xScroll;
     private int yScroll;
     private int[] levelNum = new int[2];
-    private int lives;  // player's lives
+    private int lives, numCoins;  // player's lives, number of coins collected
     
     /* I guess I should explain something real quick. The coordinates between tiles and entities are different.
     * The world coordinates for tiles is 128x128
@@ -386,8 +385,9 @@ public class SuperPusheen extends JPanel implements Runnable {
             }
         }        
         
-        level.renderBackground(screen, xScroll, yScroll);
         level.renderSprites(screen, xScroll, yScroll);
+        level.renderBackground(screen, xScroll, yScroll);
+        
         
         renderGui(); // calls the renderGui() method.
         
@@ -420,7 +420,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         // Show the stats
         int PPS = Commons.PPS;        
         String[] stringList = {"SCORE", "COINS", "WORLD", "TIME", "LIVES"};
-        int[] numList = {player.score, 0, level.getWorld(), (level.getTimeLim() - gameTime/60), player.getLives()};
+        int[] numList = {player.score, numCoins, level.getWorld(), (level.getTimeLim() - gameTime/60), player.getLives()};
         int secLen = B_WIDTH / stringList.length;  // Width of each section, 300 / 5 = 60 
         int yGap = 2;
         for (int i = 0; i < stringList.length; i++) {
@@ -569,6 +569,10 @@ public class SuperPusheen extends JPanel implements Runnable {
     
     public int getColNum() {
         return screen.sheet.width / Commons.PPS;
+    }
+    
+    public void addCoinCount() {
+        numCoins++;
     }
     
 } // end Board
