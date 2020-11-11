@@ -7,7 +7,6 @@ package main.level.tile;
 
 import main.Commons;
 import main.entity.Entity;
-import main.entity.Sprite;
 import main.gfx.Screen;
 import main.level.Level;
 
@@ -19,8 +18,8 @@ public class QuestionBrickTile extends InteractiveTile {
     
     private int bNum, bCounter, dbNum, scale;
     
-    public QuestionBrickTile(int id) {
-        super(id);
+    public QuestionBrickTile(int id, int xt, int yt) {
+        super(id, xt, yt);
         
         xS = 10;
         yS = 0;
@@ -47,7 +46,7 @@ public class QuestionBrickTile extends InteractiveTile {
                 
 //        if (isHitBottom) bNum = 3;  // No more blinking after hit on the bottom.
             
-        int xSCur = xS + bNum * 2; // animation based on walk distance (0 is standing still and 2 is moving)          
+        int xSCur = xS + bNum * wS; // animation based on walk distance (0 is standing still and 2 is moving)          
         
         int PPS = Commons.PPS;
         for (int ys = 0; ys < hS; ys++) {
@@ -90,6 +89,8 @@ public class QuestionBrickTile extends InteractiveTile {
         }
 //        System.out.println("Block counter: " + bCounter + ", Qblock number: " + bNum);
 //        System.out.println("bNum = " + bNum);
+//        if (isHitBottom)
+//            System.out.println("  QBrick's y = " + y);
     }
     
     public void hurt() {
@@ -98,7 +99,7 @@ public class QuestionBrickTile extends InteractiveTile {
         }
         else
             ds = 0;
-        bNum = 3;
+        bNum = 3;        
     }
 
     @Override
