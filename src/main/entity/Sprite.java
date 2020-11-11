@@ -14,7 +14,7 @@ public abstract class Sprite extends Entity {
 
     private boolean visible;
     private boolean dying;
-    private final int ES = Commons.ENTITY_SIZE; // Default entity size (16 px)
+    protected final int ES = Commons.ENTITY_SIZE; // Default entity size (16 px)
     int dx, dy;
     public int maxHealth = 2; // The maximum amount of health the mob can have
     public int health; // The amount of health we currently have, and set it to the maximum we can have
@@ -33,15 +33,18 @@ public abstract class Sprite extends Entity {
     // The constructor initiates the x and y coordinates and the visible variable.
     public Sprite(Level level) {
         super();
+        this.level = level;  
+        initSprite();
+    }    
+    private void initSprite() {
         visible = true;
-        dx = dy = 0;
-        this.level = level;        
+        dx = dy = 0;              
         grounded = true;
         topped = false;
         wS = hS = 2;
         initHealth();
-        lives = 1;        
-    }    
+        lives = 1;   
+    }
     
     /** Update method, (Look in the specific entity's class) */
     public void tick() {
@@ -226,13 +229,26 @@ public abstract class Sprite extends Entity {
             
             topped = topped1 || topped2;    
         }
+        
         if ((tile instanceof InteractiveTile)) {
             InteractiveTile t = (InteractiveTile) tile;
             boolean isHit = t.isHitBottom();
             if (topped && dy < 0) {
 //                t.setHit(true);
-                t.hurt();
+                
+                if (!t.isHitBottom()) {
+//                    Coin coin = new Coin(t.getX(), t.getY(), level);
+//                    level.add(coin);
+                    HiddenSprite hs = level.getHiddenSprite(t.getX(), t.getY());
+                    if (hs != null) {
+                        hs.activate();
+//                        level.player.score += hs.score; // gives the player 100 points of score
+//                        level.player.addCoinCount();
+                    }
+                }
+                t.hurt();                
 //                System.out.println("Tile's x: " + (xt1-1) + ", Tile's y: " + yt0T);
+                
             }
         }
                 
