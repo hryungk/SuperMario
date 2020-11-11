@@ -15,7 +15,6 @@ import main.level.Level;
     @author zetcode.com */
 public class Alien extends Sprite {
     
-    private final int ES = Commons.ENTITY_SIZE;
     private int counter;
     private int curDx;
     private int inity;
@@ -162,7 +161,7 @@ public class Alien extends Sprite {
                 xS += 2;
                 crushed = true;
                 dx = 0;
-                level.player.score += Commons.SPE; // gives the player 1000 points of score
+                level.player.score += Commons.SPE; // gives the player 100 points of score
                 score = Integer.toString(Commons.SPE);                
                 ((Player) sprite).setCrushedAlien(true);
             } else if (!crushed && !shot)
