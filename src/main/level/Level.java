@@ -3,9 +3,7 @@ package main.level;
 import java.util.ArrayList;
 import java.util.List;
 import main.Commons;
-import main.entity.Alien;
-import main.entity.Player;
-import main.entity.Sprite;
+import main.entity.*;
 import main.gfx.Screen;
 import main.level.levelgen.LevelGen;
 import main.level.tile.Tile;
@@ -22,6 +20,7 @@ public final class Level {
     private int world, stage; // depth level of the level
     private final int TIME_LIMIT; 
     public List<Alien> aliens; 
+    public List<HiddenSprite> hiddenSprites; 
     
     public List<Sprite> entities = new ArrayList<>(); // A list of all the entities in the world
         
@@ -52,7 +51,7 @@ public final class Level {
         for (int i = 0; i < w * h; i++) { // Loops (width * height) times
             entitiesInTiles[i] = new ArrayList<>(); // Adds a entity list in that tile.
         }
-    }    
+    }        
     
     /** Update method, updates (ticks) 60 times a second (around every 17 ms) */
     public void tick(Screen screen) {
@@ -98,7 +97,7 @@ public final class Level {
         for (int xt = 0; xt < W; xt++) { // Loops width
             for (int yt = 0; yt < H; yt++) { // Loops height
                 Tile tile = getTile(xt, yt);
-                if (tile.ID == Tile.brick.ID || tile.ID == Tile.Qbrick.ID) {// only bricks might disappear. 
+                if (tile.ID == Tile.brickID || tile.ID == Tile.QbrickID) {// only bricks might disappear. 
                     tile.tick(xt, yt, this); // updates the tile at that location.
 //                    System.out.println("Tile tick");
                 }
@@ -108,16 +107,44 @@ public final class Level {
     
     /** Spawns aliens in the world.  */
     public void spawn() {        
-        // Create aliens.        
+        
+        /* Create and add aliens. */
         int[][] APOS = Commons.APOS; // Initial positions of aliens.
         aliens = new ArrayList<>(APOS.length);
         for (int[] p : APOS) {
             Alien alien = new Alien(p[0], p[1], this);
             aliens.add(alien);
             add(alien);
-        }        
+        }                
+        
+        /* Add hidden sprites. */
+        hiddenSprites = new ArrayList<>();
+        
+        // Add coins.
+        int[][] CPOS = Commons.CPOS;
+        for (int[] a : CPOS) {
+            HiddenSprite c = new Coin(a[0], a[1], this);   
+            hiddenSprites.add(c);
+            add(c);
+        }
+        
+        // Add starman. 
+        int[][] SPOS = Commons.SPOS;
+        for (int[] a : SPOS) {
+            HiddenSprite s = new Starman(a[0], a[1], this);   
+            hiddenSprites.add(s);
+            add(s);
+        }
+        
+        // Add mushrooms. 
+        int[][] MPOS = Commons.MPOS;
+        for (int[] a : MPOS) {
+            HiddenSprite m = new Mushroom(a[0], a[1], this);   
+            hiddenSprites.add(m);
+            add(m);
+        }
     }
-    
+        
     /** This method renders all the tiles in the game
      * @param screen The current Screen displayed.
      * @param xScroll  x-offset [pixels]
@@ -131,10 +158,10 @@ public final class Level {
         int height = (screen.H + 15) >> 4; // height of the screen being rendered [tile]
         screen.setOffset(xScroll, yScroll); // sets the scroll offsets.          
         for (int y = yo; y < height + yo; y++) { // loops through the vertical positions
-            for (int x = xo; x <= width + xo; x++) { // loops through the horizontal positions
+            for (int x = xo; x < width + xo; x++) { // loops through the horizontal positions
                 Tile tile = getTile(x, y);
 //                if (tile == Tile.brick || tile == Tile.Qbrick) // only bricks might disappear. 
-                if (tile.ID == Tile.brick.ID || tile.ID == Tile.Qbrick.ID) // only bricks might disappear. 
+                if (tile.ID == Tile.brickID || tile.ID == Tile.QbrickID) // only bricks might disappear. 
                     tile.render(screen, this, x, y); // renders the tile on the screen
             }
         }
@@ -210,6 +237,25 @@ public final class Level {
             if (x < 0 || y < 0 || x >= W || y >= H) return; // If the tile request position is outside the world boundaries (like x = -1337), then stop the method.
             tileIds[x + y * W] = t.ID; // Places the tile at the x & y location
             tiles[x + y * W] = t;
+    }    
+    
+    /** Returns the hidden sprite at (x, y)
+     * @param x x-position of the hidden sprite [pixel]
+     * @param y y-position of the hidden sprite [pixel]
+     * @return  The hidden sprite at (x, y), null if none exist at this location. */
+    public HiddenSprite getHiddenSprite(int x, int y) {
+        
+        boolean found = false;
+        int ii = 0;
+        while (!found && ii < hiddenSprites.size()) {
+            HiddenSprite hs = hiddenSprites.get(ii);
+            found = (hs.getX() == x) && (hs.getY() == y);
+            if (!found)
+                ii++;
+            else
+                return hs;
+        }
+        return null;
     }
 
     /** Adds an entity to the level
