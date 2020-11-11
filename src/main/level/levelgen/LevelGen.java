@@ -151,7 +151,7 @@ public class LevelGen {
             int bNum = a[2]; // number of bricks in this row
             for (int x = x0; x < x0+bNum; x++) {
                 int i = x + y * w; // Current tile being edited.
-                InteractiveTile bt = new BrickTile(4);
+                InteractiveTile bt = new BrickTile(4, x, y);
                 idMap[i] = bt.ID; // the tile will become a brick.
                 tileMap[i] = bt;
                 tileId++;
@@ -167,12 +167,12 @@ public class LevelGen {
             int bNum = a[2]; // number of bricks in this row
             for (int x = x0; x < x0+bNum; x++) {
                 int i = x + y * w; // Current tile being edited.
-                InteractiveTile qbt = new QuestionBrickTile(5);
+                InteractiveTile qbt = new QuestionBrickTile(5, x, y);
                 idMap[i] = qbt.ID; // the tile will become a question brick.
                 tileMap[i] = qbt;
                 tileId++;
             }
-        }
+        }        
         
         return idMap; // returns the map's tiles and data.
     }
@@ -189,8 +189,8 @@ public class LevelGen {
                 if (map[i] == Tile.pipe.ID) pixels[i] = 0x80D010; // If the tile is pipe, then the pixel will be green
                 if (map[i] == Tile.ground.ID) pixels[i] = 0x802e05; // if the tile is ground, then the pixel will be dark brown  
                 if (map[i] == Tile.block.ID) pixels[i] = 0xC84C0C; // If the tile is block, then the pixel will be brown         
-                if (map[i] == Tile.brick.ID) pixels[i] = 0x802e05; // if the tile is brick, then the pixel will be light brown 
-                if (map[i] == Tile.Qbrick.ID) pixels[i] = 0xfc9838; // if the tile is question brick, then the pixel will be yellow  
+                if (map[i] == Tile.brickID) pixels[i] = 0x802e05; // if the tile is brick, then the pixel will be light brown 
+                if (map[i] == Tile.QbrickID) pixels[i] = 0xfc9838; // if the tile is question brick, then the pixel will be yellow  
             }
         }
         pixels[(player.x>>4) + (player.y>>4) * 128] = 0xffaa00;
@@ -229,8 +229,8 @@ public class LevelGen {
                     if (map[i] == Tile.pipe.ID) pixels[i] = 0x80D010; // If the tile is pipe, then the pixel will be green
                     if (map[i] == Tile.ground.ID) pixels[i] = 0x802e05; // if the tile is ground, then the pixel will be dark brown  
                     if (map[i] == Tile.block.ID) pixels[i] = 0xC84C0C; // If the tile is block, then the pixel will be brown         
-                    if (map[i] == Tile.brick.ID) pixels[i] = 0x802e05; // if the tile is brick, then the pixel will be light brown 
-                    if (map[i] == Tile.Qbrick.ID) pixels[i] = 0xfc9838; // if the tile is question brick, then the pixel will be yellow 
+                    if (map[i] == Tile.brickID) pixels[i] = 0x802e05; // if the tile is brick, then the pixel will be light brown 
+                    if (map[i] == Tile.QbrickID) pixels[i] = 0xfc9838; // if the tile is question brick, then the pixel will be yellow 
                 }
             }
             img.setRGB(0, 0, w, h, pixels, 0, w); // sets the pixels into the image
