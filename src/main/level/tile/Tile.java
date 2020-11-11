@@ -16,8 +16,11 @@ public abstract class Tile {
     public static Tile ground = new GroundTile(1); 
     public static Tile pipe = new PipeTile(2); // creates a grass tile with the Id of 0, (I don't need to explain the other simple ones)
     public static Tile block = new BlockTile(3); 
-    public static Tile brick = new BrickTile(4); 
-    public static Tile Qbrick = new QuestionBrickTile(5); 
+    public static int brickID = 4;
+    public static int QbrickID = 5;
+    
+//    public static Tile brick = new BrickTile(4); 
+//    public static Tile Qbrick = new QuestionBrickTile(5); 
     
     public final byte ID; // Id of the tile
     private boolean steppedOn;
