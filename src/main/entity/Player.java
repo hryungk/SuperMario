@@ -17,7 +17,6 @@ import main.level.Level;
 public class Player extends Sprite {
  
     private InputHandler input;
-    private final int ES = Commons.ENTITY_SIZE;
     public int score; // the player's score
     private SuperPusheen game;
     public int invulnerableTime = 0; // the invulnerability time the player has when he is hit
@@ -251,5 +250,9 @@ public class Player extends Sprite {
     
     public void setCrushedAlien(boolean crushed) {
         crushedAlien = crushed;
+    }
+    
+    public void addCoinCount() {
+        game.addCoinCount();
     }
 }
