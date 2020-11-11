@@ -7,7 +7,6 @@ package main.level.tile;
 
 import main.Commons;
 import main.entity.Entity;
-import main.entity.Sprite;
 import main.gfx.Screen;
 import main.level.Level;
 
@@ -19,8 +18,8 @@ public class BrickTile extends InteractiveTile {
 
     private final int ES = Commons.ENTITY_SIZE;
     
-    public BrickTile(int id) {
-        super(id);
+    public BrickTile(int id, int xt, int yt) {
+        super(id, xt, yt);
         
         xS = 8;
         yS = 0;
