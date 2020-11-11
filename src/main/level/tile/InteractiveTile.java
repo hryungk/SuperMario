@@ -19,18 +19,27 @@ public abstract class InteractiveTile extends Tile {
     
     protected final int ES = Commons.ENTITY_SIZE;    
     protected boolean isHitBottom;    // True when the player hits the bottom of this brick.
-    protected int initY, y;    
+    protected int x, initY, y, xt, yt;    
     protected boolean removed;
-    protected double ds;    
-    protected double dsInit;
+    protected double ds, dsInit;
     
-    public InteractiveTile(int id) {
+    public InteractiveTile(int id, int xt, int yt) {
         super(id);
-        
+        this.xt = xt;
+        this.yt = yt;
+        init();
+    }
+    
+    private void init() {
+       
         removed = false;        
         isHitBottom = false;
         ds = 0;
-        dsInit = -2.5;
+        dsInit = Commons.ITV0;
+        
+        x = xt * ES;
+        y = yt * ES;
+        initY = y;// permanent y-position   
     }
    
     @Override
@@ -50,7 +59,7 @@ public abstract class InteractiveTile extends Tile {
     
     @Override
     public void render(Screen screen, Level level, int xt, int yt) {
-        initY = yt * ES; // permanent y-position        
+//        initY = yt * ES; 
         if (isHitBottom && (int) (y + ds) <= initY) {
             y = (int) (y + ds);
         }
@@ -71,5 +80,13 @@ public abstract class InteractiveTile extends Tile {
     
     public boolean isHitBottom() {
         return isHitBottom;
+    }
+    
+    public int getX() {
+        return x;
+    }
+    
+    public int getY() {
+        return y;
     }
 }
