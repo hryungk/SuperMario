@@ -19,3 +19,11 @@ Essential features to be added soon:
 - Update each hidden sprite's behavior once activated. 
 
 - Hidden items' (Mushroom, starman, flower) effects on the player and the game mechanics.
+
+
+
+Minor features to be added:
+
+- Brick with coin should have a random number of coins and turn to block.
+
+- The player should be able to kill Goomba by hitting the brick from the bottom. 
