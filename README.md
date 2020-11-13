@@ -27,3 +27,9 @@ Minor features to be added:
 - Brick with coin should have a random number of coins and turn to block.
 
 - The player should be able to kill Goomba by hitting the brick from the bottom. 
+
+- Print scores based on the player's position
+
+- Add acceleration effect in x direction
+
+- When player or goomba dies, it has a jumping effect to fall to the bottom of the screen. 
