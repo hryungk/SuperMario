@@ -8,12 +8,12 @@ var deployJava =
                applet:["codebase","code","name","archive","object","width","height","alt","align","hspace","vspace"],
                object:["classid","codebase","codetype","data","type","archive","declare","standby","height","width","usemap","name","tabindex","align",
                        "border","hspace","vspace"]};
-      var v=l.object.concat(l.core,l.i18n,l.events);
-      var j=l.applet.concat(l.core);
-      if(typeof String.prototype.startsWith!=="function"){
+      var v = l.object.concat(l.core,l.i18n,l.events);
+      var j = l.applet.concat(l.core);
+      if(typeof String.prototype.startsWith !== "function"){
         String.prototype.startsWith = 
           function(x,w){
-          w=w||0;
+          w = w || 0;
           return this.indexOf(x,w)===w
         }
       }
@@ -174,13 +174,13 @@ var deployJava =
       }
       
       function f(y,x){
-        var w = y.length;
-        for(var z = 0; z < w; z++){
-          if(y[z] === x){
-            return true
+          var w = y.length;
+          for(var z = 0; z < w; z++){
+              if(y[z] === x){
+                  return true
+              }
           }
-        }
-        return false
+          return false
       }
       
       function u(w){
@@ -203,124 +203,125 @@ var deployJava =
         }
         return !o("1.6.0_33+",w)
       }
-      var i = {debug:null,version:"20120801",firefoxJavaVersion:null,useStaticMimeType:false,myInterval:null,preInstallJREList:null,brand:null,locale:null,installType:null,EAInstallEnabled:false,EarlyAccessURL:null,oldMimeType:"application/npruntime-scriptable-plugin;DeploymentToolkit",mimeType:"application/java-deployment-toolkit",launchButtonPNG:q(),browserName:null,browserName2:null,getJREs:function(){
-        var A = new Array();
-        if(this.isPluginInstalled()){
-          var z = this.getPlugin();
-          var w = z.jvms;
-          for(var y = 0; y < w.getLength(); y++){
-            A[y] = w.get(y).version
-          }
-        } else {
-          var x = this.getBrowser();
-          if(x == "MSIE"){
-            if(this.testUsingActiveX("9")){
-              A[0] = "9"
-            } else {
-              if(this.testUsingActiveX("1.8.0")){
-                A[0] = "1.8.0"
-              } else {
-                if(this.testUsingActiveX("1.7.0")){
-                  A[0] = "1.7.0"
-                } else {
-                  if(this.testUsingActiveX("1.6.0")){
-                    A[0] = "1.6.0"
-                  } else {
-                    if(this.testUsingActiveX("1.5.0")){
-                      A[0] = "1.5.0"
-                    } else {
-                      if(this.testUsingActiveX("1.4.2")){
-                        A[0] = "1.4.2"
-                      } else {
-                        if(this.testForMSVM()){
-                          A[0] = "1.1"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          } else {
-            if(x == "Netscape Family"){
-              this.getJPIVersionUsingMimeType();
-              if(this.firefoxJavaVersion != null){
-                A[0] = this.firefoxJavaVersion
-              } else {
-                if(this.testUsingMimeTypes("9")){
-                  A[0] = "9"
-                } else {
-                  if(this.testUsingMimeTypes("1.8")){
-                    A[0] = "1.8.0"
-                  } else {
-                    if(this.testUsingMimeTypes("1.7")){
-                      A[0] = "1.7.0"
-                    } else {
-                      if(this.testUsingMimeTypes("1.6")){
-                        A[0] = "1.6.0"
-                      } else {
-                        if(this.testUsingMimeTypes("1.5")){
-                          A[0] = "1.5.0"
-                        } else {
-                          if(this.testUsingMimeTypes("1.4.2")){
-                            A[0] = "1.4.2"
-                          } else {
-                            if(this.browserName2 == "Safari"){
-                              if(this.testUsingPluginsArray("9")){
-                                A[0] = "9"
-                              } else {
-                                if(this.testUsingPluginsArray("1.8")){
-                                  A[0] = "1.8.0"
-                                } else {
-                                  if(this.testUsingPluginsArray("1.7")){
-                                    A[0] = "1.7.0"
-                                  } else {
-                                    if(this.testUsingPluginsArray("1.6")){
-                                      A[0] = "1.6.0"
-                                    } else {
-                                      if(this.testUsingPluginsArray("1.5")){
-                                        A[0] = "1.5.0"
-                                      } else {
-                                        if(this.testUsingPluginsArray("1.4.2")){
-                                          A[0] = "1.4.2"
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        if(this.debug){
-          for(var y = 0; y < A.length; ++y){
-            k("[getJREs()] We claim to have detected Java SE "+A[y])
-          }
-        }
-        return A
-      }, installJRE:function(x){
-        k("The Deployment Toolkit installJRE()  method no longer installs JRE. It just checks if the requested version of JRE is installed and calls installLatestJRE() otherwise. More Information on usage of the Deployment Toolkit can be found in the Deployment Guide at https://docs.oracle.com/javase/8/docs/technotes/guides/deploy/");
-        if(x == "undefined" || x == null){
-          x = "1.1"
-        }
-        var w = x.match(version_regex_with_family_modifier);
-        if(w == null){
-          k("Invalid requestVersion argument to installJRE(): " + x);
-          x = "1.6"
-        }
-        if(!this.versionCheck(x)){
-          return this.installLatestJRE()
-        }
-        return true
-      }, isAutoInstallEnabled:function(w){
+      var i = {debug:null,version:"20120801",firefoxJavaVersion:null,useStaticMimeType:false,myInterval:null,preInstallJREList:null,brand:null,locale:null,installType:null,EAInstallEnabled:false,EarlyAccessURL:null,oldMimeType:"application/npruntime-scriptable-plugin;DeploymentToolkit",mimeType:"application/java-deployment-toolkit",launchButtonPNG:q(),browserName:null,browserName2:null,
+               getJREs:function(){
+                   var A = new Array();
+                   if(this.isPluginInstalled()){
+                       var z = this.getPlugin();
+                       var w = z.jvms;
+                       for(var y = 0; y < w.getLength(); y++){
+                           A[y] = w.get(y).version
+                       }
+                   } else {
+                       var x = this.getBrowser();
+                       if(x == "MSIE"){
+                           if(this.testUsingActiveX("9")){
+                               A[0] = "9"
+                           } else {
+                               if(this.testUsingActiveX("1.8.0")){
+                                   A[0] = "1.8.0"
+                               } else {
+                                   if(this.testUsingActiveX("1.7.0")){
+                                       A[0] = "1.7.0"
+                                   } else {
+                                       if(this.testUsingActiveX("1.6.0")){
+                                           A[0] = "1.6.0"
+                                       } else {
+                                           if(this.testUsingActiveX("1.5.0")){
+                                               A[0] = "1.5.0"
+                                           } else {
+                                               if(this.testUsingActiveX("1.4.2")){
+                                                   A[0] = "1.4.2"
+                                               } else {
+                                                   if(this.testForMSVM()){
+                                                       A[0] = "1.1"
+                                                   }
+                                               }
+                                           }
+                                       }
+                                   }
+                               }
+                           }
+                       } else {
+                           if(x == "Netscape Family"){
+                               this.getJPIVersionUsingMimeType();
+                               if(this.firefoxJavaVersion != null){
+                                   A[0] = this.firefoxJavaVersion
+                               } else {
+                                   if(this.testUsingMimeTypes("9")){
+                                       A[0] = "9"
+                                   } else {
+                                       if(this.testUsingMimeTypes("1.8")){
+                                           A[0] = "1.8.0"
+                                       } else {
+                                           if(this.testUsingMimeTypes("1.7")){
+                                               A[0] = "1.7.0"
+                                           } else {
+                                               if(this.testUsingMimeTypes("1.6")){
+                                                   A[0] = "1.6.0"
+                                               } else {
+                                                   if(this.testUsingMimeTypes("1.5")){
+                                                       A[0] = "1.5.0"
+                                                   } else {
+                                                       if(this.testUsingMimeTypes("1.4.2")){
+                                                           A[0] = "1.4.2"
+                                                       } else {
+                                                           if(this.browserName2 == "Safari"){
+                                                               if(this.testUsingPluginsArray("9")){
+                                                                   A[0] = "9"
+                                                               } else {
+                                                                   if(this.testUsingPluginsArray("1.8")){
+                                                                       A[0] = "1.8.0"
+                                                                   } else {
+                                                                       if(this.testUsingPluginsArray("1.7")){
+                                                                           A[0] = "1.7.0"
+                                                                       } else {
+                                                                           if(this.testUsingPluginsArray("1.6")){
+                                                                               A[0] = "1.6.0"
+                                                                           } else {
+                                                                               if(this.testUsingPluginsArray("1.5")){
+                                                                                   A[0] = "1.5.0"
+                                                                               } else {
+                                                                                  if(this.testUsingPluginsArray("1.4.2")){
+                                                                                      A[0] = "1.4.2"
+                                                                                  }
+                                                                               }
+                                                                           }
+                                                                       }
+                                                                   }
+                                                               }
+                                                           }
+                                                       }
+                                                   }
+                                               }
+                                           }
+                                       }
+                                   }
+                               }
+                           }
+                       }
+                   }
+                   if(this.debug){
+                       for(var y = 0; y < A.length; ++y){
+                          k("[getJREs()] We claim to have detected Java SE "+A[y])
+                       }
+                   }
+                   return A
+               }, installJRE:function(x){
+                   k("The Deployment Toolkit installJRE()  method no longer installs JRE. It just checks if the requested version of JRE is installed and calls installLatestJRE() otherwise. More Information on usage of the Deployment Toolkit can be found in the Deployment Guide at https://docs.oracle.com/javase/8/docs/technotes/guides/deploy/");
+                   if(x == "undefined" || x == null){
+                       x = "1.1"
+                   }
+                   var w = x.match(version_regex_with_family_modifier);
+                   if(w == null){
+                       k("Invalid requestVersion argument to installJRE(): " + x);
+                       x = "1.6"
+                   }
+                   if(!this.versionCheck(x)){
+                       return this.installLatestJRE()
+                   }
+                   return true
+               }, isAutoInstallEnabled:function(w){
         if(!this.isPluginInstalled()){
           return false
         }
@@ -500,7 +501,7 @@ var deployJava =
         var w = "javascript:deployJava.launchWebStartApplication('"+y+"');";
         document.write('<a href="' + w + '" onMouseOver="window.status=\'\'; return true;"><img src="' + this.launchButtonPNG + '" border="0" /></a>')
       }, createWebStartLaunchButton:function(y,x){
-        var w = "javascript:if (!deployJava.isWebStartInstalled(&quot;"+x+"&quot;)) {if (deployJava.installLatestJRE()) {if (deployJava.launch(&quot;"+y+"&quot;)) {}}} else {if (deployJava.launch(&quot;"+y+"&quot;)) {}}";
+        var w = "javascript:if (!deployJava.isWebStartInstalled(&quot;" + x + "&quot;)) {if (deployJava.installLatestJRE()) {if (deployJava.launch(&quot;" + y + "&quot;)) {}}} else {if (deployJava.launch(&quot;" + y + "&quot;)) {}}";
         document.write('<a href="' + w + '" onMouseOver="window.status=\'\'; return true;"><img src="' + this.launchButtonPNG + '" border="0" /></a>')
       }, launch:function(w){
         document.location = w;
