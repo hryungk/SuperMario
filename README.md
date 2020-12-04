@@ -4,7 +4,7 @@ Recreating Super Mario Brothers game by Nintendo but Pusheen as Mario :3
 Basic structures of the program are based on Miniventure codes (https://github.com/shylor/miniventure). 
 
 
-As of 11/11/20:
+As of 12/03/20:
 
 - The player's physical movement in the map is confirmed. (doesn't intersect with barriers, jumps, falls, etc.)
 
@@ -12,19 +12,19 @@ As of 11/11/20:
 
 - The player can interact with question blocks and bricks. Hidden items pop up.
 
+- Hidden sprites (mushroom, flower, starman) interact and takes in effect as expected.
+
+- Brick with coin has a random number of coins and turn to block once looted out.
+
 
 
 Essential features to be added soon:
 
-- Update each hidden sprite's behavior once activated. 
-
-- Hidden items' (Mushroom, starman, flower) effects on the player and the game mechanics.
+- End the game once the player reaches the flag.
 
 
 
 Minor features to be added:
-
-- Brick with coin should have a random number of coins and turn to block.
 
 - The player should be able to kill Goomba by hitting the brick from the bottom. 
 
