@@ -13,33 +13,34 @@ import main.java.com.demo.level.Level;
 public class Player extends Sprite {
  
     private InputHandler input;
-    public int score; // the player's score
     private SuperPusheen game;
     public int invulnerableTime = 0; // the invulnerability time the player has when he is hit
     public int immortalTime = 0; // the immortal time the player has when it eats the starman.
     private double ds;  // y velocity     
     private boolean crushedAlien, enlarged, fired, immortal;
-    private int bCounter, bNum, scale;
     
     public Player(InputHandler input, Level level, SuperPusheen board) {                
-        super(level);
-        game = board;
+        super(level);        
         this.input = input;                
-        xS = 0;
-        yS = 10;        
-        lives = 3;
+        game = board; 
         
+        lives = 3;        
         scale = 4;
+        
+        initPlayer();
+    }    
+    
+    public void initPlayer() {
+        
         width = height = ES;
         wS = width / PPS;
         hS = height / PPS;
         unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
         aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
-        initPlayer();
-    }    
-    
-    public void initPlayer() {
-       
+        
+        xS = 0;
+        yS = 10;
+        
         // Initial coordinates of the player sprite.
         int START_X = Commons.PLAYER_XI;
         setX(START_X);
@@ -58,7 +59,8 @@ public class Player extends Sprite {
         ds = 0;
         score = 0;
         
-        crushedAlien = false;   
+        
+        crushedAlien = enlarged = fired = immortal = false;   
     }    
         
     // Positions the player in horizontal direction.
@@ -69,7 +71,7 @@ public class Player extends Sprite {
         if (invulnerableTime > 0) invulnerableTime--; // if invulnerableTime is above 0, then minus it by 1.
         if (immortalTime > 0) { // if immortalTime is above 0, 
             immortalTime--; // minus it by 1.         
-            bNum = (bCounter / scale) % 4;
+            bNum = (bCounter / scale) % numStage;
             bCounter++;          
         }
 //        int xa = 0; // x acceleration
@@ -330,5 +332,9 @@ public class Player extends Sprite {
     
     public boolean isImortal() {
         return immortal;
+    }
+    
+    public int getScore() {
+        return score;
     }
 }

@@ -40,7 +40,7 @@ public class WonMenu extends Menu {
 		Font.draw("Time:", screen, 2 * 8, 5 * 8, Color.get(-1, 555, 555, 555)); // Draws "Time:" on the frame
 		Font.draw(timeString, screen, (2 + 5) * 8, 5 * 8, Color.get(-1, 550, 550, 550)); // Draws the current time next to "Time:"
 		Font.draw("Score:", screen, 2 * 8, 6 * 8, Color.get(-1, 555, 555, 555)); // Draws "Score:" on the frame
-		Font.draw("" + game.player.score, screen, (2 + 6) * 8, 6 * 8, Color.get(-1, 550, 550, 550)); // Draws the current score next to "Score:"
+		Font.draw("" + game.player.getScore(), screen, (2 + 6) * 8, 6 * 8, Color.get(-1, 550, 550, 550)); // Draws the current score next to "Score:"
 		Font.draw("Press C to win", screen, 2 * 8, 8 * 8, Color.get(-1, 333, 333, 333)); //Draws text
 	}
 }

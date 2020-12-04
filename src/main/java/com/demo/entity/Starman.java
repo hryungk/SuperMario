@@ -11,7 +11,6 @@ import main.java.com.demo.level.Level;
     @author zetcode.com */
 public class Starman extends HiddenSprite {
     
-    private int bCounter, bNum, scale;
     private boolean doneFollowing, leftBlock;
     private int y0Count;
     // The constructor initiates the x and y coordinates and the visible variable.
@@ -25,7 +24,6 @@ public class Starman extends HiddenSprite {
         xS = 8;
         yS = 4;         
         dx = 1;
-        scale = 4;
         height = width = ES;
         wS = width / PPS;
         hS = height / PPS;
@@ -45,14 +43,18 @@ public class Starman extends HiddenSprite {
     public void tick() {   
                 
         if (isActivated) {
+            bNum = (bCounter / scale) % numStage;
+            bCounter++;  
+            
             if (!doneFollowing) { // First the coin follows the InteractiveTile's movement
                 ds = ds + 0.5;
                 y = (int) (y + ds);
                 if (ds >= 0)
                     doneFollowing = true;
             } else if (!reachedTop) { // After the InteractiveTile reaches the top, this coin continues to move at a constant speed. 
-                ds = -0.5;
-                y = (int) (y + ds); 
+                ds = -1;
+                if (bCounter % ay == 0)
+                    y = (int) (y + ds);
                 if (y <= initY - ES) {
                     reachedTop = true;
                     ds = 1;
@@ -101,9 +103,7 @@ public class Starman extends HiddenSprite {
                     if (dy > 1 && backoff > 0)
                         dy -= backoff;
                 }
-            } // end if (reaching the top)
-        bNum = (bCounter / scale) % 4;
-        bCounter++;  
+            } // end if (reaching the top)        
         
         // Update score location        
             if (scoreStr.isEmpty()){

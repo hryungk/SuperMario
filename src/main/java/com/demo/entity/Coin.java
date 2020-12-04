@@ -9,11 +9,7 @@ import main.java.com.demo.level.Level;
  *  Keeps the image of the sprite and the coordinates of the sprite.
     @author zetcode.com */
 public class Coin extends HiddenSprite {
-    
-    private int bCounter, bNum, scale;
-    public String scoreStr;
-    private double scoreX, scoreY;
-    
+        
     // The constructor initiates the x and y coordinates and the visible variable.
     public Coin(int x, int y, Level level) {
         super(x, y, level);
@@ -25,14 +21,13 @@ public class Coin extends HiddenSprite {
         xS = 0;
         yS = 4;         
         dx = 0;
-        dy = -2;
-        scale = 4;
-        score = 200;
+        dy = -2;        
         
         width = height = ES;
         wS = width / PPS;
         hS = height / PPS;
         
+        score = 200;
         scoreStr = "";
         scoreX = 0;
         scoreY = 0;
@@ -67,7 +62,7 @@ public class Coin extends HiddenSprite {
             if (y >= initY && reachedTop)
                 die(); // Make invisible
 
-            bNum = (bCounter / scale) % 4;
+            bNum = (bCounter / scale) % numStage;
             bCounter++;        
                         
             if (reachedTop && y >= initY - height || !isVisible())            

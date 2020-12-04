@@ -10,9 +10,7 @@ import main.java.com.demo.level.Level;
     @author zetcode.com */
 public class Flower extends HiddenSprite {
     
-    private int bCounter, bNum, scale;
-    private boolean doneFollowing, leftBlock;
-    private int y0Count;
+    private boolean doneFollowing;
     // The constructor initiates the x and y coordinates and the visible variable.
     public Flower(int x, int y, Level level) {
         super(x, y, level);
@@ -29,38 +27,39 @@ public class Flower extends HiddenSprite {
         scoreStr = "";
         scoreX = 0;
         scoreY = 0;
-        
-        scale = 4;
+                
         height = width = ES;
         wS = width / PPS;
         hS = height / PPS;
         
         doneFollowing = false;
-        leftBlock = false;
-        y0Count = 0;
         
     }
     
     /** Update method, (Look in the specific entity's class) */
     @Override
     public void tick() {   
-                
+                 
+        
         if (isActivated) {
-            if (!doneFollowing) { // First the coin follows the InteractiveTile's movement
+            bNum = (bCounter / scale) % numStage;
+            bCounter++;    
+            
+            if (!doneFollowing) { // First the flower follows the InteractiveTile's movement
                 ds = ds + 0.5;
                 y = (int) (y + ds);
                 if (ds >= 0)
                     doneFollowing = true;
-            } else if (!reachedTop) { // After the InteractiveTile reaches the top, this coin continues to move at a constant speed. 
-                ds = -0.5;
-                y = (int) (y + ds); 
+            } else if (!reachedTop) { // After the InteractiveTile reaches the top, this flower continues to move at a constant speed. 
+                ds = -1;
+                if (bCounter % ay == 0)
+                    y = (int) (y + ds); 
                 if (y <= initY - ES) {
                     reachedTop = true;
                     ds = 1;
                 }    
             } // end if (reaching the top)
-        bNum = (bCounter / scale) % 4;
-        bCounter++;  
+        
         
         // Update score location        
             if (scoreStr.isEmpty()){
@@ -85,7 +84,7 @@ public class Flower extends HiddenSprite {
                 int sw = screen.getSheet().width;   // width of sprite sheet (256)
                 int colNum = sw / PPS;    // Number of squares in a row (32)                   
 
-                int xSCur = xS + bNum * wS; // animation based on walk distance (0 is standing still and 2 is moving)                  
+                int xSCur = xS + bNum * wS; // animation through 4 different colors
 
                 for (int ys = 0; ys < hS; ys++) {
                     for (int xs = 0; xs < wS; xs++) {

@@ -36,6 +36,8 @@ public abstract class Sprite extends Entity {
     protected String scoreStr;  // score in string
     protected double scoreX, scoreY;    // location of the score string
     protected int yFin; // final location of y
+        
+    protected int bCounter, bNum, scale, numStage, ay;    // for color change animation
     // The constructor initiates the x and y coordinates and the visible variable.
     public Sprite(Level level) {
         super();
@@ -52,6 +54,10 @@ public abstract class Sprite extends Entity {
         lives = 1;   
         
         ySpeed = 1; // By default, sprites are under gravity
+        
+        scale = 8;  // Higher the number, slower the transition.
+        numStage = 4;   // Number of color schemes
+        ay = 2; // higher the number, slower the y movement when sprung out of the block
     }
     
     /** Update method, (Look in the specific entity's class) */

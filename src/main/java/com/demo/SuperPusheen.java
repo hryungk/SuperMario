@@ -374,7 +374,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         // Show the stats
         int PPS = Commons.PPS;        
         String[] stringList = {"SCORE", "COINS", "WORLD", "TIME", "LIVES"};
-        int[] numList = {player.score, numCoins, level.getWorld(), timeLeft, player.getLives()};
+        int[] numList = {player.getScore(), numCoins, level.getWorld(), timeLeft, player.getLives()};
         int secLen = B_WIDTH / stringList.length;  // Width of each section, 300 / 5 = 60 
         int yGap = 2;
         for (int i = 0; i < stringList.length; i++) {
