@@ -1,4 +1,4 @@
-package main;
+package main.java.com.demo;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;

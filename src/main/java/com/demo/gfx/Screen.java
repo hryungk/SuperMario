@@ -1,6 +1,6 @@
-package main.gfx;
+package main.java.com.demo.gfx;
 
-import main.Commons;
+import main.java.com.demo.Commons;
 
 public class Screen {
     public int xOffset; // the x offset of the screen [pixel].

@@ -1,4 +1,4 @@
-package main;
+package main.java.com.demo;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,18 +18,11 @@ import javax.swing.JPanel;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
-import main.entity.Pipe;
-import main.entity.Player;
-
-import main.entity.Entity;
-import main.gfx.Screen;
-import main.entity.Block;
-import main.entity.GBlock;
-import main.gfx.Font;
-import main.gfx.SpriteSheet;
-import main.level.Level;
-import main.level.tile.Tile;
-import main.screen.*;
+import main.java.com.demo.screen.*;
+import main.java.com.demo.entity.*;
+import main.java.com.demo.gfx.*;
+import main.java.com.demo.level.Level;
+import main.java.com.demo.level.tile.Tile;
 
 
 /** A class including the game logic for Space Invaders game. 
@@ -41,7 +34,7 @@ public class SuperPusheen extends JPanel implements Runnable {
     
     private Dimension d;     
     private Level level; // This is the current level you are on.    
-    private List<Entity> grounds, pipes, blocks, bricks, qbricks;
+    private List<Entity> grounds, pipes, blocks;
     public Player player;
     
     private Screen screen; // Creates the main screen
@@ -50,6 +43,7 @@ public class SuperPusheen extends JPanel implements Runnable {
     
     private int deaths = 0;
     public int gameTime; // Main value in the timer used on the dead screen.
+    public int timeLeft;    // Time left before the game is over.
     private int playerDeadTime; // the paused time when you die before the dead menu shows up.
     private int pendingLevelChange; // used to determined if the player should change levels or not.
     private int wonTimer; // the paused time when you win before the win menu shows up.
@@ -123,7 +117,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         /* This sets up the screens, loads the icons.png spritesheet. */
         screen = new Screen(B_WIDTH, B_HEIGHT, new SpriteSheet(
                     ImageIO.read(SuperPusheen.class.getResourceAsStream(
-                            "/iconsPusheen.png"))));  
+                            "/main/resources/iconsPusheen.png"))));  
         
         image = new BufferedImage(B_WIDTH, B_HEIGHT, BufferedImage.TYPE_INT_RGB);
 //        WritableRaster wr = image.getRaster();  // Returns raster object.
@@ -134,7 +128,7 @@ public class SuperPusheen extends JPanel implements Runnable {
                 
         // Load background image.
 //        source = ImageIO.read(Board.class.getResourceAsStream("/bg_noObj.png")); 
-        String path = "src/bg_1-1.png";
+        String path = "src/main/resources/bg_1-1.png";
         source = ImageIO.read(new File(path));
         sourcePixels = ImageTool.convertTo2D(source);        
         numTileX = source.getWidth() / ES;  // 224
@@ -251,49 +245,6 @@ public class SuperPusheen extends JPanel implements Runnable {
             }
         }
         
-//        /* Add bricks. */                
-//        int[][] BRPOS = Commons.BRPOS;
-//        bricks = new ArrayList<>(BRPOS.length);
-//        for (int[] a : BRPOS) {
-//            // Loops through the height of the map
-//            int x0 = a[0]; // x position
-//            int y = a[1]; // y position
-//            int bNum = a[2]; // number of bricks in this row
-//            for (int xi = 0; xi < bNum; xi++) {
-//                int x = x0 + xi * ES;
-//                GeneralBrick brick = new GeneralBrick(x, y);
-//                bricks.add(brick);
-//                int[][] brickPixels = ImageTool.convertTo2D(brick.getImage());
-//                // Add the pipe to the background.
-//                for (int j = 0; j < brick.getWidth(); j++) {
-//                    for (int i = 0; i < brick.getHeight(); i++) {                            
-//                        sourcePixels[i+brick.getY()][j+brick.getX()] = brickPixels[i][j];
-//                    }
-//                }    
-//            }
-//        }
-//        
-//        /* Add question bricks. */
-//        int[][] QBRPOS = Commons.QBRPOS;
-//        qbricks = new ArrayList<>(QBRPOS.length);
-//        for (int[] a : QBRPOS) {
-//            // Loops through the height of the map
-//            int x0 = a[0];
-//            int y = a[1];
-//            int bNum = a[2];
-//            for (int xi = 0; xi < bNum; xi++) {
-//                int x = x0 + xi * ES;
-//                QBrick qb = new QBrick(x, y);
-//                qbricks.add(qb);
-//                int[][] qbrickPixels = ImageTool.convertTo2D(qb.getImage());
-//                // Add the pipe to the background.
-//                for (int j = 0; j < qb.getWidth(); j++) {
-//                    for (int i = 0; i < qb.getHeight(); i++) {                            
-//                        sourcePixels[i+qb.getY()][j+qb.getX()] = qbrickPixels[i][j];
-//                    }
-//                }    
-//            }
-//        }        
         
         /* Add background to the current screen. */
         int xOffset = screen.xOffset; // offset of the screen from y = 0        
@@ -313,7 +264,8 @@ public class SuperPusheen extends JPanel implements Runnable {
         playerDeadTime = 0;
         wonTimer = 0;
         gameTime = 0;
-        hasWon = false;  
+        hasWon = false; 
+        numCoins = 0;
         
         level = new Level(numTileX, numTileY, levelNum, 400); // creates the map        
         tiles = level.tileIds;        
@@ -342,15 +294,17 @@ public class SuperPusheen extends JPanel implements Runnable {
         playerDeadTime = 0;
         wonTimer = 0;
         gameTime = 0;
-        hasWon = false;   
+        hasWon = false;  
         
         level = new Level(numTileX, numTileY, levelNum, 400); // creates the map                
         player.level = level;
         player.initPlayer();
-        level.add(player);
+        level.add(player);        
         
-        // Create aliens.        
+        // Create aliens and hidden sprites.        
         level.spawn();                
+        if (player.isEnlarged())
+            level.mushroom2Flower();    // change mushrooms to flowers.
         
         /* Initialize the screen pixels as the background. */     
         int count = 0;
@@ -420,20 +374,20 @@ public class SuperPusheen extends JPanel implements Runnable {
         // Show the stats
         int PPS = Commons.PPS;        
         String[] stringList = {"SCORE", "COINS", "WORLD", "TIME", "LIVES"};
-        int[] numList = {player.score, numCoins, level.getWorld(), (level.getTimeLim() - gameTime/60), player.getLives()};
+        int[] numList = {player.score, numCoins, level.getWorld(), timeLeft, player.getLives()};
         int secLen = B_WIDTH / stringList.length;  // Width of each section, 300 / 5 = 60 
         int yGap = 2;
         for (int i = 0; i < stringList.length; i++) {
             // Draw section names.
             String str = stringList[i];
             int strLen = str.length() * PPS;
-            Font.draw(str, screen, (secLen - strLen)/2 + secLen * i, yGap, main.gfx.Color.WHITE);
+            Font.draw(str, screen, (secLen - strLen)/2 + secLen * i, yGap, main.java.com.demo.gfx.Color.WHITE);
             // Draw corresponding values.
             String numStr = Integer.toString(numList[i]);
             if (i == 2) // Adjust world string.
                 numStr += "-" + level.getStage();
             int numStrLen = numStr.length() * PPS;
-            Font.draw(numStr, screen, (secLen - numStrLen)/2 + secLen * i, yGap + PPS + yGap, main.gfx.Color.WHITE);
+            Font.draw(numStr, screen, (secLen - numStrLen)/2 + secLen * i, yGap + PPS + yGap, main.java.com.demo.gfx.Color.WHITE);
         }
         
         //if there is an active menu, then it will render it.
@@ -507,7 +461,13 @@ public class SuperPusheen extends JPanel implements Runnable {
         if (!hasFocus()) {
                 input.releaseAll(); // If the player is not focused on the screen, then all the current inputs will be set to off (well up).
         } else {
-            if (!player.removed && !hasWon && menu == null) gameTime++; //increases tickCount by 1, this is used for the timer on the death screen.
+            if (!player.removed && !hasWon && menu == null) {//increases tickCount by 1, this is used for the timer on the death screen.
+                gameTime++;
+                timeLeft = level.getTimeLim() - 2 * gameTime/60;
+            } 
+            
+            if (timeLeft <= 0)
+                player.hurt(player.health);
             
             input.tick(); // calls the tick() method in InputHandler.java            
             

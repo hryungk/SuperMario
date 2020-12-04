@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.level.tile;
+package main.java.com.demo.level.tile;
 
-import main.entity.Entity;
-import main.entity.Sprite;
-import main.gfx.Screen;
-import main.level.Level;
+import main.java.com.demo.entity.Entity;
+import main.java.com.demo.gfx.Screen;
+import main.java.com.demo.level.Level;
 
 /**
  *

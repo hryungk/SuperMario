@@ -1,65 +1,121 @@
-package main.entity;
+package main.java.com.demo.entity;
 
-import main.Commons;
-import main.gfx.Screen;
-import main.level.Level;
+import main.java.com.demo.Commons;
+import main.java.com.demo.gfx.Color;
+import main.java.com.demo.gfx.Font;
+import main.java.com.demo.gfx.Screen;
+import main.java.com.demo.level.Level;
 
 /** Represents a sprite.
  *  Keeps the image of the sprite and the coordinates of the sprite.
     @author zetcode.com */
 public class Starman extends HiddenSprite {
     
-    private int initY;
-    private boolean reachedTop;
     private int bCounter, bNum, scale;
-    protected double ds, dsInit;
-    
+    private boolean doneFollowing, leftBlock;
+    private int y0Count;
     // The constructor initiates the x and y coordinates and the visible variable.
     public Starman(int x, int y, Level level) {
         super(x, y, level);
-        this.x = x;
-        this.y = y;
         initCoin();
     }    
     
     private void initCoin() {
         initY = y;
-        xS = 0;
-        yS = 17;         
-        dx = 0;
-        dy = -2;
-        reachedTop = false;
+        xS = 8;
+        yS = 4;         
+        dx = 1;
         scale = 4;
-        wS = 2;
-        hS = 2;        
-        dsInit = Commons.ITV0 - 0.5; // -3
-        ds = dsInit; 
+        height = width = ES;
+        wS = width / PPS;
+        hS = height / PPS;
+        
+        score = 1000; 
+        scoreStr = "";
+        scoreX = 0;
+        scoreY = 0;
+        
+        doneFollowing = false;
+        leftBlock = false;
+        y0Count = 0;
     }
     
     /** Update method, (Look in the specific entity's class) */
+    @Override
     public void tick() {   
                 
         if (isActivated) {
-            if (ds < 0) { // First the coin follows the InteractiveTile's movement
+            if (!doneFollowing) { // First the coin follows the InteractiveTile's movement
                 ds = ds + 0.5;
                 y = (int) (y + ds);
-            } else {    // After the InteractiveTile reaches the top, this coin continues to move at a constant speed. 
-                if (y <= initY) {
-                    if (y <= initY - 3 * ES && !reachedTop) {
-                        reachedTop = true;
-                        dy = -dy;
-                    }
-                    y += dy;  
+                if (ds >= 0)
+                    doneFollowing = true;
+            } else if (!reachedTop) { // After the InteractiveTile reaches the top, this coin continues to move at a constant speed. 
+                ds = -0.5;
+                y = (int) (y + ds); 
+                if (y <= initY - ES) {
+                    reachedTop = true;
+                    ds = 1;
+                }    
+            } else if (!leftBlock) {                
+                move(dx, dy);     // Updates x and y.
+                if (!grounded)
+                    leftBlock = true;
+            } else { // Move normally
+                                
+                boolean stopped = !move(dx, dy);     // Updates x and y.
+
+                if (stopped && dx != 0)    // Has met a wall
+                    dx = - dx;                                       
+
+                /* Update visibility on the screen. */
+                int offset = level.getOffset();
+                if (x <= 0)
+                    remove();        
+                else if (x+width <= offset || offset + Commons.BOARD_WIDTH <= x)
+                    remove();     
+
+                if (y > Commons.BOARD_HEIGHT)
+                    remove();     
+                
+                /* Update y position. */
+                double g = 3.125;  // gravitational force        
+
+                if (grounded)
+                    ds = -g;
+                else if (topped || y0Count >= (int) (1.0/0.125 / 2)) { // This is so that 0 velocity doesn't occur for a long time.
+                    ds = 1;
+                    y0Count = 0;    // Reset the count for the next leap
                 }
-            }        
+                else if (y + height + ds < Commons.BOARD_HEIGHT)
+                    ds = ds + 0.125;                
 
-            if (y >= initY && reachedTop)
-                remove();
+                dy = (int) ds;
+                
+                if (dy == 0) y0Count++; // This is so that 0 velocity doesn't occur for a long time.
 
-            bNum = (bCounter / scale) % 4;
-            bCounter++;        
-//            System.out.print("Starman's y = " + y);
-        }
+                // Adjust dy when facing a ground tile.
+                if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
+                    int yt1 = y + dy + ES;
+                    int backoff = yt1 - (yt1 >> unit) * ES;
+                    if (dy > 1 && backoff > 0)
+                        dy -= backoff;
+                }
+            } // end if (reaching the top)
+        bNum = (bCounter / scale) % 4;
+        bCounter++;  
+        
+        // Update score location        
+            if (scoreStr.isEmpty()){
+                scoreX = x + width;
+                scoreY = y + height - PPS;
+                yFin = y + height - PPS;
+            } else {    // has died and printing score on the screen during deathTime.
+                scoreY = scoreY - 0.5;
+                if (scoreY < yFin - 2 * height)
+                    remove();
+            }     
+        } // end if(isActivated)         
     }    
 
     /** Draws the sprite on the screen
@@ -67,17 +123,33 @@ public class Starman extends HiddenSprite {
     public void render(Screen screen) {
                 
         if (isActivated) {
-            int sw = screen.getSheet().width;   // width of sprite sheet (256)
-            int PPS = Commons.PPS;
-            int colNum = sw / PPS;    // Number of squares in a row (32)                   
+            if (isVisible()) {
+                int sw = screen.getSheet().width;   // width of sprite sheet (256)
+                int colNum = sw / PPS;    // Number of squares in a row (32)                   
 
-            int xSCur = xS + bNum * wS; // animation based on walk distance (0 is standing still and 2 is moving)                  
+                int xSCur = xS + bNum * wS; // animation based on walk distance (bNum cycles through 0-3.)                  
 
-            for (int ys = 0; ys < hS; ys++) {
-                for (int xs = 0; xs < wS; xs++) {
-                    screen.render(x + xs * PPS, y + ys * PPS, (xSCur + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to render them all on the screen.                    
+                for (int jj = 0; jj < hS; jj++) {
+                    for (int ii = 0; ii < wS; ii++) {
+                        screen.render(x + ii * PPS, y + jj * PPS, (xSCur + ii) + (yS + jj) * colNum, 0); // Loops through all the squares to render them all on the screen.                    
+                    }
                 }
             }
+            
+            // Render score location once died
+            if (!scoreStr.isEmpty()){
+                Font.draw(scoreStr, screen, (int)scoreX, (int)scoreY, Color.WHITE);
+            }   
         }
-    }    
+    }
+   
+    @Override
+    protected void touchedBy(Sprite sprite) {     
+        super.touchedBy(sprite);
+        if (sprite instanceof Player && isActivated && firstTime) {
+            ((Player)sprite).eatStarman(score);
+            scoreStr = Integer.toString(score);
+            firstTime = false;            
+        }
+    }
 }

@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.level.tile;
+package main.java.com.demo.level.tile;
 
-import main.Commons;
-import main.entity.Entity;
-import main.gfx.Screen;
-import main.level.Level;
+import main.java.com.demo.Commons;
+import main.java.com.demo.entity.Entity;
+import main.java.com.demo.gfx.Screen;
+import main.java.com.demo.level.Level;
 
 /**
  *
@@ -93,6 +93,7 @@ public class QuestionBrickTile extends InteractiveTile {
 //            System.out.println("  QBrick's y = " + y);
     }
     
+    @Override
     public void hurt() {
         if (!isHitBottom) {
             super.hurt();

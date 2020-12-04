@@ -1,40 +1,36 @@
-package main.entity;
+package main.java.com.demo.entity;
 
-import main.Commons;
-import main.gfx.Screen;
-import main.level.Level;
+import main.java.com.demo.Commons;
+import main.java.com.demo.gfx.Color;
+import main.java.com.demo.gfx.Font;
+import main.java.com.demo.gfx.Screen;
+import main.java.com.demo.level.Level;
 
 /** Represents a sprite.
  *  Keeps the image of the sprite and the coordinates of the sprite.
     @author zetcode.com */
 public class Mushroom extends HiddenSprite {
     
-    private int initY;
-    private boolean reachedTop;
-    private int bCounter, bNum, scale;
-    protected double ds, dsInit;
-    
-    // The constructor initiates the x and y coordinates and the visible variable.
     public Mushroom(int x, int y, Level level) {
-        super(x, y, level);
-        this.x = x;
-        this.y = y;
+        super(x, y, level);        
         initCoin();
     }    
     
     private void initCoin() {
         initY = y;
         xS = 0;
-        yS = 19;         
-        dx = 0;
-        dy = -2;
-        reachedTop = false;
-        scale = 4;
-        wS = 2;
-        hS = 2;        
-        dsInit = Commons.ITV0 - 0.5; // -3
-        ds = dsInit; 
-        score = 1000;
+        yS = 8;         
+        dx = 2;
+        dy = -1;
+        
+        width = height = ES;
+        wS = width / PPS;
+        hS = height / PPS;
+        
+        score = 1000; 
+        scoreStr = "";
+        scoreX = 0;
+        scoreY = 0;
     }
     
     /** Update method, (Look in the specific entity's class) */
@@ -45,43 +41,94 @@ public class Mushroom extends HiddenSprite {
                 ds = ds + 0.5;
                 y = (int) (y + ds);
             } else {    // After the InteractiveTile reaches the top, this coin continues to move at a constant speed. 
-                if (y <= initY) {
-                    if (y <= initY - 3 * ES && !reachedTop) {
+                ds = -0.5;
+                if (!reachedTop) {                    
+                    y = (int) (y + ds); 
+                    if (y <= initY - ES) {
                         reachedTop = true;
                         dy = -dy;
-                    }
-                    y += dy;  
-                }
-            }        
+                    }                    
+                } else { // Move normally
+                    /* Update y position. */
+                    int oldY = y;
+                    boolean stopped = !move(dx, dy);     // Updates x and y.
 
-            if (y >= initY && reachedTop)
-                remove();
-     
-//            System.out.print("Mushroom's y = " + y);
-        }
+                    if (stopped && dx != 0)    // Has met a wall
+                        dx = - dx;                                       
+
+                    // Update visibility on the screen.
+                    int offset = level.getOffset();
+                    if (x <= 0)
+                        hurt(health);        
+                    else if (x+width <= offset && offset + Commons.BOARD_WIDTH <= x)
+                        setVisible(false);     
+
+                    if (y > Commons.BOARD_HEIGHT)
+                        remove();            
+
+                    // When falling, add acceleration to y.
+                    int effDy = y - oldY;
+                    if (effDy != 0) // actual y displacement
+                        dy++;            
+                    else
+                        dy = ySpeed; // By default, there is gravity.
+
+                    // Adjust dy when facing a ground tile.
+                    if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
+                        int yt1 = y + dy + ES;
+                        int backoff = yt1 - (yt1 >> 4) * 16;
+                        if (backoff > 1)
+                            dy -= backoff;
+                    }   
+                } // end if (reaching the top)
+            } // end if (following the InteractiveTile)
+            
+            // Update score location        
+            if (scoreStr.isEmpty()){
+                scoreX = x + width;
+                scoreY = y + height - PPS;
+                yFin = y + height - PPS;
+            } else {    // has died and printing score on the screen during deathTime.
+                scoreY = scoreY - 0.5;
+                if (scoreY < yFin - 2 * height)
+                    remove();
+            }     
+        } // end if(isActivated)
     }    
 
     /** Draws the sprite on the screen
      * @param screen The screen to be displayed on. */
+    @Override
     public void render(Screen screen) {
                 
         if (isActivated) {
-            int sw = screen.getSheet().width;   // width of sprite sheet (256)
-            int PPS = Commons.PPS;
-            int colNum = sw / PPS;    // Number of squares in a row (32)                   
+            if (isVisible()) {
+                int sw = screen.getSheet().width;   // width of sprite sheet (256)
+                int colNum = sw / PPS;    // Number of squares in a row (32)         
+                int flip = 0; // dx > 0
+                if (dir == 2) // dx < 0
+                    flip = 1;
 
-            for (int ys = 0; ys < hS; ys++) {
-                for (int xs = 0; xs < wS; xs++) {
-                    screen.render(x + xs * PPS, y + ys * PPS, (xS + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to render them all on the screen.                    
-                }
+                screen.render(x + PPS * flip, y, xS + yS * colNum, flip); // render the top-left part of the sprite         
+                screen.render(x - PPS * flip + PPS, y, (xS + 1) + yS * colNum, flip);  // render the top-right part of the sprite
+                screen.render(x + PPS * flip, y + PPS, xS + (yS + 1) * colNum, flip); // render the bottom-left part of the sprite
+                screen.render(x - PPS * flip + PPS, y + PPS, xS + 1 + (yS + 1) * colNum, flip); // render the bottom-right part of the sprite
             }
+            
+            // Render score location once died
+            if (!scoreStr.isEmpty()){
+                Font.draw(scoreStr, screen, (int)scoreX, (int)scoreY, Color.WHITE);
+            }   
         }
     }    
     
     @Override
-    protected void touchedBy(Sprite sprite) {
+    protected void touchedBy(Sprite sprite) {     
         super.touchedBy(sprite);
-        if (isActivated)
-            level.player.score += score;
+        if (sprite instanceof Player && isActivated && firstTime) {
+            ((Player)sprite).eatMushroom(score);
+            scoreStr = Integer.toString(score);
+            firstTime = false;            
+        }
     }
 }

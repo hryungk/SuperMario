@@ -1,7 +1,7 @@
-package main.gfx;
+package main.java.com.demo.gfx;
 
 import java.awt.image.BufferedImage;
-import main.ImageTool;
+import main.java.com.demo.ImageTool;
 
 public class SpriteSheet {
     public int width, height; // width and height of the sprite sheet

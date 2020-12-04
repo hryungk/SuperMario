@@ -1,4 +1,4 @@
-package main.gfx;
+package main.java.com.demo.gfx;
 
 public class Color {
 

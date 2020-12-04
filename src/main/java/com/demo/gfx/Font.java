@@ -1,6 +1,6 @@
-package main.gfx;
+package main.java.com.demo.gfx;
 
-import main.Commons;
+import main.java.com.demo.Commons;
 
 public class Font {
     /* This is all the characters that will be translated to the screen. (The spaces are important). 

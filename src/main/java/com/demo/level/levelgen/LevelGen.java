@@ -1,6 +1,6 @@
-package main.level.levelgen;
+package main.java.com.demo.level.levelgen;
 
-import main.entity.Player;
+import main.java.com.demo.entity.Player;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -9,12 +9,12 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import main.SuperPusheen;
-import main.Commons;
-import main.level.tile.BrickTile;
-import main.level.tile.InteractiveTile;
-import main.level.tile.QuestionBrickTile;
-import main.level.tile.Tile;
+import main.java.com.demo.SuperPusheen;
+import main.java.com.demo.Commons;
+import main.java.com.demo.level.tile.BrickTile;
+import main.java.com.demo.level.tile.InteractiveTile;
+import main.java.com.demo.level.tile.QuestionBrickTile;
+import main.java.com.demo.level.tile.Tile;
 
 public class LevelGen {
     

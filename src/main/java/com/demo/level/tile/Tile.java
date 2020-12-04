@@ -1,11 +1,11 @@
-package main.level.tile;
+package main.java.com.demo.level.tile;
 
 import java.util.Random;
-import main.entity.Entity;
-import main.entity.Player;
-import main.entity.Sprite;
-import main.gfx.Screen;
-import main.level.Level;
+import main.java.com.demo.entity.Entity;
+import main.java.com.demo.entity.Player;
+import main.java.com.demo.entity.Sprite;
+import main.java.com.demo.gfx.Screen;
+import main.java.com.demo.level.Level;
 
 public abstract class Tile {
     public static int tickCount = 0; //A global tickCount used in the Lava & water tiles.
@@ -42,7 +42,7 @@ public abstract class Tile {
             return false;
     }
      /** Returns if the player can walk on it, overrides in sub-classes  */
-    public boolean mayPass(int x, int y, Entity e) {
+    public boolean mayPass() {
         return false;
     }    
     /** What happens when a Sprite steps on the tile. */

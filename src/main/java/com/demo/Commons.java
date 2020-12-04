@@ -1,4 +1,4 @@
-package main;
+package main.java.com.demo;
 
 
 public interface Commons {
@@ -23,7 +23,7 @@ public interface Commons {
    
     int Y96 = BOARD_HEIGHT - 96;  // y-position at 240-96 = 144
     int Y160 = BOARD_HEIGHT - 160; // y-position at 240-160 = 80
-    int SPE = 100;  // Score per enemy
+    
     double ITV0 = -2.5; // beginning speed of the interactive tiles when hit.
     
     // Ground map
@@ -73,7 +73,7 @@ public interface Commons {
     
     // Initial position of coins.
     int[][] CPOS = { //{x position, y position}
-        {256, Y96}, {352, Y160}, {368, Y96}, {1504, Y96}, {1504, Y96}, {1504, Y160}, 
+        {256, Y96}, {352, Y160}, {368, Y96}, {1504, Y96}, {1504, Y160}, 
         {1696, Y96}, {1744, Y96}, {1792, Y96}, {2064, Y160}, {2080, Y160}, {2720, Y96}
     };  
     

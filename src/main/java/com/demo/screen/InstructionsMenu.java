@@ -1,8 +1,8 @@
-package main.screen;
+package main.java.com.demo.screen;
 
-import main.gfx.Color;
-import main.gfx.Font;
-import main.gfx.Screen;
+import main.java.com.demo.gfx.Color;
+import main.java.com.demo.gfx.Font;
+import main.java.com.demo.gfx.Screen;
 
 public class InstructionsMenu extends Menu {
 	private Menu parent; // Creates a parent object to go back to

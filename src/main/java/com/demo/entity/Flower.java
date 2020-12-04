@@ -8,14 +8,13 @@ import main.java.com.demo.level.Level;
 /** Represents a sprite.
  *  Keeps the image of the sprite and the coordinates of the sprite.
     @author zetcode.com */
-public class Coin extends HiddenSprite {
+public class Flower extends HiddenSprite {
     
     private int bCounter, bNum, scale;
-    public String scoreStr;
-    private double scoreX, scoreY;
-    
+    private boolean doneFollowing, leftBlock;
+    private int y0Count;
     // The constructor initiates the x and y coordinates and the visible variable.
-    public Coin(int x, int y, Level level) {
+    public Flower(int x, int y, Level level) {
         super(x, y, level);
         initCoin();
     }    
@@ -23,19 +22,23 @@ public class Coin extends HiddenSprite {
     private void initCoin() {
         initY = y;
         xS = 0;
-        yS = 4;         
+        yS = 6;         
         dx = 0;
-        dy = -2;
-        scale = 4;
-        score = 200;
         
-        width = height = ES;
-        wS = width / PPS;
-        hS = height / PPS;
-        
+        score = 1000; 
         scoreStr = "";
         scoreX = 0;
         scoreY = 0;
+        
+        scale = 4;
+        height = width = ES;
+        wS = width / PPS;
+        hS = height / PPS;
+        
+        doneFollowing = false;
+        leftBlock = false;
+        y0Count = 0;
+        
     }
     
     /** Update method, (Look in the specific entity's class) */
@@ -43,53 +46,40 @@ public class Coin extends HiddenSprite {
     public void tick() {   
                 
         if (isActivated) {
-            
-            if (firstTime) {
-                level.player.score += score; // gives the player 100 points of score
-                level.player.addCoinCount();
-                firstTime = false;
-            }
-            
-            
-            if (ds < 0) { // First the coin follows the InteractiveTile's movement
+            if (!doneFollowing) { // First the coin follows the InteractiveTile's movement
                 ds = ds + 0.5;
                 y = (int) (y + ds);
-            } else {    // After the InteractiveTile reaches the top, this coin continues to move at a constant speed. 
-                if (y <= initY) {
-                    if (y <= initY - 3 * ES && !reachedTop) {
-                        reachedTop = true;
-                        dy = -dy;
-                    }
-                    y += dy;  
-                }                
-            }        
-
-            if (y >= initY && reachedTop)
-                die(); // Make invisible
-
-            bNum = (bCounter / scale) % 4;
-            bCounter++;        
-                        
-            if (reachedTop && y >= initY - height || !isVisible())            
-                scoreStr = Integer.toString(score);
-            
-            // Update score location        
+                if (ds >= 0)
+                    doneFollowing = true;
+            } else if (!reachedTop) { // After the InteractiveTile reaches the top, this coin continues to move at a constant speed. 
+                ds = -0.5;
+                y = (int) (y + ds); 
+                if (y <= initY - ES) {
+                    reachedTop = true;
+                    ds = 1;
+                }    
+            } // end if (reaching the top)
+        bNum = (bCounter / scale) % 4;
+        bCounter++;  
+        
+        // Update score location        
             if (scoreStr.isEmpty()){
-                scoreX = x + ES;
-                scoreY = y + ES - PPS;
+                scoreX = x + width;
+                scoreY = y + height - PPS;
+                yFin = y + height - PPS;
             } else {    // has died and printing score on the screen during deathTime.
-//                scoreX = scoreX + 0.5;
                 scoreY = scoreY - 0.5;
-                if (scoreY < y - 2 * ES)
+                if (scoreY < yFin - 2 * height)
                     remove();
             }     
-        }
+        } // end if(isActivated)         
     }    
 
     /** Draws the sprite on the screen
      * @param screen The screen to be displayed on. */
     @Override
-    public void render(Screen screen) {                
+    public void render(Screen screen) {
+                
         if (isActivated) {
             if (isVisible()) {
                 int sw = screen.getSheet().width;   // width of sprite sheet (256)
@@ -107,7 +97,17 @@ public class Coin extends HiddenSprite {
             // Render score location once died
             if (!scoreStr.isEmpty()){
                 Font.draw(scoreStr, screen, (int)scoreX, (int)scoreY, Color.WHITE);
-            }        
+            }   
         }
     }
+
+    @Override
+    protected void touchedBy(Sprite sprite) {     
+        super.touchedBy(sprite);
+        if (sprite instanceof Player && isActivated && firstTime) {
+            ((Player)sprite).eatFlower(score);
+            scoreStr = Integer.toString(score);
+            firstTime = false;
+        }
+    }        
 }

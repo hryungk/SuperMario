@@ -1,15 +1,11 @@
-package main.entity;
+package main.java.com.demo.entity;
 
-import main.Commons;
+import main.java.com.demo.Commons;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-import main.SuperPusheen;
-import main.InputHandler;
-import main.gfx.Screen;
-import main.level.Level;
+import main.java.com.demo.SuperPusheen;
+import main.java.com.demo.InputHandler;
+import main.java.com.demo.gfx.Screen;
+import main.java.com.demo.level.Level;
 
 /** Represents a player as a sprite.
  *  Keeps the image of the sprite and the coordinates of the sprite.
@@ -20,36 +16,30 @@ public class Player extends Sprite {
     public int score; // the player's score
     private SuperPusheen game;
     public int invulnerableTime = 0; // the invulnerability time the player has when he is hit
+    public int immortalTime = 0; // the immortal time the player has when it eats the starman.
     private double ds;  // y velocity     
-    private boolean crushedAlien;
+    private boolean crushedAlien, enlarged, fired, immortal;
+    private int bCounter, bNum, scale;
     
     public Player(InputHandler input, Level level, SuperPusheen board) {                
         super(level);
         game = board;
         this.input = input;                
-        xS = 4;
-        yS = 2;        
+        xS = 0;
+        yS = 10;        
         lives = 3;
         
+        scale = 4;
+        width = height = ES;
+        wS = width / PPS;
+        hS = height / PPS;
+        unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
+        aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
         initPlayer();
     }    
     
     public void initPlayer() {
        
-        String playerImg = "src/Pusheen_Right.png";                      
-       
-        try {
-            BufferedImage source = ImageIO.read(new File(playerImg));
-//            BufferedImage source = ImageIO.read(Board.class.getResourceAsStream("/Pusheen_Right.png"));
-            setImage(source);
-        } catch (IOException ex) {
-            String msg = String.format("No such file found: %s", ex.getMessage());
-            System.out.println(msg);
-        }
-        
-//        var ii = new ImageIcon(playerImg);        
-//        width = ii.getImage().getWidth(null);
-        
         // Initial coordinates of the player sprite.
         int START_X = Commons.PLAYER_XI;
         setX(START_X);
@@ -61,16 +51,14 @@ public class Player extends Sprite {
         dir = 3;    // facing right when first created
         
         xSpeed = 2;
-        ySpeed = 2;
+//        ySpeed = 2;
         
         dx = 0;
         dy = ySpeed;
         ds = 0;
         score = 0;
         
-        crushedAlien = false;
-        
-        unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
+        crushedAlien = false;   
     }    
         
     // Positions the player in horizontal direction.
@@ -79,6 +67,11 @@ public class Player extends Sprite {
         super.tick();
         
         if (invulnerableTime > 0) invulnerableTime--; // if invulnerableTime is above 0, then minus it by 1.
+        if (immortalTime > 0) { // if immortalTime is above 0, 
+            immortalTime--; // minus it by 1.         
+            bNum = (bCounter / scale) % 4;
+            bCounter++;          
+        }
 //        int xa = 0; // x acceleration
 //        int ya = 0; // y acceleration
 //        if (input.jump.down) 
@@ -107,11 +100,11 @@ public class Player extends Sprite {
         else if (topped) {
             ds = 1;
         }
-        else if (y + ds + height < Commons.BOARD_HEIGHT)
+        else if (y + height + ds < Commons.BOARD_HEIGHT)
             ds = ds + 0.5;
         
         if (input.jump.clicked && grounded)
-             ds = -g;
+            ds = -g;
         if (crushedAlien) {
             ds = -3;
             crushedAlien = false;
@@ -120,8 +113,8 @@ public class Player extends Sprite {
         dy = (int) ds;
         
         if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
-            int yt1 = y + dy + ES;
-            int backoff = yt1 - (yt1 >> 4) * 16;
+            int yt1 = y + dy + height;
+            int backoff = yt1 - (yt1 >> 4) * ES;
             if (dy > 1 && backoff > 0)
                 dy -= backoff;
         }
@@ -170,8 +163,11 @@ public class Player extends Sprite {
 //        else
 //            hurt(health);
         move(dx, dy);
-        if (y > Commons.BOARD_HEIGHT)
-            hurt(health);
+        if (y > Commons.BOARD_HEIGHT) { // When falls to the bottom
+//            hurt(health);
+            lives--;
+            resetGame();
+        }
                 
         int xScroll = level.getOffset();
         if (x <= xScroll) // left end in the middle of the game
@@ -180,8 +176,9 @@ public class Player extends Sprite {
 //        System.out.print("dx = " + dx + ", x = " + x + ", ");
 //        System.out.println("dy = " + dy + ", y = " + y);
         
-        // Add a shot
-        if (input.attack.clicked) {
+
+        /* Add a shot. */
+        if (fired && input.attack.clicked) {
             Shot shot = new Shot(level);
             int dxShot = 0;
             int xShot = 0;
@@ -202,41 +199,81 @@ public class Player extends Sprite {
     }       
     
     /** What happens when the player touches an entity. */
+    @Override
     protected void touchedBy(Sprite sprite) {
-        if (sprite instanceof Alien) { // if the entity is not a player.
-            sprite.touchedBy(this); // calls the touchedBy() method in the entity's class            
+        if (sprite instanceof Alien)  {// if the sprite is an enemy
+//            sprite.touchedBy(this); // calls the touchedBy() method in the sprite's class            
+            if (enlarged) {
+                width /= 2;
+                height /= 2;
+                wS = width / PPS;
+                hS = height / PPS;
+                unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (5 for 32 px, 4 for 16 px sprite, and 3 for 8px sprite)
+                aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
+                yS -= 4;
+                enlarged = false;
+                level.flower2Mushroom();    // change flowers back to mushrooms.
+                if (fired) {
+                    yS -= 8;
+                    fired = false;
+                }
+            }
         }
+        if (sprite instanceof HiddenSprite)
+            sprite.touchedBy(this);
     }
     
     @Override
     public void render(Screen screen) {
-        int xt = xS;
-        // Becomes 1 every other square (8 pixels)
-        int flip1 = (walkDist >> 3) & 1; // This will either be a 1 or a 0 depending on the walk distance (Used for walking effect by mirroring the sprite)
-        int flip2 = (walkDist >> 3) & 1; // This will either be a 1 or a 0 depending on the walk distance (Used for walking effect by mirroring the sprite)
-
-        if (dir > 1) { // if the direction is larger than 1 (2 is left / 3 is right)...
-            flip1 = 0; // flip1 will equal 0.
-            flip2 = ((walkDist >> 4) & 1); // This will either be a 1 or a 0 depending on the walk distance (Used for walking effect by mirroring the sprite)
-            if (dir == 2) { // if the direction is 2 (left)
-                flip1 = 1; // mirror the sprite (because we only have facing right image)
-            }
-            xt += ((walkDist >> 3) & 1) * 2; // animation based on walk distance (0 is standing still and 2 is moving)            
+        int yt = yS;
+        
+        int flip1 = 0; // flip1 will equal 0.
+        if (dir == 2) { // if the direction is 2 (left)
+            flip1 = 1; // mirror the sprite (because we only have facing right image)
         }
+        // ((walkDist >> 3) & 1) will either be a 1 or a 0 depending on the walk distance (Used for walking effect by mirroring the sprite)
+        // Becomes 1 every other square (8 pixels)
+        yt += ((walkDist >> 3) & 1) * (height / PPS); // animation based on walk distance (0 is standing still and 2 or 4 is moving)            
+        
         
         int sw = screen.getSheet().width;   // width of sprite sheet (256)
-        int colNum = sw / Commons.PPS;    // Number of squares in a row (32)    
-//        screen.render(x, y, xt + yS * colNum, flip1);
-        int PPS = Commons.PPS;
-        screen.render(x + PPS * flip1, y, xt + yS * colNum, flip1); // render the top-left part of the sprite         
-        screen.render(x - PPS * flip1 + PPS, y, (xt + 1) + yS * colNum, flip1);  // render the top-right part of the sprite
-        screen.render(x + PPS * flip1, y + PPS, xt + (yS + 1) * colNum, flip1); // render the bottom-left part of the sprite
-        screen.render(x - PPS * flip1 + PPS, y + PPS, xt + 1 + (yS + 1) * colNum, flip1); // render the bottom-right part of the sprite
+        int colNum = sw / PPS;    // Number of squares in a row (32)    
+//        screen.render(x + PPS * flip1, y, xS + yt * colNum, flip1); // render the top-left part of the sprite         
+//        screen.render(x - PPS * flip1 + PPS, y, (xS + 1) + yt * colNum, flip1);  // render the top-right part of the sprite
+//        screen.render(x + PPS * flip1, y + PPS, xS + (yt + 1) * colNum, flip1); // render the bottom-left part of the sprite
+//        screen.render(x - PPS * flip1 + PPS, y + PPS, xS + 1 + (yt + 1) * colNum, flip1); // render the bottom-right part of the sprite
+        
+        int doRender = 1;
+        if (invulnerableTime > 0)
+            doRender = (invulnerableTime >> 1) & 1;
+        
+        if (doRender == 1) {
+            int xSCur = xS;
+            if (immortalTime > 0) // if immortalTime is above 0, 
+                xSCur = xS + bNum * wS;  // animation based on walk distance (bNum cycles through 0-3.)   
+
+            boolean mirrorX = (flip1 == 1); // determines if the image should be mirrored horizontally.
+            for (int ii = 0; ii < wS; ii++) {
+                int xeff = ii; // effective x pixel
+                if (mirrorX) xeff = (wS-1) - ii;  // Reverses the pixel for a mirroring effect
+                for (int jj = 0; jj < hS; jj++) {
+                    screen.render(x + xeff * PPS, y + jj * PPS, (xSCur + ii) + (yt + jj) * colNum, flip1); // render the top-left part of the sprite         
+                }
+            }
+        }        
+    }
+    
+    @Override
+    public void hurt(int damage) { // mob hurts this sprite
+        if (invulnerableTime > 0 || immortalTime > 0) return; // if hurt time OR invulnerableTime is above 0, then skip the rest of the code.
+        
+        super.hurt(damage); // Actually change our health
+        if (enlarged || fired) invulnerableTime = 100; // invulnerable time is set to 30        
     }
     
     /** What happens when the player wins */
     public void gameWon() {
-        level.player.invulnerableTime = 60 * 5; // sets the invulnerable time to 300
+        invulnerableTime = 60 * 5; // sets the invulnerable time to 300
         game.won(); // win the game
     }    
     
@@ -254,5 +291,44 @@ public class Player extends Sprite {
     
     public void addCoinCount() {
         game.addCoinCount();
+    }
+    
+    public void eatMushroom(int score) {
+        this.score += score;
+        if (!enlarged) {
+            width *= 2;
+            height *= 2;
+            wS = width / PPS;
+            hS = height / PPS;
+            unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (5 for 32 px, 4 for 16 px sprite, and 3 for 8px sprite)
+            aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)            
+            yS += 4;
+            health++;
+            if (grounded)
+                y -= ES;
+            level.mushroom2Flower();    // change mushrooms to flowers.
+        }
+        enlarged = true;
+    }
+    
+    public boolean isEnlarged() {
+        return enlarged;
+    }
+    
+    public void eatFlower(int score) {
+        this.score += score;
+        if (!fired)
+            yS += 8;
+        fired = true;        
+    }
+    
+    public void eatStarman(int score) {
+        this.score += score;        
+        immortalTime = 500;
+        immortal = true; 
+    }
+    
+    public boolean isImortal() {
+        return immortal;
     }
 }

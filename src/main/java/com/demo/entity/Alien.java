@@ -1,14 +1,10 @@
-package main.entity;
+package main.java.com.demo.entity;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-import main.Commons;
-import main.gfx.Color;
-import main.gfx.Font;
-import main.gfx.Screen;
-import main.level.Level;
+import main.java.com.demo.Commons;
+import main.java.com.demo.gfx.Color;
+import main.java.com.demo.gfx.Font;
+import main.java.com.demo.gfx.Screen;
+import main.java.com.demo.level.Level;
 
 /** Represents an alien as a sprite.
  *  Keeps the image of the sprite and the coordinates of the sprite.
@@ -17,30 +13,28 @@ public class Alien extends Sprite {
     
     private int counter;
     private int curDx;
-    private int inity;
     private boolean activated, crushed;
-    public boolean shot;
-    private int deathTime;
-    public String score;
-    private int scoreX;
-    private double scoreY;
+    private boolean isShot;
+    private int deathTime;  // Counts ticks after death
     
     public Alien(int x, int y, Level level) {                
         super(level);
-        initAlien(x, y);
-        xS = 10;
-        yS = 2;
-        inity = y;
+        initAlien(x, y);        
     }    
     
     private void initAlien(int x, int y) {
+        
+        xS = 4;
+        yS = 2;
+        width = height = ES;
+        wS = width / PPS;
+        hS = height / PPS;
         
         setX(x);
         setY(y);    
         ground = y+height;
         
         xSpeed = 1;
-        ySpeed = 1;
         
         dx = -xSpeed;
         dy = ySpeed;
@@ -48,24 +42,15 @@ public class Alien extends Sprite {
         counter = 0;
         curDx = dx;
         
-        activated = crushed = shot =false;
+        activated = crushed = isShot =false;
         deathTime = 0;
-        score = "";
+        score = 100;
+        scoreStr = "";
         scoreX = 0;
         scoreY = 0;
         
-        var alienImg = "src/LittleGoomba.png";                   
-       
-        try {
-            BufferedImage source = ImageIO.read(new File(alienImg));
-//                BufferedImage source = ImageIO.read(Board.class.getResourceAsStream("/LittleGoomba.png"));
-            setImage(source);
-        } catch (IOException ex) {
-            String msg = String.format("No such file found: %s", ex.getMessage());
-            System.out.println(msg);
-        }
-        
         unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
+        aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
     }    
         
     // Positions the alien in horizontal direction.
@@ -73,79 +58,67 @@ public class Alien extends Sprite {
     public void tick() {
         super.tick();     
                 
-        if (deathTime >= 20)
+        if (deathTime == 20) {    // Make invisible after 20 ticks.
             die();
-        else if ((crushed || shot) && !removed)
             deathTime++;
-        else {
+        } else if ((crushed || isShot) && !removed)   // increase tick when attacked but not removed
+            deathTime++;
+        else {  // unaffected and moves            
+            /* Update x position. */
+            // Moves in x direction every other tick. This is to slow down alien.
             if (counter % 2 == 0) 
                 dx = curDx;
             else  {
                 dx = 0;
             }
-            counter++;
-
-            int oldX = x;
+            counter++;      
+    
+            /* Update y position. */
             int oldY = y;
-
-    //        boolean stopped = false;
-    //        if (x <= level.getOffset()) { // left of the screen
-    //            setVisible(false);
-    //        } else {          
-    //            stopped = !move(dx, dy);            
-    //        }
-
-            boolean stopped = !move(dx, dy);      
+            boolean stopped = !move(dx, dy);     // Updates x and y.
+                        
+            if (stopped && dx != 0) {   // Has met a wall
+                dx = - dx;
+                curDx = dx;                    
+            }
             
-            if (y > Commons.BOARD_HEIGHT)
-                remove();
-            
-            
+            // Update visibility on the screen.
             int offset = level.getOffset();
             if (x <= 0)
                 hurt(health);        
-            else if (offset < x+width && x < offset + Commons.BOARD_WIDTH )
+            else if (offset < x+width && x < offset + Commons.BOARD_WIDTH)
                 setVisible(true);    
             else
                 setVisible(false);        
 
-            if (y >= Commons.BOARD_HEIGHT - height - ES) {  //bottom of the game            
-    //            y = Commons.BOARD_HEIGHT - height - ES - 1;
-                hurt(health);
-            }
-            // When falling, don't move in the x direction.
-            int effDx = x - oldX;
+            if (y > Commons.BOARD_HEIGHT)
+                remove();            
+            
+            // When falling, add acceleration to y.
             int effDy = y - oldY;
-    //        if (effDy != 0 && effDx != 0) {
-            if (effDy != 0) {
-    //            x = oldX;
-                dy++;
-            }
+            if (effDy != 0) // actual y displacement
+                dy++;            
             else
-                dy = ySpeed;        
-
+                dy = ySpeed; // By default, there is gravity.
+            
+            // Adjust dy when facing a ground tile.
             if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
                 int yt1 = y + dy + ES;
                 int backoff = yt1 - (yt1 >> 4) * 16;
                 if (backoff > 1)
                     dy -= backoff;
-            }
-
-    //        if (inity == Commons.Y160 - ES)
-    //            System.out.println("y = " + y + ", dy = " + dy);
-
-            if (stopped && dx != 0) {
-                dx = - dx;
-                curDx = dx;                    
-            }                   
+            }                  
         }
+        
         // Update score location        
-        if (score.isEmpty()){
+        if (scoreStr.isEmpty()){
             scoreX = x;
             scoreY = y;
-        } else {
+            yFin = y;
+        } else {    // has died and printing score on the screen during deathTime.
+//            scoreX = scoreX + 0.5;
             scoreY = scoreY - 0.5;
-            if (scoreY < y - ES)
+            if (scoreY < yFin - ES)
                 remove();
         }     
     }  
@@ -157,15 +130,23 @@ public class Alien extends Sprite {
             boolean isOverTop = sprite.y + sprite.height <= y;
             boolean willCrossTop = sprite.y + sprite.height + sprite.dy >= y;
             boolean isXInRange = sprite.x + sprite.width > x && x + width > sprite.x;
-            if (isOverTop && willCrossTop && isXInRange && !crushed) {
+            if (isOverTop && willCrossTop && isXInRange && !crushed) { // player jumps over the enemy
                 xS += 2;
                 crushed = true;
                 dx = 0;
-                level.player.score += Commons.SPE; // gives the player 100 points of score
-                score = Integer.toString(Commons.SPE);                
+                ((Player)sprite).score += score; // gives the player 100 points of score
+                scoreStr = Integer.toString(score);                
                 ((Player) sprite).setCrushedAlien(true);
-            } else if (!crushed && !shot)
-                sprite.hurt(1); // hurts the player, damage is based on lvl.
+            } else if (!crushed && !isShot) {
+                if (((Player) sprite).isImortal()) {                    
+                    setShot();
+                    dx = 0;
+                    ((Player)sprite).score += score; // gives the player 1000 points of score
+                    scoreStr = Integer.toString(score);
+                }
+                else
+                    sprite.hurt(1); // hurts the player, damage is based on lvl.
+            }
         }
 //        if (sprite instanceof Shot) { // if the shot touches this alien
 ////            hurt(health); // hurts this alien.
@@ -195,15 +176,14 @@ public class Alien extends Sprite {
         int flip1 = (walkDist >> 2) & 1; // This will either be a 1 or a 0 depending on the walk distance (Used for walking effect by mirroring the sprite)
                        
         int sw = screen.getSheet().width;   // width of sprite sheet (256)
-        int colNum = sw / Commons.PPS;    // Number of squares in a row (32)    
+        int colNum = sw / PPS;    // Number of squares in a row (32)    
 //        screen.render(x, y, xS + yS * colNum, flip1); // draws the top-left tile
-        int PPS = Commons.PPS;        
         
         if (isVisible()) {
             if (crushed) {
                 screen.render(x, y + PPS, xS + yS * colNum, 0); // render the top-left part of the sprite         
                 screen.render(x + PPS, y + PPS, (xS + 1) + yS * colNum, 0);  // render the top-right part of the sprite
-            } else if (shot) {
+            } else if (isShot) {
                 flip1 = 0;
                 screen.render(x + PPS * flip1, y + PPS, xS + yS * colNum, 2); // render the top-left part of the sprite         
                 screen.render(x - PPS * flip1 + PPS, y + PPS, (xS + 1) + yS * colNum, 2);  // render the top-right part of the sprite
@@ -218,21 +198,11 @@ public class Alien extends Sprite {
         }
 
         // Render score location once died
-        if (!score.isEmpty()){
-            Font.draw(score, screen, scoreX, (int)scoreY, Color.WHITE);
+        if (!scoreStr.isEmpty()){
+            Font.draw(scoreStr, screen, (int)scoreX, (int)scoreY, Color.WHITE);
 //            System.out.println("scoreY: " + (int)scoreY);
         }        
-    }
-    
-    /** What happens when the alien dies */
-    @Override
-    public void die() {
-        super.die(); // calls the die() method in Mob.java
-        if (level.player != null && y + height <= Commons.GROUND && x > 0) { // if the player is not null
-//            level.player.score += 10; // gives the player 1000 points of score
-//            level.player.gameWon(); // player wins the game
-        }
-    }
+    }    
     
     public void activate() {
         activated = true;
@@ -250,5 +220,13 @@ public class Alien extends Sprite {
     
     public boolean isCrushed() {
         return crushed;
+    }
+    
+    public boolean isShot() {
+        return isShot;
+    }
+    
+    public void setShot() {
+        isShot = true;
     }
 }

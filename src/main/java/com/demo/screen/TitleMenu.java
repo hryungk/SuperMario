@@ -1,8 +1,8 @@
-package main.screen;
+package main.java.com.demo.screen;
 
-import main.gfx.Color;
-import main.gfx.Font;
-import main.gfx.Screen;
+import main.java.com.demo.gfx.Color;
+import main.java.com.demo.gfx.Font;
+import main.java.com.demo.gfx.Screen;
 //import main.sound.Sound;
 
 public class TitleMenu extends Menu {
@@ -26,7 +26,7 @@ public class TitleMenu extends Menu {
         if (input.attack.clicked || input.menu.clicked) { //If either the "Attack" or "Menu" keys are pressed then...
             if (selected == 0) { //If the selection is 0 ("Start game")
 //                Sound.test.play(); // Play a sound
-                game.initGame(); // Reset the game
+                game.initGame(); // Initialize the game
                 game.setMenu(null); // Set the menu to null (No active menu)
                 System.out.println("=============================Start the game!=============================");
             }
@@ -45,7 +45,8 @@ public class TitleMenu extends Menu {
         int h = 11; // Number of squares in vertical direction (on the spritesheet)
         int w = 14; // Number of squares in horizontal direction (on the spritesheet)     
 
-        int yS = 4; // Y tile coordinate in the sprite-sheet
+        int xS = 18; // X tile coordinate in the sprite-sheet
+        int yS = 0; // Y tile coordinate in the sprite-sheet
         int xo = (screen.W - w * PPS) / 2; // X location of the title
         int yo = 3 * PPS; // Y location of the title            
         int lastY = yo; // last y location of the displayed object
@@ -53,7 +54,7 @@ public class TitleMenu extends Menu {
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 lastY = yo + y * PPS;
-                screen.render(xo + x * PPS, lastY, x + (yS + y) * COLNUM, 0); // Loops through all the squares to render them all on the screen.                
+                screen.render(xo + x * PPS, lastY, (xS + x) + (yS + y) * COLNUM, 0); // Loops through all the squares to render them all on the screen.                
             }
         }
         lastY += PPS;

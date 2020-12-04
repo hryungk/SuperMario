@@ -1,8 +1,8 @@
-package main.screen;
+package main.java.com.demo.screen;
 
-import main.gfx.Color;
-import main.gfx.Font;
-import main.gfx.Screen;
+import main.java.com.demo.gfx.Color;
+import main.java.com.demo.gfx.Font;
+import main.java.com.demo.gfx.Screen;
 
 public class DeadMenu extends Menu {
 	private int inputDelay = 60; // variable to delay the input of the player, so they won't skip the dead menu the first second.

@@ -1,11 +1,11 @@
-package main.screen;
+package main.java.com.demo.screen;
 
-import main.Commons;
+import main.java.com.demo.Commons;
 import java.util.List;
 
-import main.SuperPusheen;
-import main.InputHandler;
-import main.gfx.Screen;
+import main.java.com.demo.SuperPusheen;
+import main.java.com.demo.InputHandler;
+import main.java.com.demo.gfx.Screen;
 
 public abstract class Menu {
     protected SuperPusheen game; // game object used in the menu classes.

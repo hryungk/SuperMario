@@ -1,4 +1,4 @@
-package main.entity;
+package main.java.com.demo.entity;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;

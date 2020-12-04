@@ -1,4 +1,4 @@
-package main.entity;
+package main.java.com.demo.entity;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import main.SuperPusheen;
+import main.java.com.demo.SuperPusheen;
 
 /** Represents a sprite.
  *  Keeps the image of the sprite and the coordinates of the sprite.
@@ -17,7 +17,7 @@ public class Pipe extends RigidEntity {
     public Pipe(int pipeSize, int x, int y) {          
         super();
         
-        var pipeImg = "src/pipe" + pipeSize + ".png";
+        var pipeImg = "src/main/resources/pipe" + pipeSize + ".png";
 //        var ii = new ImageIcon(pipeImg);        
 //        setImage(ii.getImage());
         
