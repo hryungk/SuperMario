@@ -64,7 +64,7 @@ public class SuperPusheen extends JPanel implements Runnable {
     private int numNoG;   // Number of ground blocks in a row.
     public byte[] tiles; // an array of all the tiles in the world.    
     private int numTileX, numTileY;    // Number of tiles in x direction
-    private int xScroll;
+    private int xScroll, pMax;
     private int yScroll;
     private int[] levelNum = new int[2];
     private int lives, numCoins;  // player's lives, number of coins collected
@@ -109,7 +109,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         tickCount = 0; 
         initGame();        // will be done in TitleMenu()
         
-        setMenu(new TitleMenu());  // Sets the menu to the title menu.
+        setMenu(new TitleMenu(this));  // Sets the menu to the title menu.
     }
         
     private void bgInit() throws IOException{
@@ -286,6 +286,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         } 
         xScroll = 0;
         yScroll = 0;
+        pMax = Commons.PLAYER_XMAX;
     }
     
     // Create level and sprite objects for the game.
@@ -316,6 +317,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         } 
         xScroll = 0;
         yScroll = 0;
+        pMax = Commons.PLAYER_XMAX;
     }
         
 
@@ -324,7 +326,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         super.paintComponent(g);
         
         // Update the scroll.
-        xScroll = Math.max(xScroll, player.x + ES - Commons.PLYAER_XMAX);
+        xScroll = Math.max(xScroll, player.x + ES - pMax);
         xScroll = Math.min(xScroll, source.getWidth() - B_WIDTH);
         int yScroll = 0;        
 //        System.out.println("x = " + player.x);
@@ -466,32 +468,39 @@ public class SuperPusheen extends JPanel implements Runnable {
                 timeLeft = level.getTimeLim() - 2 * gameTime/60;
             } 
             
-            if (timeLeft <= 0)
-                player.hurt(player.health);
-            
             input.tick(); // calls the tick() method in InputHandler.java            
             
             if (menu != null) { 
                     menu.tick(); // If there is an active menu, it will call the tick method of that menu.
                     level.tickTiles();
             } else {
+                
+                if (input.pause.clicked)
+                    setMenu(new PauseMenu());
+                
                 if (player.removed) {
                     playerDeadTime++;
                     if (playerDeadTime > 60) {
                         setMenu(new DeadMenu()); // If the player has been removed and a second has passed, then set the menu to the dead menu.
                     }
                 } 
-//                else {
-//                    if (pendingLevelChange != 0) {
-//                        setMenu(new LevelTransitionMenu(pendingLevelChange)); //if the player hits a stairs, then a screen transition menu will appear.
-//                        pendingLevelChange = 0;
-//                    }
-//                }
-                if (wonTimer > 0) {
-                    if (--wonTimer == 0) {
-                        setMenu(new WonMenu()); // if the wonTimer is above 0, this will be called and if it hits 0 then it actives the win menu.
+                
+                if (player.enteredCastle()) {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        player.addScore(50);
+                    } else {
+                        if (wonTimer > 0) {                    
+                            if (--wonTimer == 0) {
+                                setMenu(new WonMenu()); // if the wonTimer is above 0, this will be called and if it hits 0 then it actives the win menu.
+                            }
+                        }
                     }
-                }
+                } else {
+                    if (timeLeft <= 0)
+                        player.hurt(player.health);
+                }        
+                
                 level.tick(screen); // calls the tick() method in Level.java                
             }
             Tile.tickCount++; // increases the tickCount in Tile.java. Used for Water.java and Lava.java.
@@ -519,7 +528,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         
     /** This is called when the player has won the game */
     public void won() {
-        wonTimer = 60 * 3; // the pause time before the win menu shows up.
+        wonTimer = 60 * 1; // the pause time before the win menu shows up.
         hasWon = true; //confirms that the player has indeed, won the game.
     }
     
@@ -533,6 +542,12 @@ public class SuperPusheen extends JPanel implements Runnable {
     
     public void addCoinCount() {
         numCoins++;
+    }
+    
+    /** Sets pMax for the screen.
+     * @param num The maximum x for player before starting to scroll. */
+    public void setPMax(int num) {
+        pMax = num;
     }
     
 } // end Board

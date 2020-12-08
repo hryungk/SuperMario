@@ -18,6 +18,7 @@ public class InputHandler extends KeyAdapter {
     public Key jump = new Key();
     public Key attack = new Key();
     public Key menu = new Key();
+    public Key pause = new Key();
 
     public InputHandler() { //Board game) {
 //        game.addKeyListener(this); // Adds this to Game.java so it can detect when a key is being pressed.
@@ -54,8 +55,10 @@ public class InputHandler extends KeyAdapter {
         if (ke.getKeyCode() == KeyEvent.VK_NUMPAD0) attack.toggle(pressed); //press keypad 0, attack toggled
         if (ke.getKeyCode() == KeyEvent.VK_C) attack.toggle(pressed); // press C, attack toggled
         
-        if (ke.getKeyCode() == KeyEvent.VK_ENTER) menu.toggle(pressed); //press Enter, attack toggled
+        if (ke.getKeyCode() == KeyEvent.VK_ENTER) menu.toggle(pressed); //press Enter, menu toggled
         if (ke.getKeyCode() == KeyEvent.VK_X) menu.toggle(pressed); //press X, menu toggled
+        
+        if (ke.getKeyCode() == KeyEvent.VK_ESCAPE) pause.toggle(pressed); //press X, menu toggled
     }
 
     

@@ -15,8 +15,7 @@ import main.java.com.demo.level.Level;
  * @author HRK
  */
 public abstract class InteractiveTile extends Tile {
-    
-    protected final int ES = Commons.ENTITY_SIZE;    
+        
     protected boolean isHitBottom;    // True when the player hits the bottom of this brick.
     protected int x, initY, y, xt, yt;    
     protected boolean removed;

@@ -84,5 +84,5 @@ public class BrickTile extends InteractiveTile {
     @Override
     public void bumpedInto(int xt, int yt, Entity entity) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }    
+    }   
 }

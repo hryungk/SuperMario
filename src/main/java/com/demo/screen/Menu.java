@@ -1,7 +1,6 @@
 package main.java.com.demo.screen;
 
 import main.java.com.demo.Commons;
-import java.util.List;
 
 import main.java.com.demo.SuperPusheen;
 import main.java.com.demo.InputHandler;

@@ -19,10 +19,12 @@ public interface Commons {
     int GROUND_TILE = GROUND / ENTITY_SIZE;
     
     int PLAYER_XI = 42;
-    int PLYAER_XMAX = BOARD_WIDTH / 2 - 2 * ENTITY_SIZE;    //(150 - 32 = 118)
+    int PLAYER_XMAX = BOARD_WIDTH / 2 - 2 * ENTITY_SIZE;    //(150 - 32 = 118)
    
     int Y96 = BOARD_HEIGHT - 96;  // y-position at 240-96 = 144
     int Y160 = BOARD_HEIGHT - 160; // y-position at 240-160 = 80
+    
+    int X_MAX = 3168;   // Location of the flag 
     
     double ITV0 = -2.5; // beginning speed of the interactive tiles when hit.
     
@@ -53,7 +55,7 @@ public interface Commons {
      };
     // Descending blocks
     int[][] BPOS_D = {
-         {2240, 4, 4}, {2480, 4, 4}, {3168, 1, 1}
+         {2240, 4, 4}, {2480, 4, 4}, {X_MAX, 1, 1}
      };    
     
     // Initial position of bricks

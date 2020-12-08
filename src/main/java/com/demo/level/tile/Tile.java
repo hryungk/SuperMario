@@ -1,6 +1,7 @@
 package main.java.com.demo.level.tile;
 
 import java.util.Random;
+import main.java.com.demo.Commons;
 import main.java.com.demo.entity.Entity;
 import main.java.com.demo.entity.Player;
 import main.java.com.demo.entity.Sprite;
@@ -10,6 +11,7 @@ import main.java.com.demo.level.Level;
 public abstract class Tile {
     public static int tickCount = 0; //A global tickCount used in the Lava & water tiles.
     protected Random random = new Random(); // Random is used for random numbers (duh!).
+    protected final int ES = Commons.ENTITY_SIZE;    
 
     public static Tile[] tiles = new Tile[256]; // An array of tiles
     public static Tile sky = new SkyTile(0);
@@ -18,6 +20,7 @@ public abstract class Tile {
     public static Tile block = new BlockTile(3); 
     public static int brickID = 4;
     public static int QbrickID = 5;
+    public static Tile flag = new FlagTile(6); 
     
 //    public static Tile brick = new BrickTile(4); 
 //    public static Tile Qbrick = new QuestionBrickTile(5); 

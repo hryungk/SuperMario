@@ -6,6 +6,8 @@ import main.java.com.demo.SuperPusheen;
 import main.java.com.demo.InputHandler;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
+import main.java.com.demo.level.tile.FlagTile;
+import main.java.com.demo.level.tile.Tile;
 
 /** Represents a player as a sprite.
  *  Keeps the image of the sprite and the coordinates of the sprite.
@@ -18,6 +20,8 @@ public class Player extends Sprite {
     public int immortalTime = 0; // the immortal time the player has when it eats the starman.
     private double ds;  // y velocity     
     private boolean crushedAlien, enlarged, fired, immortal;
+    private boolean firstTime, reachedEnd, reachedPollBottom, flagReachedBottom, faceLeft, jumped, enteredCastle;
+    private int leftCount;
     
     public Player(InputHandler input, Level level, SuperPusheen board) {                
         super(level);        
@@ -59,8 +63,10 @@ public class Player extends Sprite {
         ds = 0;
         score = 0;
         
-        
         crushedAlien = enlarged = fired = immortal = false;   
+        reachedEnd = reachedPollBottom = flagReachedBottom = faceLeft = jumped = enteredCastle = false;
+        firstTime = true;
+        leftCount = 0;
     }    
         
     // Positions the player in horizontal direction.
@@ -85,16 +91,12 @@ public class Player extends Sprite {
 //        dx = xa;
 //        dy = ya;
                         
-        
+        /* x increment. */
         dx = 0;
-        if (input.left.down) dx = -xSpeed; // if the player presses left then his x acceleration will be -1        
-//        if (x < Commons.PLYAER_XMAX && input.right.down) dx = 1;        
-        if (input.right.clicked || input.right.down) dx = xSpeed;        
+        if (input.left.down) dx = -xSpeed; // if the player presses left then his x acceleration will be -1 
+        if (input.right.clicked || input.right.down) dx = xSpeed;     
         
-//        if (y + height < Commons.GROUND)        grounded = isGrounded();
-//        topped = checkTopped();
-    
-        
+        /* y increment. */
         int g = 8;  // gravitational force        
         
         if (grounded && y + height == ground)
@@ -107,7 +109,7 @@ public class Player extends Sprite {
         
         if (input.jump.clicked && grounded)
             ds = -g;
-        if (crushedAlien) {
+        if (crushedAlien) { // Slightly jump over the enemy
             ds = -3;
             crushedAlien = false;
         }
@@ -120,65 +122,65 @@ public class Player extends Sprite {
             if (dy > 1 && backoff > 0)
                 dy -= backoff;
         }
-//        if (dy > 1 && y + dy + ES > ground)
-//            dy = ground - y - ES;
         
-        
-//        int jumpDist = ground - y - height;
-//        if (jumpDist >= MAX_JUMP)
-//            dy = ySpeed; // Once reached the maximum jump height, fall to the ground (positive y)
-//        
-//        // Jump
-//        if (input.jump.clicked && grounded) dy = - ySpeed;
-//                 
-//        if (input.jump.down && jumpDist < MAX_JUMP) dy = dy;   
-//        else dy = ySpeed;
-                
-        
-        
-        // This is to prevent the player from going out of the frame.
-//        if (x <= ES)    // left end in the beginning
-//            x = ES+1;        
-              
-//        int xScroll = level.getOffset();
-//        if (x <= xScroll) // left end in the middle of the game
-//            x = xScroll;
-        
-//        if (x + width + ES >= level.W * Commons.ENTITY_SIZE) // right end of the game
-//            x = level.W * Commons.ENTITY_SIZE - width - ES - 1;
-        if (x + width >= level.W * ES) // right end of the game
+        /* Boundary controls. */
+        // right end of the screen
+        if (x + width >= level.W * ES)
             x = level.W * ES - width;
         
-//        if (y <= ES) // top of the game
-//            y = ES+1;
-        if (y <= 0) // top of the game
-            y = 0;                       
-//        if (y >= Commons.BOARD_HEIGHT - height - ES) //bottom of the game
-//            y = Commons.BOARD_HEIGHT - height - ES -1;
-//            health = 0;
+        // top of the screen
+        if (y <= 0) 
+            y = 0;             
         
-//        if (y + height > Commons.GROUND)
-//            System.out.println("below the ground");
-        
-//        if (y + dy + height < Commons.BOARD_HEIGHT)
-//            move(dx, dy);        
-//        else
-//            hurt(health);
-        move(dx, dy);
-        if (y > Commons.BOARD_HEIGHT) { // When falls to the bottom
-//            hurt(health);
+        // When falls to the bottom, die immediately and start over.
+        if (y > Commons.BOARD_HEIGHT) { 
             lives--;
             resetGame();
         }
-                
+        // Don't go beyond the left end of the screen.
         int xScroll = level.getOffset();
-        if (x <= xScroll) // left end in the middle of the game
-            x = xScroll;
+        if (x <= xScroll) 
+            x = xScroll;        
         
-//        System.out.print("dx = " + dx + ", x = " + x + ", ");
-//        System.out.println("dy = " + dy + ", y = " + y);
+        // When reached the flag
+        reachedEnd = x + width >= Commons.X_MAX + ES / 2;     
+        if (reachedEnd) {
+            if (firstTime) {
+                gameWon();
+                ((FlagTile)Tile.flag).setScore((Commons.GROUND - y) / ES * 100);
+                firstTime = false;
+            }
+            dx = 0;
+            reachedPollBottom = y + height >= Commons.GROUND - ES;
+            flagReachedBottom = ((FlagTile)Tile.flag).reachedBottom();
+            enteredCastle = x + width>= Commons.X_MAX + 7 * ES;            
+            if (!reachedPollBottom) {
+                dy = 1;                
+            } else if (!flagReachedBottom) {
+                dy = 0;// wait                            
+            } else if (!faceLeft) {
+                if (leftCount == 0) {
+                    x += width;
+                    dir = 2; // change direction to left
+                    game.setPMax(Commons.PLAYER_XMAX + width);
+                } else if (leftCount > 10) {
+                    faceLeft = true;
+                }
+                leftCount++;            
+            } else if (!jumped){                
+                dx = xSpeed;
+                ds = -1.5;
+                jumped = true;                
+            } else if (!enteredCastle) {
+                dx = xSpeed;
+            } else {
+                setVisible(false);
+            }
+        }
         
-
+        
+        move(dx, dy);
+        
         /* Add a shot. */
         if (fired && input.attack.clicked) {
             Shot shot = new Shot(level);
@@ -246,7 +248,7 @@ public class Player extends Sprite {
 //        screen.render(x - PPS * flip1 + PPS, y + PPS, xS + 1 + (yt + 1) * colNum, flip1); // render the bottom-right part of the sprite
         
         int doRender = 1;
-        if (invulnerableTime > 0)
+        if (invulnerableTime > 0 && !reachedEnd)
             doRender = (invulnerableTime >> 1) & 1;
         
         if (doRender == 1) {
@@ -336,5 +338,17 @@ public class Player extends Sprite {
     
     public int getScore() {
         return score;
+    }
+    
+    public void addScore(int num) {
+        score += num;
+    }
+    
+    public boolean reachedEnd() {
+        return reachedEnd;
+    }
+    
+    public boolean enteredCastle() {
+        return enteredCastle;
     }
 }

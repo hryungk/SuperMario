@@ -1,19 +1,16 @@
 package main.java.com.demo.screen;
 
-import main.java.com.demo.SuperPusheen;
 import main.java.com.demo.gfx.Color;
 import main.java.com.demo.gfx.Font;
 import main.java.com.demo.gfx.Screen;
 //import main.sound.Sound;
 
-public class TitleMenu extends Menu {
+public class PauseMenu extends Menu {
     private int selected = 0; // Currently selected option
 
-    private static final String[] OPTIONS = {"Start game", "How to play", "About"}; // Options that are on the main menu, each seperated by a comma.
+    private static final String[] OPTIONS = {"Restart game", "Go back to game", "How to play", "About"}; // Options that are on the main menu, each seperated by a comma.
 
-    public TitleMenu(SuperPusheen game) {
-        this.game = game;
-        this.game.initGame(); // Initialize the game
+    public PauseMenu() {
     }
 
      /** Update method used in menus. */
@@ -28,13 +25,17 @@ public class TitleMenu extends Menu {
 
         if (input.attack.clicked || input.menu.clicked) { //If either the "Attack" or "Menu" keys are pressed then...
             if (selected == 0) { //If the selection is 0 ("Start game")
-//                Sound.test.play(); // Play a sound                
+//                Sound.test.play(); // Play a sound
+                game.initGame(); // Initialize the game
                 game.setMenu(null); // Set the menu to null (No active menu)
-                System.out.println("=============================Start the game!=============================");
+                System.out.println("=============================Restart the game!=============================");
             }
-            if (selected == 1) game.setMenu(new InstructionsMenu(this)); //If the selection is 1 ("How to play") then go to the instructions menu.
-            if (selected == 2) game.setMenu(new AboutMenu(this)); //If the selection is 2 ("About") then go to the about menu.
+            if (selected == 1) game.setMenu(null); //If the selection is 1 ("How to play") then go to the instructions menu.
+            if (selected == 2) game.setMenu(new InstructionsMenu(this)); //If the selection is 1 ("How to play") then go to the instructions menu.
+            if (selected == 3) game.setMenu(new AboutMenu(this)); //If the selection is 2 ("About") then go to the about menu.
         }
+        if (input.pause.clicked)
+            game.setMenu(null);
     }
 
     /** Render method used in menus.

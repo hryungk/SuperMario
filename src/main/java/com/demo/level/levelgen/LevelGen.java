@@ -11,10 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import main.java.com.demo.SuperPusheen;
 import main.java.com.demo.Commons;
-import main.java.com.demo.level.tile.BrickTile;
-import main.java.com.demo.level.tile.InteractiveTile;
-import main.java.com.demo.level.tile.QuestionBrickTile;
-import main.java.com.demo.level.tile.Tile;
+import main.java.com.demo.level.tile.*;
 
 public class LevelGen {
     
@@ -24,7 +21,8 @@ public class LevelGen {
      * r will be a number between (0 to 19) [0 counts as the first value)
      */
     private final int W; // width of the map
-    private final int H; // height of the map
+    private final int H; // height of the map    
+    private static final int ES = Commons.ENTITY_SIZE;   // Tile size (width and height) [pixel]
     public static Tile[] tileMap;
 
     /** This creates noise to create random values for level generation
@@ -32,7 +30,7 @@ public class LevelGen {
      * @param h Height of the map [tile] */
     public LevelGen(int w, int h) {
         this.W = w; // assigns the width of the map
-        this.H = h; // assigns the height of the map        
+        this.H = h; // assigns the height of the map   
     }	
 
     /** Creates and determines if the surface map is ready to be played.
@@ -78,8 +76,8 @@ public class LevelGen {
         int[][] GPOS = Commons.GPOS;
         for (int y = h-2; y < h; y++) { // Loops through the height of the map
             for (int[] a : GPOS) {
-                int beg = a[0]/16;
-                int end = a[1]/16;
+                int beg = a[0] / ES;
+                int end = a[1] / ES;
                 for (int x = beg; x <= end; x++) { // A loop inside a loop that loops through the width of the map.
                     int i = x + y * w; // Current tile being edited.
                     idMap[i] = Tile.ground.ID; // the tile will become ground     
@@ -92,9 +90,9 @@ public class LevelGen {
         int[][] PPOS = Commons.PPOS;
         //for (int ii = 0; ii < pLen; ii++) { // Loops through the height of the map  
         for (int[] a : PPOS) {
-            int xLeft = a[1]/16; // x tile position
+            int xLeft = a[1] / ES; // x tile position
             for (int x = xLeft; x <= xLeft+1; x++) {                    
-                int yTop = a[2]/16; // y tile position
+                int yTop = a[2] / ES; // y tile position
                 for (int y = yTop; y < h-2; y++) {
                     int i = x + y * w; // Current tile being edited.
                     idMap[i] = Tile.pipe.ID; // the tile will become a pipe.
@@ -104,11 +102,11 @@ public class LevelGen {
         }
 
         /* Add blocks. */
-        int y1 = (bh-48)/16; 
+        int y1 = (bh-48) / ES; 
         // Ascending blocks
         int[][] BPOS_A = Commons.BPOS_A;
         for (int[] blocks : BPOS_A) { // Loop through the BPOS_A list                
-            int x0 = blocks[0]/16; // x tile position
+            int x0 = blocks[0] / ES; // x tile position
             int numX = blocks[1];
             int numY = blocks[2];
             for (int yi = 0; yi < numY; yi++) { // Loops through vertical way
@@ -126,7 +124,7 @@ public class LevelGen {
         // Descending blocks
         int[][] BPOS_D = Commons.BPOS_D;
         for (int[] blocks : BPOS_D) { // Loop through the BPOS_D list                
-            int x0 = blocks[0]/16; // x tile position
+            int x0 = blocks[0] / ES; // x tile position
             int numX = blocks[1];
             int numY = blocks[2];
             for (int yi = 0; yi < numY; yi++) { // Loops through vertical way             
@@ -146,8 +144,8 @@ public class LevelGen {
         int[][] BRPOS = Commons.BRPOS;
         for (int[] a : BRPOS) {
             // Loops through the height of the map
-            int x0 = a[0]/16; // x tile position
-            int y = a[1]/16; // y tile position
+            int x0 = a[0] / ES; // x tile position
+            int y = a[1] / ES; // y tile position
             int bNum = a[2]; // number of bricks in this row
             for (int x = x0; x < x0+bNum; x++) {
                 int i = x + y * w; // Current tile being edited.
@@ -162,8 +160,8 @@ public class LevelGen {
         int[][] QBRPOS = Commons.QBRPOS;
         for (int[] a : QBRPOS) {
             // Loops through the height of the map
-            int x0 = a[0]/16; // x tile position
-            int y = a[1]/16; // y tile position
+            int x0 = a[0] / ES; // x tile position
+            int y = a[1] / ES; // y tile position
             int bNum = a[2]; // number of bricks in this row
             for (int x = x0; x < x0+bNum; x++) {
                 int i = x + y * w; // Current tile being edited.
@@ -173,6 +171,15 @@ public class LevelGen {
                 tileId++;
             }
         }        
+        
+        /* Add the flag. */ 
+        int x = ((FlagTile)Tile.flag).getX() / ES;
+        int y = ((FlagTile)Tile.flag).getY() / ES;
+        int i = x + y * w; // Current tile being edited.        
+        idMap[i] = Tile.flag.ID; // the tile will become sky    
+        tileMap[i] = Tile.flag;
+        tileId++;
+                
         
         return idMap; // returns the map's tiles and data.
     }
@@ -191,6 +198,7 @@ public class LevelGen {
                 if (map[i] == Tile.block.ID) pixels[i] = 0xC84C0C; // If the tile is block, then the pixel will be brown         
                 if (map[i] == Tile.brickID) pixels[i] = 0x802e05; // if the tile is brick, then the pixel will be light brown 
                 if (map[i] == Tile.QbrickID) pixels[i] = 0xfc9838; // if the tile is question brick, then the pixel will be yellow  
+                if (map[i] == Tile.flag.ID) pixels[i] = 0xffffff; // if the tile is the flag, then the pixel will be white  
             }
         }
         pixels[(player.x>>4) + (player.y>>4) * 128] = 0xffaa00;
@@ -206,8 +214,8 @@ public class LevelGen {
 
         boolean hasquit = false; // Determines if the player has quit the program or not.
         while (!hasquit) { //If the player has not quit the map
-            int w = 3584/16; // width of the map
-            int h = 240/16; // height of the map
+            int w = 3584 / ES; // width of the map
+            int h = 240 / ES; // height of the map
             byte[] map; // the map
             map = LevelGen.createAndValidateTopMap(w, h); // Map will show the surface.
 
@@ -231,6 +239,7 @@ public class LevelGen {
                     if (map[i] == Tile.block.ID) pixels[i] = 0xC84C0C; // If the tile is block, then the pixel will be brown         
                     if (map[i] == Tile.brickID) pixels[i] = 0x802e05; // if the tile is brick, then the pixel will be light brown 
                     if (map[i] == Tile.QbrickID) pixels[i] = 0xfc9838; // if the tile is question brick, then the pixel will be yellow 
+                    if (map[i] == Tile.flag.ID) pixels[i] = 0xffffff; // if the tile is the flag, then the pixel will be white
                 }
             }
             img.setRGB(0, 0, w, h, pixels, 0, w); // sets the pixels into the image

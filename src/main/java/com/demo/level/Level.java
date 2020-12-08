@@ -7,6 +7,7 @@ import main.java.com.demo.entity.*;
 import main.java.com.demo.Commons;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.levelgen.LevelGen;
+import main.java.com.demo.level.tile.FlagTile;
 import main.java.com.demo.level.tile.Tile;
 
 
@@ -99,7 +100,7 @@ public final class Level {
         for (int xt = 0; xt < W; xt++) { // Loops width
             for (int yt = 0; yt < H; yt++) { // Loops height
                 Tile tile = getTile(xt, yt);
-                if (tile.ID == Tile.brickID || tile.ID == Tile.QbrickID) {// only bricks might disappear. 
+                if (tile.ID == Tile.brickID || tile.ID == Tile.QbrickID || tile.ID == Tile.flag.ID) {// only bricks might disappear. 
                     tile.tick(xt, yt, this); // updates the tile at that location.
                 }
             }
@@ -153,13 +154,13 @@ public final class Level {
     public void renderBackground(Screen screen, int xScroll, int yScroll) {
         this.screen = screen;
         this.xScroll = xScroll;
-        int xo = xScroll >> 4; // the game's horizontal scroll offset [tile].
-        int yo = yScroll >> 4; // the game's vertical scroll offset [tile].
-        int width = (screen.W + 15) >> 4; // width of the screen being rendered [tile]
-        int height = (screen.H + 15) >> 4; // height of the screen being rendered [tile]
+        int xto = xScroll >> 4; // the game's horizontal scroll offset [tile].
+        int yto = yScroll >> 4; // the game's vertical scroll offset [tile].
+        int ws = (screen.W + 15) >> 4; // width of the screen being rendered [tile]
+        int hs = (screen.H + 15) >> 4; // height of the screen being rendered [tile]
         screen.setOffset(xScroll, yScroll); // sets the scroll offsets.          
-        for (int y = yo; y < height + yo; y++) { // loops through the vertical positions
-            for (int x = xo; x < width + xo; x++) { // loops through the horizontal positions
+        for (int y = yto; y < hs + yto; y++) { // loops through the vertical positions
+            for (int x = xto; x < ws + xto; x++) { // loops through the horizontal positions
                 Tile tile = getTile(x, y);
                 if (tile.ID == Tile.brickID || tile.ID == Tile.QbrickID) // only bricks might disappear. 
                     tile.render(screen, this, x, y); // renders the tile on the screen
@@ -171,24 +172,33 @@ public final class Level {
     /** Renders all the entity sprites on the screen */
     public void renderSprites(Screen screen, int xScroll, int yScroll) {
         this.screen = screen;
-            int xto = xScroll >> 4; // the game's horizontal scroll offset [tiles].
-            xto = Math.max(0, xto-1);
-            int yto = yScroll >> 4; // the game's vertical scroll offset [tiles].
-            int ws = (screen.W + 15) >> 4; // width of the screen being rendered
-            int hs = (screen.H + 15) >> 4; // height of the screen being rendered
+        int xto = xScroll >> 4; // the game's horizontal scroll offset [tiles].
+        xto = Math.max(0, xto-1);
+        int yto = yScroll >> 4; // the game's vertical scroll offset [tiles].
+        int ws = (screen.W + 15) >> 4; // width of the screen being rendered
+        int hs = (screen.H + 15) >> 4; // height of the screen being rendered
 
-            screen.setOffset(xScroll, yScroll); // sets the scroll offsets.
-            for (int y = yto; y <= hs + yto; y++) { // loops through the vertical positions
-                    for (int x = xto; x <= ws + xto; x++) { // loops through the horizontal positions
-                        if (x < 0 || y < 0 || x >= W || y >= H) continue; // If the x & y positions of the sprites are within the map's boundaries
-                        rowSprites.addAll(entitiesInTiles[x + y * W]); // adds all of the sprites in the entitiesInTiles array.                        
-                    }
-                    if (rowSprites.size() > 0) { // If the rowSprites list size is larger than 0...
-                        sortAndRender(screen, rowSprites); // sorts and renders the sprites on the screen
-                    }
-                    rowSprites.clear(); // clears the list
-            }
-            screen.setOffset(0, 0); // resets the offset.
+        screen.setOffset(xScroll, yScroll); // sets the scroll offsets.
+        
+        
+        /* Render Flag tile before the player. */
+        int xtFlag = ((FlagTile) Tile.flag).getX() >> 4;
+        int ytFlag = ((FlagTile) Tile.flag).getY() >> 4;
+        if (xto <= xtFlag && xtFlag <= ws + xto)
+            Tile.flag.render(screen, this, xtFlag, ytFlag); // renders the tile on the screen
+    
+        /* Render sprites including player. */
+        for (int y = yto; y <= hs + yto; y++) { // loops through the vertical positions
+                for (int x = xto; x <= ws + xto; x++) { // loops through the horizontal positions
+                    if (x < 0 || y < 0 || x >= W || y >= H) continue; // If the x & y positions of the sprites are within the map's boundaries
+                    rowSprites.addAll(entitiesInTiles[x + y * W]); // adds all of the sprites in the entitiesInTiles array.                        
+                }
+                if (rowSprites.size() > 0) { // If the rowSprites list size is larger than 0...
+                    sortAndRender(screen, rowSprites); // sorts and renders the sprites on the screen
+                }
+                rowSprites.clear(); // clears the list
+        }
+        screen.setOffset(0, 0); // resets the offset.
     }
     
     /** Sorts and renders sprites from an entity list */
@@ -196,7 +206,7 @@ public final class Level {
         this.screen = screen;
         for (int i = 0; i < list.size(); i++) { // loops through the entity list
             Sprite sprite = list.get(i);
-//            if (sprite.isVisible())
+            if (sprite.isVisible())
                 sprite.render(screen); // renders the sprite on the screen
         }
     }
