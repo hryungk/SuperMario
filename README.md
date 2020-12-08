@@ -4,7 +4,7 @@ Recreating Super Mario Brothers game by Nintendo but Pusheen as Mario :3
 Basic structures of the program are based on Miniventure codes (https://github.com/shylor/miniventure). 
 
 
-As of 12/03/20:
+As of 12/08/20:
 
 - The player's physical movement in the map is confirmed. (doesn't intersect with barriers, jumps, falls, etc.)
 
@@ -16,19 +16,24 @@ As of 12/03/20:
 
 - Brick with coin has a random number of coins and turn to block once looted out.
 
+- End the game once the player reaches the flag.
 
 
 Essential features to be added soon:
 
-- End the game once the player reaches the flag.
+- Print scores based on the player's position
 
 
 
 Minor features to be added:
 
-- The player should be able to kill Goomba by hitting the brick from the bottom. 
+- Moving bricks should affect the sprites.
 
-- Print scores based on the player's position
+  * The player should be able to kill Goomba by hitting the brick from the bottom. 
+
+  * Mushroom should change direction when hit by the jumping bricks.
+
+- Big Pusheen crushes the bricks when jumping to the bottom of them.
 
 - Add acceleration effect in x direction
 
