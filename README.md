@@ -18,14 +18,12 @@ As of 12/08/20:
 
 - End the game once the player reaches the flag.
 
-
-Essential features to be added soon:
-
 - Print scores based on the player's position
 
 
+Essential features to be added soon:
 
-Minor features to be added:
+- Big Pusheen crushes the bricks when jumping to the bottom of them.
 
 - Moving bricks should affect the sprites.
 
@@ -33,7 +31,8 @@ Minor features to be added:
 
   * Mushroom should change direction when hit by the jumping bricks.
 
-- Big Pusheen crushes the bricks when jumping to the bottom of them.
+
+Minor features to be added:
 
 - Add acceleration effect in x direction
 
