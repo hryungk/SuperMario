@@ -45,6 +45,6 @@ public class WonMenu extends Menu {
         Font.draw(timeString, screen, 8 * ES + 5 * PPS, 5 * PPS, Color.get(-1, 550, 550, 550)); // Draws the current time next to "Time:"
         Font.draw("Score:", screen, 8 * ES, 6 * PPS, Color.get(-1, 555, 555, 555)); // Draws "Score:" on the frame
         Font.draw("" + game.player.getScore(), screen, 8 * ES + 6 * PPS, 6 * PPS, Color.get(-1, 550, 550, 550)); // Draws the current score next to "Score:"
-        Font.draw("Press C to win", screen, 8 * ES, 8 * PPS, Color.get(-1, 333, 333, 333)); //Draws text
+        Font.draw("Press C to return to title screen.", screen, 8 * ES, 8 * PPS, Color.get(-1, 333, 333, 333)); //Draws text
     }
 }

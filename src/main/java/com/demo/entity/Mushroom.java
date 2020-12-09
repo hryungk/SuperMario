@@ -1,8 +1,6 @@
 package main.java.com.demo.entity;
 
 import main.java.com.demo.Commons;
-import main.java.com.demo.gfx.Color;
-import main.java.com.demo.gfx.Font;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
@@ -29,9 +27,6 @@ public class Mushroom extends HiddenSprite {
         hS = height / PPS;
         
         score = 1000; 
-        scoreStr = "";
-        scoreX = 0;
-        scoreY = 0;
         
         doneFollowing = false;
     }
@@ -88,18 +83,7 @@ public class Mushroom extends HiddenSprite {
                     if (backoff > 1)
                         dy -= backoff;
                 }  
-            } // end if (following the InteractiveTile)
-            
-            // Update score location        
-            if (scoreStr.isEmpty()){
-                scoreX = x + width;
-                scoreY = y + height - PPS;
-                yFin = y + height - PPS;
-            } else {    // has died and printing score on the screen during deathTime.
-                scoreY = scoreY - 0.5;
-                if (scoreY < yFin - 2 * height)
-                    remove();
-            }     
+            } // end if (following the InteractiveTile)            
         } // end if(isActivated)
     }    
 
@@ -120,22 +104,18 @@ public class Mushroom extends HiddenSprite {
                 screen.render(x - PPS * flip + PPS, y, (xS + 1) + yS * colNum, flip);  // render the top-right part of the sprite
                 screen.render(x + PPS * flip, y + PPS, xS + (yS + 1) * colNum, flip); // render the bottom-left part of the sprite
                 screen.render(x - PPS * flip + PPS, y + PPS, xS + 1 + (yS + 1) * colNum, flip); // render the bottom-right part of the sprite
-            }
-            
-            // Render score location once died
-            if (!scoreStr.isEmpty()){
-                Font.draw(scoreStr, screen, (int)scoreX, (int)scoreY, Color.WHITE);
-            }   
+            }               
         }
     }    
     
     @Override
     protected void touchedBy(Sprite sprite) {     
         super.touchedBy(sprite);
-        if (sprite instanceof Player && isActivated && firstTime) {
+        if (sprite instanceof Player && isActivated) {
             ((Player)sprite).eatMushroom(score);
-            scoreStr = Integer.toString(score);
-            firstTime = false;            
+//            scoreStr = Integer.toString(score);
+            level.add(new ScoreString(x + 4, y + height/2, score, level));
+            remove();
         }
     }
 }

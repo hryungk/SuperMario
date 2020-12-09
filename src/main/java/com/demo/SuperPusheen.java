@@ -550,4 +550,8 @@ public class SuperPusheen extends JPanel implements Runnable {
         pMax = num;
     }
     
+    public int getPMax() {
+        return pMax;
+    }
+    
 } // end Board

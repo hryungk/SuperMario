@@ -24,10 +24,10 @@ public final class Level {
     public List<Alien> aliens; 
     public List<HiddenSprite> hiddenSprites; 
     
-    public List<Sprite> entities = new ArrayList<>(); // A list of all the entities in the world
-        
-    private List<Sprite> rowSprites = new ArrayList<>(); // list of entities to be rendered
-
+    public List<Sprite> entities = new ArrayList<>(); // A list of all the entities in the world        
+    private List<Sprite> rowSprites = new ArrayList<>(); // A list of entities to be rendered
+    public List<ScoreString> scores = new ArrayList<>(); // A list of score strings
+    
     public Player player; // the player object
     public Screen screen;
     private int xScroll;
@@ -286,6 +286,8 @@ public final class Level {
         entities.add(e); // adds the entity to the entities list
         if (e instanceof HiddenSprite)
             hiddenSprites.add((HiddenSprite)e);
+        if (e instanceof ScoreString)
+            scores.add((ScoreString)e);
 //        entity.init(this); // Initializes the entity
         int xt = e.x >> 4; // gets the x position of the entity
         int yt = e.y >> 4; // gets the y position of the entity

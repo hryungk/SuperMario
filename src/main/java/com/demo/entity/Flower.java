@@ -1,7 +1,5 @@
 package main.java.com.demo.entity;
 
-import main.java.com.demo.gfx.Color;
-import main.java.com.demo.gfx.Font;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
@@ -24,9 +22,6 @@ public class Flower extends HiddenSprite {
         dx = 0;
         
         score = 1000; 
-        scoreStr = "";
-        scoreX = 0;
-        scoreY = 0;
                 
         height = width = ES;
         wS = width / PPS;
@@ -38,8 +33,7 @@ public class Flower extends HiddenSprite {
     
     /** Update method, (Look in the specific entity's class) */
     @Override
-    public void tick() {   
-                 
+    public void tick() {                    
         
         if (isActivated) {
             bNum = (bCounter / scale) % numStage;
@@ -58,19 +52,7 @@ public class Flower extends HiddenSprite {
                     reachedTop = true;
                     ds = 1;
                 }    
-            } // end if (reaching the top)
-        
-        
-        // Update score location        
-            if (scoreStr.isEmpty()){
-                scoreX = x + width;
-                scoreY = y + height - PPS;
-                yFin = y + height - PPS;
-            } else {    // has died and printing score on the screen during deathTime.
-                scoreY = scoreY - 0.5;
-                if (scoreY < yFin - 2 * height)
-                    remove();
-            }     
+            } // end if (reaching the top)        
         } // end if(isActivated)         
     }    
 
@@ -91,11 +73,6 @@ public class Flower extends HiddenSprite {
                         screen.render(x + xs * PPS, y + ys * PPS, (xSCur + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to render them all on the screen.                    
                     }
                 }
-            }
-            
-            // Render score location once died
-            if (!scoreStr.isEmpty()){
-                Font.draw(scoreStr, screen, (int)scoreX, (int)scoreY, Color.WHITE);
             }   
         }
     }
@@ -103,10 +80,14 @@ public class Flower extends HiddenSprite {
     @Override
     protected void touchedBy(Sprite sprite) {     
         super.touchedBy(sprite);
-        if (sprite instanceof Player && isActivated && firstTime) {
-            ((Player)sprite).eatFlower(score);
-            scoreStr = Integer.toString(score);
-            firstTime = false;
+        if (sprite instanceof Player && isActivated) {
+            if (((Player)sprite).isEnlarged())
+                ((Player)sprite).eatFlower(score);
+            else
+                ((Player)sprite).eatMushroom(score);
+//            scoreStr = Integer.toString(score);
+            level.add(new ScoreString(x + 4, y + height/2, score, level));
+            remove();
         }
     }        
 }

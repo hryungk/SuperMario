@@ -1,8 +1,6 @@
 package main.java.com.demo.entity;
 
 import main.java.com.demo.Commons;
-import main.java.com.demo.gfx.Color;
-import main.java.com.demo.gfx.Font;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
@@ -29,9 +27,6 @@ public class Starman extends HiddenSprite {
         hS = height / PPS;
         
         score = 1000; 
-        scoreStr = "";
-        scoreX = 0;
-        scoreY = 0;
         
         doneFollowing = false;
         leftBlock = false;
@@ -104,17 +99,6 @@ public class Starman extends HiddenSprite {
                         dy -= backoff;
                 }
             } // end if (reaching the top)        
-        
-        // Update score location        
-            if (scoreStr.isEmpty()){
-                scoreX = x + width;
-                scoreY = y + height - PPS;
-                yFin = y + height - PPS;
-            } else {    // has died and printing score on the screen during deathTime.
-                scoreY = scoreY - 0.5;
-                if (scoreY < yFin - 2 * height)
-                    remove();
-            }     
         } // end if(isActivated)         
     }    
 
@@ -134,11 +118,6 @@ public class Starman extends HiddenSprite {
                         screen.render(x + ii * PPS, y + jj * PPS, (xSCur + ii) + (yS + jj) * colNum, 0); // Loops through all the squares to render them all on the screen.                    
                     }
                 }
-            }
-            
-            // Render score location once died
-            if (!scoreStr.isEmpty()){
-                Font.draw(scoreStr, screen, (int)scoreX, (int)scoreY, Color.WHITE);
             }   
         }
     }
@@ -146,10 +125,11 @@ public class Starman extends HiddenSprite {
     @Override
     protected void touchedBy(Sprite sprite) {     
         super.touchedBy(sprite);
-        if (sprite instanceof Player && isActivated && firstTime) {
+        if (sprite instanceof Player && isActivated) {
             ((Player)sprite).eatStarman(score);
-            scoreStr = Integer.toString(score);
-            firstTime = false;            
+//            scoreStr = Integer.toString(score);
+            level.add(new ScoreString(x, y - height, score, level));
+            remove();
         }
     }
 }
