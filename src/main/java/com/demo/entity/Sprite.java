@@ -33,9 +33,6 @@ public abstract class Sprite extends Entity {
     protected double aTile;
     
     protected int score;    // score the player get when interact with the hidden sprite.
-    protected String scoreStr;  // score in string
-    protected double scoreX, scoreY;    // location of the score string
-    protected int yFin; // final location of y
         
     protected int bCounter, bNum, scale, numStage, ay;    // for color change animation
     // The constructor initiates the x and y coordinates and the visible variable.

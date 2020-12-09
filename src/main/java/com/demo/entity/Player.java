@@ -21,7 +21,8 @@ public class Player extends Sprite {
     private double ds;  // y velocity     
     private boolean crushedAlien, enlarged, fired, immortal;
     private boolean firstTime, reachedEnd, reachedPollBottom, flagReachedBottom, faceLeft, jumped, enteredCastle;
-    private int leftCount;
+    private int leftCount;    
+    private int netDx;
     
     public Player(InputHandler input, Level level, SuperPusheen board) {                
         super(level);        
@@ -66,7 +67,7 @@ public class Player extends Sprite {
         crushedAlien = enlarged = fired = immortal = false;   
         reachedEnd = reachedPollBottom = flagReachedBottom = faceLeft = jumped = enteredCastle = false;
         firstTime = true;
-        leftCount = 0;
+        leftCount = 0;        
     }    
         
     // Positions the player in horizontal direction.
@@ -178,8 +179,9 @@ public class Player extends Sprite {
             }
         }
         
-        
+        int oldX = x;
         move(dx, dy);
+        netDx = x - oldX;
         
         /* Add a shot. */
         if (fired && input.attack.clicked) {
@@ -298,7 +300,7 @@ public class Player extends Sprite {
     }
     
     public void eatMushroom(int score) {
-        this.score += score;
+        addScore(score);
         if (!enlarged) {
             width *= 2;
             height *= 2;
@@ -320,14 +322,16 @@ public class Player extends Sprite {
     }
     
     public void eatFlower(int score) {
-        this.score += score;
+        
+        addScore(score);
         if (!fired)
             yS += 8;
         fired = true;        
     }
     
     public void eatStarman(int score) {
-        this.score += score;        
+        
+        addScore(score);
         immortalTime = 500;
         immortal = true; 
     }
@@ -350,5 +354,13 @@ public class Player extends Sprite {
     
     public boolean enteredCastle() {
         return enteredCastle;
+    }
+    
+    public int getPMax() {
+        return game.getPMax();
+    }
+    
+    public int getNetDx() {
+        return netDx;
     }
 }

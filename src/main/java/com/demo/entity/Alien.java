@@ -1,8 +1,6 @@
 package main.java.com.demo.entity;
 
 import main.java.com.demo.Commons;
-import main.java.com.demo.gfx.Color;
-import main.java.com.demo.gfx.Font;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
@@ -45,9 +43,6 @@ public class Alien extends Sprite {
         activated = crushed = isShot =false;
         deathTime = 0;
         score = 100;
-        scoreStr = "";
-        scoreX = 0;
-        scoreY = 0;
         
         unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
         aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
@@ -59,7 +54,7 @@ public class Alien extends Sprite {
         super.tick();     
                 
         if (deathTime == 20) {    // Make invisible after 20 ticks.
-            die();
+            remove();
             deathTime++;
         } else if ((crushed || isShot) && !removed)   // increase tick when attacked but not removed
             deathTime++;
@@ -108,19 +103,7 @@ public class Alien extends Sprite {
                 if (backoff > 1)
                     dy -= backoff;
             }                  
-        }
-        
-        // Update score location        
-        if (scoreStr.isEmpty()){
-            scoreX = x;
-            scoreY = y;
-            yFin = y;
-        } else {    // has died and printing score on the screen during deathTime.
-//            scoreX = scoreX + 0.5;
-            scoreY = scoreY - 0.5;
-            if (scoreY < yFin - ES)
-                remove();
-        }     
+        }        
     }  
     
     /** What happens when the player touches an entity.
@@ -134,30 +117,25 @@ public class Alien extends Sprite {
                 xS += 2;
                 crushed = true;
                 dx = 0;
-                ((Player)sprite).score += score; // gives the player 100 points of score
-                scoreStr = Integer.toString(score);                
+                ((Player)sprite).addScore(score); // gives the player 100 points of score
+//                scoreStr = Integer.toString(score);                       
+                level.add(new ScoreString(x, y - height, score, level));
                 ((Player) sprite).setCrushedAlien(true);
             } else if (!crushed && !isShot) {
                 if (((Player) sprite).isImortal()) {                    
                     setShot();
                     dx = 0;
-                    ((Player)sprite).score += score; // gives the player 1000 points of score
-                    scoreStr = Integer.toString(score);
+                    ((Player)sprite).addScore(score); // gives the player 1000 points of score
+//                    scoreStr = Integer.toString(score);
+                    level.add(new ScoreString(x, y - height, score, level));
                 }
-                else
+                else {
                     sprite.hurt(1); // hurts the player, damage is based on lvl.
-            }
+                    sprite.touchedBy(this);
+                }
+            }            
         }
-//        if (sprite instanceof Shot) { // if the shot touches this alien
-////            hurt(health); // hurts this alien.
-//            sprite.hurt(sprite.health); // hurt the shot
-//            if (!shot) {                
-//                shot = true;
-//                dx = 0;
-//                level.player.score += Commons.SPE; // gives the player 1000 points of score
-//                score = Integer.toString(Commons.SPE);
-//            }
-//        }
+        
         if (sprite instanceof Alien) {
             if (!((Alien) sprite).isCrushed()) {
                 if (dx != 0) {
@@ -195,13 +173,7 @@ public class Alien extends Sprite {
                 screen.render(x + PPS * flip1, y + PPS, xS + (yS + 1) * colNum, flip1); // render the bottom-left part of the sprite
                 screen.render(x - PPS * flip1 + PPS, y + PPS, xS + 1 + (yS + 1) * colNum, flip1); // render the bottom-right part of the sprite        
             }
-        }
-
-        // Render score location once died
-        if (!scoreStr.isEmpty()){
-            Font.draw(scoreStr, screen, (int)scoreX, (int)scoreY, Color.WHITE);
-//            System.out.println("scoreY: " + (int)scoreY);
-        }        
+        }               
     }    
     
     public void activate() {

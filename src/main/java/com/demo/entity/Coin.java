@@ -1,7 +1,5 @@
 package main.java.com.demo.entity;
 
-import main.java.com.demo.gfx.Color;
-import main.java.com.demo.gfx.Font;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
@@ -28,9 +26,6 @@ public class Coin extends HiddenSprite {
         hS = height / PPS;
         
         score = 200;
-        scoreStr = "";
-        scoreX = 0;
-        scoreY = 0;
     }
     
     /** Update method, (Look in the specific entity's class) */
@@ -40,7 +35,7 @@ public class Coin extends HiddenSprite {
         if (isActivated) {
             
             if (firstTime) {
-                level.player.score += score; // gives the player 100 points of score
+                level.player.addScore(score); // gives the player 100 points of score
                 level.player.addCoinCount();
                 firstTime = false;
             }
@@ -59,25 +54,18 @@ public class Coin extends HiddenSprite {
                 }                
             }        
 
-            if (y >= initY && reachedTop)
-                die(); // Make invisible
+            if (y >= initY && reachedTop) {
+                die(); // Make invisible                
+            }
 
             bNum = (bCounter / scale) % numStage;
             bCounter++;        
                         
-            if (reachedTop && y >= initY - height || !isVisible())            
-                scoreStr = Integer.toString(score);
-            
-            // Update score location        
-            if (scoreStr.isEmpty()){
-                scoreX = x + ES;
-                scoreY = y + ES - PPS;
-            } else {    // has died and printing score on the screen during deathTime.
-//                scoreX = scoreX + 0.5;
-                scoreY = scoreY - 0.5;
-                if (scoreY < y - 2 * ES)
-                    remove();
-            }     
+            if (reachedTop && y >= initY - height || !isVisible()) {
+//                scoreStr = Integer.toString(score);
+                level.add(new ScoreString(x + 4, y + height/2, score, level));
+                remove();
+            }            
         }
     }    
 
@@ -97,12 +85,7 @@ public class Coin extends HiddenSprite {
                         screen.render(x + xs * PPS, y + ys * PPS, (xSCur + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to render them all on the screen.                    
                     }
                 }
-            }
-            
-            // Render score location once died
-            if (!scoreStr.isEmpty()){
-                Font.draw(scoreStr, screen, (int)scoreX, (int)scoreY, Color.WHITE);
-            }        
+            }                    
         }
     }
 }
