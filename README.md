@@ -4,7 +4,7 @@ Recreating Super Mario Brothers game by Nintendo but Pusheen as Mario :3
 Basic structures of the program are based on Miniventure codes (https://github.com/shylor/miniventure). 
 
 
-As of 12/08/20:
+As of 12/09/20:
 
 - The player's physical movement in the map is confirmed. (doesn't intersect with barriers, jumps, falls, etc.)
 
