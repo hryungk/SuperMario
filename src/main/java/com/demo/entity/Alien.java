@@ -10,10 +10,11 @@ import main.java.com.demo.level.Level;
 public class Alien extends Sprite {
     
     private int counter;
-    private int curDx;
-    private boolean activated, crushed;
+    private int curDx, initY;
+    private boolean activated, crushed, jumping;
     private boolean isShot;
     private int deathTime;  // Counts ticks after death
+    private double ds;
     
     public Alien(int x, int y, Level level) {                
         super(level);
@@ -36,11 +37,12 @@ public class Alien extends Sprite {
         
         dx = -xSpeed;
         dy = ySpeed;
+        ds = 1;
         
         counter = 0;
         curDx = dx;
         
-        activated = crushed = isShot =false;
+        activated = crushed = isShot = jumping = false;
         deathTime = 0;
         score = 100;
         
@@ -53,12 +55,30 @@ public class Alien extends Sprite {
     public void tick() {
         super.tick();     
                 
-        if (deathTime == 20) {    // Make invisible after 20 ticks.
+        if (deathTime == 20) {    // Remove after 20 ticks.
             remove();
+        } else if ((crushed || isShot&&!jumping) && !removed)   // increase tick when attacked but not removed
             deathTime++;
-        } else if ((crushed || isShot) && !removed)   // increase tick when attacked but not removed
-            deathTime++;
-        else {  // unaffected and moves            
+        else {  // unaffected and moves               
+            // When punched from below, die.            
+            if (grounded && isPunchedOnBottom) {                
+                ds = -3;
+                initY = y;
+                jumping = true;
+                setShot();                
+            }
+            
+            /* Update y position. */
+            if (jumping) {
+                dy = (int) ds;
+                ds += 0.5;
+                if (y + dy >= initY)
+                    jumping = false;
+            } else if (!grounded)
+                dy++;            
+            else
+                dy = ySpeed; // By default, there is gravity.
+            
             /* Update x position. */
             // Moves in x direction every other tick. This is to slow down alien.
             if (counter % 2 == 0) 
@@ -68,6 +88,14 @@ public class Alien extends Sprite {
             }
             counter++;      
     
+            // Adjust dy when facing a ground tile.
+            if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
+                int yt1 = y + dy + ES;
+                int backoff = yt1 - (yt1 >> 4) * 16;
+                if (backoff > 1)
+                    dy -= backoff;
+            }            
+            
             /* Update y position. */
             int oldY = y;
             boolean stopped = !move(dx, dy);     // Updates x and y.
@@ -89,20 +117,13 @@ public class Alien extends Sprite {
             if (y > Commons.BOARD_HEIGHT)
                 remove();            
             
-            // When falling, add acceleration to y.
-            int effDy = y - oldY;
-            if (effDy != 0) // actual y displacement
-                dy++;            
-            else
-                dy = ySpeed; // By default, there is gravity.
+//            // When falling, add acceleration to y.
+//            int effDy = y - oldY;
+//            if (effDy != 0) // actual y displacement            
+//                dy++;            
+//            else
+//                dy = ySpeed; // By default, there is gravity.
             
-            // Adjust dy when facing a ground tile.
-            if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
-                int yt1 = y + dy + ES;
-                int backoff = yt1 - (yt1 >> 4) * 16;
-                if (backoff > 1)
-                    dy -= backoff;
-            }                  
         }        
     }  
     
@@ -113,23 +134,17 @@ public class Alien extends Sprite {
             boolean isOverTop = sprite.y + sprite.height <= y;
             boolean willCrossTop = sprite.y + sprite.height + sprite.dy >= y;
             boolean isXInRange = sprite.x + sprite.width > x && x + width > sprite.x;
-            if (isOverTop && willCrossTop && isXInRange && !crushed) { // player jumps over the enemy
+            if (isOverTop && willCrossTop && isXInRange && !crushed) { // player jumps onto the enemy
                 xS += 2;
                 crushed = true;
                 dx = 0;
                 ((Player)sprite).addScore(score); // gives the player 100 points of score
-//                scoreStr = Integer.toString(score);                       
                 level.add(new ScoreString(x, y - height, score, level));
                 ((Player) sprite).setCrushedAlien(true);
-            } else if (!crushed && !isShot) {
-                if (((Player) sprite).isImortal()) {                    
+            } else if (!crushed && !isShot) {   // regular encounter
+                if (((Player) sprite).isImortal()) { // when player is immortal (ate starman)
                     setShot();
-                    dx = 0;
-                    ((Player)sprite).addScore(score); // gives the player 1000 points of score
-//                    scoreStr = Integer.toString(score);
-                    level.add(new ScoreString(x, y - height, score, level));
-                }
-                else {
+                } else {    
                     sprite.hurt(1); // hurts the player, damage is based on lvl.
                     sprite.touchedBy(this);
                 }
@@ -158,16 +173,16 @@ public class Alien extends Sprite {
 //        screen.render(x, y, xS + yS * colNum, flip1); // draws the top-left tile
         
         if (isVisible()) {
-            if (crushed) {
+            if (crushed) {  // crushed into half the height
                 screen.render(x, y + PPS, xS + yS * colNum, 0); // render the top-left part of the sprite         
                 screen.render(x + PPS, y + PPS, (xS + 1) + yS * colNum, 0);  // render the top-right part of the sprite
-            } else if (isShot) {
+            } else if (isShot) {    // Upside down
                 flip1 = 0;
                 screen.render(x + PPS * flip1, y + PPS, xS + yS * colNum, 2); // render the top-left part of the sprite         
                 screen.render(x - PPS * flip1 + PPS, y + PPS, (xS + 1) + yS * colNum, 2);  // render the top-right part of the sprite
                 screen.render(x + PPS * flip1, y, xS + (yS + 1) * colNum, 2); // render the bottom-left part of the sprite
                 screen.render(x - PPS * flip1 + PPS, y, xS + 1 + (yS + 1) * colNum, 2); // render the bottom-right part of the sprite        
-            } else {
+            } else { // Normal state
                 screen.render(x + PPS * flip1, y, xS + yS * colNum, flip1); // render the top-left part of the sprite         
                 screen.render(x - PPS * flip1 + PPS, y, (xS + 1) + yS * colNum, flip1);  // render the top-right part of the sprite
                 screen.render(x + PPS * flip1, y + PPS, xS + (yS + 1) * colNum, flip1); // render the bottom-left part of the sprite
@@ -200,5 +215,8 @@ public class Alien extends Sprite {
     
     public void setShot() {
         isShot = true;
+        dx = 0;
+        level.player.addScore(score);
+        level.add(new ScoreString(x, y - height, score, level));
     }
 }

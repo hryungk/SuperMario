@@ -62,10 +62,6 @@ public class Shot extends Sprite {
             hurt(health); // hurt the shot
             if (!((Alien) sprite).isShot()) {                
                 ((Alien) sprite).setShot();
-                sprite.dx = 0;
-                level.player.addScore(((Alien) sprite).score); // gives the player 1000 points of score
-//                ((Alien) sprite).scoreStr = Integer.toString(((Alien) sprite).score);
-                level.add(new ScoreString(x + 4, y + height/2, ((Alien) sprite).score, level));
             }
         }
     }

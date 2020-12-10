@@ -225,7 +225,7 @@ public class Player extends Sprite {
                 }
             }
         }
-        if (sprite instanceof HiddenSprite)
+        if (sprite instanceof HiddenSprite && !sprite.removed)
             sprite.touchedBy(this);
     }
     
@@ -310,7 +310,7 @@ public class Player extends Sprite {
             aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)            
             yS += 4;
             health++;
-            if (grounded)
+//            if (grounded)
                 y -= ES;
             level.mushroom2Flower();    // change mushrooms to flowers.
         }

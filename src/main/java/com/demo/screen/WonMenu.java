@@ -27,7 +27,7 @@ public class WonMenu extends Menu {
     public void render(Screen screen) {
         int ES = Commons.ENTITY_SIZE;
         
-        Font.draw("You won! Yay!", screen, 8 * ES, 4 * PPS, Color.get(-1, 555, 555, 555)); // Draws text
+        Font.draw("You won! Yay!", screen, 5 * ES, 9 * PPS + 3, Color.get(-1, 555, 555, 555)); // Draws text
 
         int seconds = game.gameTime / 60; // The current amount of seconds in the game.
         int minutes = seconds / 60; // The current amount of minutes in the game.
@@ -41,10 +41,10 @@ public class WonMenu extends Menu {
         } else {
             timeString = minutes + "m " + (seconds < 10 ? "0" : "") + seconds + "s"; // If under an hour has passed, then it will show minutes and seconds.
         }
-        Font.draw("Time:", screen, 8 * ES, 5 * PPS, Color.get(-1, 555, 555, 555)); // Draws "Time:" on the frame
-        Font.draw(timeString, screen, 8 * ES + 5 * PPS, 5 * PPS, Color.get(-1, 550, 550, 550)); // Draws the current time next to "Time:"
-        Font.draw("Score:", screen, 8 * ES, 6 * PPS, Color.get(-1, 555, 555, 555)); // Draws "Score:" on the frame
-        Font.draw("" + game.player.getScore(), screen, 8 * ES + 6 * PPS, 6 * PPS, Color.get(-1, 550, 550, 550)); // Draws the current score next to "Score:"
-        Font.draw("Press C to return to title screen.", screen, 8 * ES, 8 * PPS, Color.get(-1, 333, 333, 333)); //Draws text
+        Font.draw("Time:", screen, 5 * ES, 10 * PPS + 6, Color.get(-1, 555, 555, 555)); // Draws "Time:" on the frame
+        Font.draw(timeString, screen, 5 * ES + 5 * PPS, 10 * PPS + 6, Color.get(-1, 550, 550, 550)); // Draws the current time next to "Time:"
+        Font.draw("Score:", screen, 5 * ES, 11 * PPS + 9, Color.get(-1, 555, 555, 555)); // Draws "Score:" on the frame
+        Font.draw("" + game.player.getScore(), screen, 5 * ES + 6 * PPS, 11 * PPS + 9, Color.get(-1, 550, 550, 550)); // Draws the current score next to "Score:"
+        Font.draw("Press C to return to title screen.", screen, 1 * ES, 14 * PPS, Color.get(-1, 333, 333, 333)); //Draws text
     }
 }

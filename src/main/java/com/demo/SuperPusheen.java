@@ -267,7 +267,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         hasWon = false; 
         numCoins = 0;
         
-        level = new Level(numTileX, numTileY, levelNum, 400); // creates the map        
+        level = new Level(numTileX, numTileY, levelNum, Commons.GAME_TIME); // creates the map        
         tiles = level.tileIds;        
         player = new Player(input, level, this);
         player.initPlayer();
@@ -297,7 +297,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         gameTime = 0;
         hasWon = false;  
         
-        level = new Level(numTileX, numTileY, levelNum, 400); // creates the map                
+        level = new Level(numTileX, numTileY, levelNum, Commons.GAME_TIME); // creates the map                
         player.level = level;
         player.initPlayer();
         level.add(player);        

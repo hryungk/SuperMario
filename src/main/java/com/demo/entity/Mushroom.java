@@ -9,7 +9,7 @@ import main.java.com.demo.level.Level;
     @author zetcode.com */
 public class Mushroom extends HiddenSprite {
     
-    private boolean doneFollowing;
+    private boolean doneFollowing, jumping;
     public Mushroom(int x, int y, Level level) {
         super(x, y, level);        
         initCoin();
@@ -28,7 +28,7 @@ public class Mushroom extends HiddenSprite {
         
         score = 1000; 
         
-        doneFollowing = false;
+        doneFollowing = jumping = false;
     }
     
     /** Update method, (Look in the specific entity's class) */
@@ -51,27 +51,21 @@ public class Mushroom extends HiddenSprite {
                     reachedTop = true;
                     dy = -dy;
                 } 
-            } else { // Move normally
+            } else { // Move normally                
+                // When punched from below, die.            
+                if (grounded && isPunchedOnBottom) {                
+                    ds = -4;
+                    initY = y;
+                    jumping = true;
+                }
+                
                 /* Update y position. */
-                int oldY = y;
-                boolean stopped = !move(dx, dy);     // Updates x and y.
-
-                if (stopped && dx != 0)    // Has met a wall
-                    dx = - dx;                                       
-
-                // Update visibility on the screen.
-                int offset = level.getOffset();
-                if (x <= 0)
-                    hurt(health);        
-                else if (x+width <= offset && offset + Commons.BOARD_WIDTH <= x)
-                    setVisible(false);     
-
-                if (y > Commons.BOARD_HEIGHT)
-                    remove();            
-
-                // When falling, add acceleration to y.
-                int effDy = y - oldY;
-                if (effDy != 0) // actual y displacement
+                if (jumping) {
+                    dy = (int) ds;
+                    ds += 0.5;
+                    if (y + dy >= initY)
+                        jumping = false;
+                } else if (!grounded)
                     dy++;            
                 else
                     dy = ySpeed; // By default, there is gravity.
@@ -82,7 +76,27 @@ public class Mushroom extends HiddenSprite {
                     int backoff = yt1 - (yt1 >> 4) * 16;
                     if (backoff > 1)
                         dy -= backoff;
-                }  
+                }                  
+                
+                boolean stopped = !move(dx, dy);     // Updates x and y.
+                
+                if (stopped && dx != 0)    // Has met a wall
+                    dx = - dx;   
+                
+                // Update visibility on the screen.
+                int offset = level.getOffset();
+                if (x <= 0)
+                    remove();        
+                else if (x+width <= offset && offset + Commons.BOARD_WIDTH <= x)
+                    setVisible(false);     
+
+                if (y > Commons.BOARD_HEIGHT)
+                    remove();       
+                
+//                // When falling, add acceleration to y.
+//                int effDy = y - oldY;
+//                if (effDy != 0) // actual y displacement                
+
             } // end if (following the InteractiveTile)            
         } // end if(isActivated)
     }    

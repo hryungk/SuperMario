@@ -212,18 +212,18 @@ public final class Level {
     }
     
     /** Gets a tile from the world.
-     * @param x x position in the current level
-     * @param y y position in the current level
+     * @param xt x position in the current level [tile]
+     * @param yt y position in the current level [tile]
      * @return A Tile object at position (x, y) in the current level */
-    public Tile getTile(int x, int y) {
-        if (x < 0 || y < 0 || x >= W || y >= H) return null; // If the tile request is outside the world's boundaries (like x = -5), then returns a rock.
+    public Tile getTile(int xt, int yt) {
+        if (xt < 0 || yt < 0 || xt >= W || yt >= H) return null; // If the tile request is outside the world's boundaries (like x = -5), then returns a rock.
 //        return Tile.tiles[tileIds[x + y * W]]; // Returns the tile that is at the position
-        return tiles[x + y * W];
+        return tiles[xt + yt * W];
     }
     
     /** Gets a tile from the world.
-     * @param x x position in the current level
-     * @param y y position in the current level
+     * @param x x position in the current level [tile]
+     * @param y y position in the current level [tile]
      * @param unit The unit of tile (8 px for shot, 16 px for sprites, 32 px for big pusheen)
      * @return A Tile object at position (x, y) in the current level */
     public Tile getTile(double x, double y, int unit) {

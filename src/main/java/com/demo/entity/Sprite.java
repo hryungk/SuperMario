@@ -35,7 +35,10 @@ public abstract class Sprite extends Entity {
     protected int score;    // score the player get when interact with the hidden sprite.
         
     protected int bCounter, bNum, scale, numStage, ay;    // for color change animation
-    // The constructor initiates the x and y coordinates and the visible variable.
+    
+    protected boolean isPunchedOnBottom;
+
+// The constructor initiates the x and y coordinates and the visible variable.
     public Sprite(Level level) {
         super();
         this.level = level;  
@@ -55,6 +58,7 @@ public abstract class Sprite extends Entity {
         scale = 8;  // Higher the number, slower the transition.
         numStage = 4;   // Number of color schemes
         ay = 2; // higher the number, slower the y movement when sprung out of the block
+        isPunchedOnBottom = false;
     }
     
     /** Update method, (Look in the specific entity's class) */
@@ -75,7 +79,7 @@ public abstract class Sprite extends Entity {
         if (lives <= 0)  // If no more lives left, die.
             remove(); 
 //        else
-//            initHealth();        
+//            initHealth();   
     }    
 
     /** Draws the sprite on the screen
@@ -127,8 +131,8 @@ public abstract class Sprite extends Entity {
             
             if (dx < 0) dir = 2; // Set the mob's direction based on movement: left
             if (dx > 0) dir = 3; // right
-//            if (dy < 0) dir = 1; // up
-//            if (dy > 0) dir = 0; // down
+//            if (dir == 2) dx = -Math.abs(dx);
+//            if (dir == 3) dx = Math.abs(dx);
             
             boolean stopped = true; // stopped value, used for checking if the entity has stopped.
 //            if (dx != 0 && move2(dx, 0)) stopped = false; // If the horizontal acceleration and the movement was successful then stopped equals false.
@@ -189,7 +193,7 @@ public abstract class Sprite extends Entity {
                 ((x % ES != 0) && !(level.getTile(xto1, yt1, unit).mayPass()));       
         else if (x + width >= level.W * ES) // When going beyond the right of the screen
             grounded = !(level.getTile(xto1-aTile, yt1, unit).mayPass());
-        else if (level.W * ES - ES <= x + width && x + width < level.W * ES) // When in between one tile to the right of the screen
+        else if (level.W * ES - ES <= x + width && x + width < level.W * ES) // When less than one tile close to the right of the screen
             grounded = !(level.getTile(xto1, yt1, unit).mayPass());
         else if (y + height > Commons.GROUND) // when falling beyond the ground
             grounded = false;
@@ -197,19 +201,50 @@ public abstract class Sprite extends Entity {
 //            grounded = !(level.getTile(xt1-aTile, yt1, unit).mayPass()) ||
 //                ((x % ES != 0) && !(level.getTile(xt1, yt1, unit).mayPass()));    
             boolean[] tempBool = new boolean[2];
+//            boolean[] tempBool2 = new boolean[2];
             int nn = 0;
             for (double xx = xt1; xx > xt; xx -= aTile){
-                boolean temp = !(level.getTile(xx-aTile, yt1, unit).mayPass()) ||
-                        ((x % ES != 0) && !(level.getTile(xx, yt1, unit).mayPass()));    
+                Tile t1 = level.getTile(xx-aTile, yt1, unit);
+                Tile t2 = level.getTile(xx, yt1, unit);
+                boolean temp = !(t1.mayPass()) || ((x % ES != 0) && !(t2.mayPass()));    
                 tempBool[nn] = temp;
+                
+//                // Find whether the ground is punched
+//                boolean temp2 = ((t1 instanceof InteractiveTile) && ((InteractiveTile)t1).isHitBottom()) ||
+//                                ((t2 instanceof InteractiveTile) && ((InteractiveTile)t2).isHitBottom());
+//                tempBool2[nn] = temp && temp2;
+                
                 nn++;
             }
             boolean finalBool = false;
-            for (int ii = 0; ii < nn; ii++)
+//            boolean finalBool2 = false;
+            for (int ii = 0; ii < nn; ii++) {
                 finalBool = finalBool || tempBool[ii];
+//                finalBool2 = finalBool2 || tempBool2[ii];
+            }
             grounded = finalBool;
+//            isPunchedOnBottom = finalBool2;
         }
         
+        // Find whether the ground is punched
+        if (grounded) {  
+            Tile t1 = level.getTile(xt1-aTile, yt1, unit);
+            Tile t2 = level.getTile(xt1, yt1, unit);
+            boolean temp1 = !(t1.mayPass()) && ((t1 instanceof InteractiveTile) && !this.equals(((InteractiveTile)t1).getHiddenSprite()) && ((InteractiveTile)t1).getInitY() != ((InteractiveTile)t1).getY());
+            boolean temp2 = ((x % ES != 0) && !(t2.mayPass())) && ((t2 instanceof InteractiveTile) && !this.equals(((InteractiveTile)t2).getHiddenSprite()) && ((InteractiveTile)t2).getInitY() != ((InteractiveTile)t2).getY());
+            isPunchedOnBottom = temp1 || temp2;            
+            
+            if (dx != 0) {
+                if (temp1) {
+                    dir = 3;
+                    this.dx = Math.abs(dx);
+                } else if (temp2) {
+                    dir = 2;
+                    this.dx = -Math.abs(dx);
+                }        
+            }        
+        }
+                
         // if the increment is negative, round up the tile coordinates.
         if (dy < 0) {            
             yto0 = (Math.ceil((y - Math.min(ES, height)) / (double)height));

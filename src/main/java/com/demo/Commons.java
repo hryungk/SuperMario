@@ -6,6 +6,7 @@ public interface Commons {
     int PPS = 8;    // Pixels per square in the spritesheet.
     int BOARD_WIDTH = 300;
     int BOARD_HEIGHT = 240;    
+    int GAME_TIME = 350;
     
     int ENTITY_SIZE = 16;   // Width, height both is 16 by default.    
 

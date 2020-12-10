@@ -110,4 +110,12 @@ public abstract class InteractiveTile extends Tile {
 //        if (firstTime)
 //            numHS = 1;
     }
+    
+    public HiddenSprite getHiddenSprite() {
+        return hs;
+    }
+    
+    public int getInitY() {
+        return initY;
+    }
 }
