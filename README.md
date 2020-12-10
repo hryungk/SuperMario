@@ -20,16 +20,16 @@ As of 12/08/20:
 
 - Print scores based on the player's position
 
-
-Essential features to be added soon:
-
-- Big Pusheen crushes the bricks when jumping to the bottom of them.
-
 - Moving bricks should affect the sprites.
 
   * The player should be able to kill Goomba by hitting the brick from the bottom. 
 
   * Mushroom should change direction when hit by the jumping bricks.
+  
+
+Essential features to be added soon:
+
+- Big Pusheen crushes the bricks when jumping to the bottom of them.
 
 
 Minor features to be added:
