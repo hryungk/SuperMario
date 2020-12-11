@@ -76,7 +76,7 @@ public class Player extends Sprite {
         super.tick();
         
         if (invulnerableTime > 0) invulnerableTime--; // if invulnerableTime is above 0, then minus it by 1.
-        if (immortalTime > 0) { // if immortalTime is above 0, 
+        if (immortalTime > 0) { // While Starman is in effect, 
             immortalTime--; // minus it by 1.         
             bNum = (bCounter / scale) % numStage;
             bCounter++;          

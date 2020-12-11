@@ -106,8 +106,10 @@ public class Entity {
         return !(x + w < x0 || y + h < y0 || x1 < x || y1 < y); 
     }
     
-    /** Extended in Sprite.java. */
+    /** Extended in Sprite.java.
+     * @param e The entity that wants to interact with this entity.
+     * @return  true if this entity blocks e, false if this entity lets e pass it. */
     public boolean blocks(Entity e) {
-            return true;
+        return true;
     }
 }
