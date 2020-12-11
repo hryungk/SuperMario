@@ -10,12 +10,9 @@ import main.java.com.demo.level.Level;
     @author zetcode.com */
 public class Shot extends Sprite {
     
-    private final int ES = Commons.ENTITY_SIZE;
-    
-    public Shot( Level level) {      
+    public Shot(Level level) {      
         super(level);
-        initShot();
-        
+        initShot();        
     }       
     
     // (x, y) is the position of the player.
@@ -30,7 +27,7 @@ public class Shot extends Sprite {
 //        
 //        this.dx = dx; 
         
-        xS = 8;
+        xS = 10;
         yS = 2;
         
         dy = 0;        

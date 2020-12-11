@@ -11,7 +11,6 @@ public abstract class HiddenSprite extends Sprite {
     public static int mushroomID = 1;
     public static int starmanID = 2;
     
-    protected final int PPS = Commons.PPS;
     protected boolean reachedTop;   // True when the sprite reaches its upper limit during emerging
     protected double ds;    // temporary dy
     protected int initY;  // Initial y

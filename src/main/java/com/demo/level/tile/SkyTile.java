@@ -6,7 +6,6 @@
 package main.java.com.demo.level.tile;
 
 import main.java.com.demo.entity.Entity;
-import main.java.com.demo.entity.Sprite;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
@@ -33,7 +32,9 @@ public class SkyTile extends Tile {
     public void bumpedInto(int xt, int yt, Entity entity) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-     /** Returns if the player can walk on it, overrides in sub-classes  */
+    
+    /** Returns if the player can walk on it, overrides in sub-classes
+     * @return True if the sprite can walk on it, false if it's a physical block. */
     @Override
     public boolean mayPass() {
         return true;

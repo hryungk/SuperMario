@@ -21,12 +21,13 @@ public final class Level {
 
     private int world, stage; // depth level of the level
     private final int TIME_LIMIT; 
-    public List<Alien> aliens; 
-    public List<HiddenSprite> hiddenSprites; 
-    
-    public List<Sprite> entities = new ArrayList<>(); // A list of all the entities in the world        
-    private List<Sprite> rowSprites = new ArrayList<>(); // A list of entities to be rendered
-    public List<ScoreString> scores = new ArrayList<>(); // A list of score strings
+        
+    private List<Sprite> entities; // A list of all the entities in the world        
+    private List<Sprite> rowSprites; // A list of entities to be rendered    
+    private List<Alien> aliens; 
+    private List<HiddenSprite> hiddenSprites; 
+    private List<ScoreString> scores; // A list of score strings
+    private List<Sprite> brokenBricks; // A list of broken bricks to be rendered    
     
     public Player player; // the player object
     public Screen screen;
@@ -53,6 +54,12 @@ public final class Level {
         for (int i = 0; i < w * h; i++) { // Loops (width * height) times
             entitiesInTiles[i] = new ArrayList<>(); // Adds a entity list in that tile.
         }
+        
+        /* Initialize the sprite lists. */
+        entities = new ArrayList<>(); // A list of all the entities in the world        
+        rowSprites = new ArrayList<>(); // A list of entities to be rendered
+        scores = new ArrayList<>(); // A list of score strings
+        brokenBricks = new ArrayList<>(); // A list of broken bricks
     }        
     
     /** Update method, updates (ticks) 60 times a second (around every 17 ms)
@@ -166,10 +173,20 @@ public final class Level {
                     tile.render(screen, this, x, y); // renders the tile on the screen
             }
         }
+        
+        /* Render broken brick pieces over the blocks. */
+        for (int i = 0; i < brokenBricks.size(); i++) { // loops through the entity list
+            Sprite sprite = brokenBricks.get(i);
+            if (sprite.isVisible())
+                sprite.render(screen); // renders the sprite on the screen
+        }
         screen.setOffset(0, 0); // resets the offset.     
     }
 
-    /** Renders all the entity sprites on the screen */
+    /** Renders all the entity sprites on the screen.
+     * @param screen The screen to render.
+     * @param xScroll The x offset of the map to display on the screen.
+     * @param yScroll The y offset of the map to display on the screen. */
     public void renderSprites(Screen screen, int xScroll, int yScroll) {
         this.screen = screen;
         int xto = xScroll >> 4; // the game's horizontal scroll offset [tiles].
@@ -178,8 +195,7 @@ public final class Level {
         int ws = (screen.W + 15) >> 4; // width of the screen being rendered
         int hs = (screen.H + 15) >> 4; // height of the screen being rendered
 
-        screen.setOffset(xScroll, yScroll); // sets the scroll offsets.
-        
+        screen.setOffset(xScroll, yScroll); // sets the scroll offsets.        
         
         /* Render Flag tile before the player. */
         int xtFlag = ((FlagTile) Tile.flag).getX() >> 4;
@@ -189,14 +205,14 @@ public final class Level {
     
         /* Render sprites including player. */
         for (int y = yto; y <= hs + yto; y++) { // loops through the vertical positions
-                for (int x = xto; x <= ws + xto; x++) { // loops through the horizontal positions
-                    if (x < 0 || y < 0 || x >= W || y >= H) continue; // If the x & y positions of the sprites are within the map's boundaries
-                    rowSprites.addAll(entitiesInTiles[x + y * W]); // adds all of the sprites in the entitiesInTiles array.                        
-                }
-                if (rowSprites.size() > 0) { // If the rowSprites list size is larger than 0...
-                    sortAndRender(screen, rowSprites); // sorts and renders the sprites on the screen
-                }
-                rowSprites.clear(); // clears the list
+            for (int x = xto; x <= ws + xto; x++) { // loops through the horizontal positions
+                if (x < 0 || y < 0 || x >= W || y >= H) continue; // If the x & y positions of the sprites are within the map's boundaries
+                rowSprites.addAll(entitiesInTiles[x + y * W]); // adds all of the sprites in the entitiesInTiles array.                        
+            }
+            if (rowSprites.size() > 0) { // If the rowSprites list size is larger than 0...
+                sortAndRender(screen, rowSprites); // sorts and renders the sprites on the screen
+            }
+            rowSprites.clear(); // clears the list
         }
         screen.setOffset(0, 0); // resets the offset.
     }
@@ -277,24 +293,30 @@ public final class Level {
 
     /** Adds an entity to the level
      * @param e An entity to add to the level */
-    public void add(Sprite e) {
+    public void add(Sprite e) {        
+        if (e == null)
+            throw new NullPointerException("Added sprite is null.");
         
         if (e instanceof Player) { // if the entity happens to be a player
             player = (Player) e; // the player object will be this entity
-        }
+        }        
         e.removed = false; // sets the entity's removed value to false
+        
         entities.add(e); // adds the entity to the entities list
         if (e instanceof HiddenSprite)
             hiddenSprites.add((HiddenSprite)e);
         if (e instanceof ScoreString)
             scores.add((ScoreString)e);
+        if (e instanceof BrokenBrick)
+            brokenBricks.add((BrokenBrick)e);
 //        entity.init(this); // Initializes the entity
         int xt = e.x >> 4; // gets the x position of the entity
         int yt = e.y >> 4; // gets the y position of the entity
         insertEntity(xt, yt, e); // inserts the entity into the world
     }
     
-    /** Removes a entity */
+    /** Removes a sprite entity.
+     * @param e The sprite to be removed. */
     public void remove(Sprite e) { 
         entities.remove(e); // removes the entity from the entities list
         int xt = e.x >> 4; // gets the x position of the entity
@@ -302,19 +324,24 @@ public final class Level {
         removeEntity(xt, yt, e); // removes the entity based on the x & y position.
     }    
     
-    /** Inserts an entity to the entitiesInTiles list */
+    /** Inserts an entity to the entitiesInTiles list. */
     private void insertEntity(int xt, int yt, Sprite e) {
         if (xt < 0 || yt < 0 || xt >= W || yt >= H) return; // if the entity's position is outside the world, then stop the method.
         entitiesInTiles[xt + yt * W].add(e); // adds the entity to the entitiesInTiles list array.
     }    
 
-    /** Removes an entity in the entitiesInTiles list */
+    /** Removes an entity in the entitiesInTiles list. */
     private void removeEntity(int xt, int yt, Sprite e) {
         if (xt < 0 || yt < 0 || xt >= W || yt >= H) return; // if the entity's position is outside the world, then stop the method.
         entitiesInTiles[xt + yt * W].remove(e); // removes the entity to the entitiesInTiles list array.
     }
     
-    /** Gets all the entities from a square area of 4 points. */
+    /** Gets all the entities from a square area of 4 points.
+     * @param x0 Left boundary of the intersection.
+     * @param y0 Top boundary of the intersection.
+     * @param x1 Right boundary of the intersection.
+     * @param y1 Bottom boundary of the intersection.
+     * @return A list of sprite inside the intersection box.     */
     public List<Sprite> getEntities(int x0, int y0, int x1, int y1) {
         List<Sprite> result = new ArrayList<>(); // result list of entities
         int xt0 = (x0 >> 4) - 1; // tile location of x0

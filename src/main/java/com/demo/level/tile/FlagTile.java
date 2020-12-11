@@ -36,7 +36,7 @@ public class FlagTile extends Tile {
         y = Commons.GROUND - ES - 127 - ES;
         dy = 0;
         
-        xS = 10;
+        xS = 12;
         yS = 2;
         
         yFin = y;
@@ -48,9 +48,8 @@ public class FlagTile extends Tile {
     @Override
     public void render(Screen screen, Level level, int xt, int yt) {
         int sw = screen.getSheet().width;   // width of sprite sheet (256)
-        int colNum = sw / Commons.PPS;    // Number of squares in a row (32)     
+        int colNum = sw / PPS;    // Number of squares in a row (32)     
         
-        int PPS = Commons.PPS;
         for (int ys = 0; ys < hS; ys++) {
             for (int xs = 0; xs < wS; xs++) {
                 screen.render(x + xs * PPS, y + ys * PPS, (xS + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to render them all on the screen.                    

@@ -57,12 +57,22 @@ public class Alien extends Sprite {
                 
         if (deathTime == 20) {    // Remove after 20 ticks.
             remove();
-        } else if ((crushed || isShot&&!jumping) && !removed)   // increase tick when attacked but not removed
+        } else if ((crushed) && !removed)   // increase tick when attacked but not removed
             deathTime++;
-        else {  // unaffected and moves               
+        else if (isShot) {
+            dy = (int) ds;
+            if (dy < 4)
+                ds += 0.5;     
+
+            x += dx;
+            y += dy;
+            
+            // Update visibility on the screen.
+            updateVisibility();     
+            
+        } else {  // unaffected and moves               
             // When punched from below, die.            
-            if (grounded && isPunchedOnBottom) {                
-                ds = -3;
+            if (grounded && isPunchedOnBottom) {     
                 initY = y;
                 jumping = true;
                 setShot();                
@@ -97,7 +107,6 @@ public class Alien extends Sprite {
             }            
             
             /* Update y position. */
-            int oldY = y;
             boolean stopped = !move(dx, dy);     // Updates x and y.
                         
             if (stopped && dx != 0) {   // Has met a wall
@@ -106,29 +115,13 @@ public class Alien extends Sprite {
             }
             
             // Update visibility on the screen.
-            int offset = level.getOffset();
-            if (x <= 0)
-                hurt(health);        
-            else if (offset < x+width && x < offset + Commons.BOARD_WIDTH)
-                setVisible(true);    
-            else
-                setVisible(false);        
-
-            if (y > Commons.BOARD_HEIGHT)
-                remove();            
-            
-//            // When falling, add acceleration to y.
-//            int effDy = y - oldY;
-//            if (effDy != 0) // actual y displacement            
-//                dy++;            
-//            else
-//                dy = ySpeed; // By default, there is gravity.
-            
+            updateVisibility();
         }        
     }  
     
     /** What happens when the player touches an entity.
      * @param sprite The sprite that this sprite is touched by. */    
+    @Override
     protected void touchedBy(Sprite sprite) {
         if (sprite instanceof Player) { // if the entity touches the player
             boolean isOverTop = sprite.y + sprite.height <= y;
@@ -199,6 +192,7 @@ public class Alien extends Sprite {
         return activated;
     }
     
+    @Override
     public boolean blocks(Sprite e) {
 //        if (crushed) return true;
 //        else 
@@ -216,7 +210,22 @@ public class Alien extends Sprite {
     public void setShot() {
         isShot = true;
         dx = 0;
+        ds = -3;
         level.player.addScore(score);
         level.add(new ScoreString(x, y - height, score, level));
+    }
+    
+    private void updateVisibility() {
+        // Update visibility on the screen.
+        int offset = level.getOffset();
+        if (x <= 0)
+            remove();   //hurt(health);     
+        else if (x+width <= offset && offset + Commons.BOARD_WIDTH <= x)
+            setVisible(false);   
+        else
+            setVisible(true);   
+
+        if (y > Commons.BOARD_HEIGHT)
+            remove();              
     }
 }

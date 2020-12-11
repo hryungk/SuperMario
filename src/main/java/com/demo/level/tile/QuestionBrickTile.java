@@ -5,7 +5,6 @@
  */
 package main.java.com.demo.level.tile;
 
-import main.java.com.demo.Commons;
 import main.java.com.demo.entity.Entity;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
@@ -16,14 +15,14 @@ import main.java.com.demo.level.Level;
  */
 public class QuestionBrickTile extends InteractiveTile {
     
-    private int bNum, bCounter, dbNum, scale;
+    private int bNum, bCounter, dbNum;
+    private final int scale = 7;
     
     public QuestionBrickTile(int id, int xt, int yt) {
         super(id, xt, yt);
         
         xS = 10;
         yS = 0;
-        scale = 7;
         
         bCounter = tickCount;
         dbNum = 1;
@@ -38,17 +37,15 @@ public class QuestionBrickTile extends InteractiveTile {
      * @param yt x tile position of the current level */
     @Override
     public void render(Screen screen, Level level, int xt, int yt) {
-        super.render(screen, level, xt, yt);
         
         int sw = screen.getSheet().width;   // width of sprite sheet (256)
-        int colNum = sw / Commons.PPS;    // Number of squares in a row (32)
+        int colNum = sw / PPS;    // Number of squares in a row (32)
 //        screen.render(x * ES + 0, y * ES + 0, xS + yS * colNum, 0); // renders the top-left part of the brick        
                 
 //        if (isHitBottom) bNum = 3;  // No more blinking after hit on the bottom.
             
         int xSCur = xS + bNum * wS; // animation based on walk distance (0 is standing still and 2 is moving)          
         
-        int PPS = Commons.PPS;
         for (int ys = 0; ys < hS; ys++) {
             for (int xs = 0; xs < wS; xs++) {
                 screen.render(xt * ES + xs * PPS, y + ys * PPS, (xSCur + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to render them all on the screen.                    

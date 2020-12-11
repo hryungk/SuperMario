@@ -7,7 +7,6 @@ package main.java.com.demo.level.tile;
 
 import main.java.com.demo.Commons;
 import main.java.com.demo.entity.HiddenSprite;
-import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
 /**
@@ -48,35 +47,22 @@ public abstract class InteractiveTile extends Tile {
    
     @Override
     public void tick(int xt, int yt, Level level) {
-//        if (isHitBottom && bNum != 3) { // When first hit by the player
-//            bNum = 3;
-//            ds = dsInit;
-//        }            
-//        if (isHitBottom) {
-            if ((y == initY && ds == dsInit) || y < initY) {                 
-                ds = ds + 0.5;
-            }
-            else
-                ds = 0;        
-//        }
+        
+        /* Update y increment. */
+        if ((y == initY && ds == dsInit) || y < initY) { // When first hit or after hit
+            ds = ds + 0.5;
+        }
+        else  // When reached the initial position
+            ds = 0;      
 
-        if ((int) (y + ds) <= initY) {
+        /* Update y position. */
+        if ((int) (y + ds) <= initY) { // When first hit or after hit
             y = (int) (y + ds);
         }
-        else
+        else // When reached the initial position
             y = initY;
     }
     
-    @Override
-    public void render(Screen screen, Level level, int xt, int yt) {
-//        initY = yt * ES; 
-//        if (isHitBottom && (int) (y + ds) <= initY) {
-//        if ((int) (y + ds) <= initY) {
-//            y = (int) (y + ds);
-//        }
-//        else
-//            y = initY;
-    }
     
     /** What happens when you hit the tile (ex: punching a tree) */
     public void hurt() {

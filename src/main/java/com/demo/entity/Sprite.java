@@ -12,21 +12,21 @@ import main.java.com.demo.level.tile.Tile;
     @author zetcode.com */
 public abstract class Sprite extends Entity {
 
+    public Level level; // the level that the entity is on
+    public int maxHealth = 2; // The maximum amount of health the mob can have
+    public int health; // The amount of health we currently have, and set it to the maximum we can have
     private boolean visible;
     private boolean dying;
     protected final int ES = Commons.ENTITY_SIZE; // Default entity size (16 px)
-    int dx, dy;
-    public int maxHealth = 2; // The maximum amount of health the mob can have
-    public int health; // The amount of health we currently have, and set it to the maximum we can have
+    protected final int PPS = Commons.PPS;  // Pixels per square (8)
+    protected final int MAX_JUMP = Commons.BOARD_HEIGHT - 2 * ES - Commons.Y96; // (64)
+    protected int numS = 256 / PPS;    // number of squres in a row in the sprite sheet (32)
+    protected int dx, dy;
     protected int walkDist = 0; // How far we've walked currently, incremented after each movement
     protected int dir = 0; // The direction the mob is facing, used in attacking and rendering. 0 is down, 1 is up, 2 is left, 3 is right   
-    protected final int PPS = Commons.PPS;  // Pixels per square (8)
-    int numS = 256 / PPS;    // number of squres in a row in the sprite sheet (32)
     protected boolean grounded, topped; // Whether the sprite is on to a solid tile/touched a solid tile on the head.
-    protected int ground;
-    public Level level; // the level that the entity is on
-    protected int wS, hS; // width and height of tile [squares]
-    protected final int MAX_JUMP = Commons.BOARD_HEIGHT - 2 * ES - Commons.Y96; // (64)
+    protected int ground;    
+    protected int wS, hS; // width and height of tile [squares]    
     protected int xSpeed, ySpeed;
     protected int lives;
     protected int unit;
