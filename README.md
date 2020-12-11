@@ -4,7 +4,7 @@ Recreating Super Mario Brothers game by Nintendo but Pusheen as Mario :3
 Basic structures of the program are based on Miniventure codes (https://github.com/shylor/miniventure). 
 
 
-As of 12/09/20:
+As of 12/11/20:
 
 - The player's physical movement in the map is confirmed. (doesn't intersect with barriers, jumps, falls, etc.)
 
@@ -25,15 +25,18 @@ As of 12/09/20:
   * The player should be able to kill Goomba by hitting the brick from the bottom. 
 
   * Mushroom should change direction when hit by the jumping bricks.
-  
+
+- Big Pusheen crushes the bricks when jumping to the bottom of them.
+
+- When goomba dies with an indirect hit, it has a jumping effect to fall to the bottom of the screen. 
+
 
 Essential features to be added soon:
 
-- Big Pusheen crushes the bricks when jumping to the bottom of them.
 
 
 Minor features to be added:
 
 - Add acceleration effect in x direction
 
-- When player or goomba dies, it has a jumping effect to fall to the bottom of the screen. 
+- When the player dies, it has a jumping effect to fall to the bottom of the screen. 
