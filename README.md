@@ -28,7 +28,8 @@ As of 12/11/20:
 
 - Big Pusheen crushes the bricks when jumping to the bottom of them.
 
-- When goomba dies with an indirect hit, it has a jumping effect to fall to the bottom of the screen. 
+- When Goomba and the player dies with an indirect hit, it has a jumping effect to fall to the bottom of the screen. 
+
 
 
 Essential features to be added soon:
@@ -39,4 +40,4 @@ Minor features to be added:
 
 - Add acceleration effect in x direction
 
-- When the player dies, it has a jumping effect to fall to the bottom of the screen. 
+- Fire ball bounces up and down as it travels while rotating.
