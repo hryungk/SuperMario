@@ -297,8 +297,12 @@ public class Player extends Sprite {
     public void hurt(int damage) { // mob hurts this sprite
         if (invulnerableTime > 0 || immortalTime > 0) return; // if hurt time OR invulnerableTime is above 0, then skip the rest of the code.
         
-        super.hurt(damage); // Actually change our health
+//        super.hurt(damage); // Actually change our health
         if (enlarged || fired) invulnerableTime = 100; // invulnerable time is set to 30        
+        else {
+            setDying(true);
+            ds = -5;
+        }
     }    
     
     /** What happens when the player wins */

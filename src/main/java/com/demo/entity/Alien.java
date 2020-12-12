@@ -136,9 +136,9 @@ public class Alien extends Sprite {
                 if (p.isImortal()) { // when player is immortal (ate starman)
                     setShot();
                 } else {    
+                    sprite.hurt(1); // hurts the player, damage is based on lvl.
 //                    p.touchedBy(this);                    
-                    if (p.isEnlarged()) {
-                        sprite.hurt(1); // hurts the player, damage is based on lvl.
+                    if (p.isEnlarged()) {                        
                         p.width /= 2;
                         p.height /= 2;
                         p.wS = p.width / PPS;
@@ -152,10 +152,11 @@ public class Alien extends Sprite {
                             p.yS -= 8;
                             p.setFired(false);
                         }
-                    } else {
-                        p.setDying(true);
-                        p.ds = -5;
-                    }           
+                    } 
+//                    else {
+//                        p.setDying(true);
+//                        p.ds = -5;
+//                    }           
                 }
             }
         }
