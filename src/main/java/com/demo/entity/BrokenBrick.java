@@ -9,7 +9,6 @@ import main.java.com.demo.level.Level;
     @author zetcode.com */
 public class BrokenBrick extends Sprite {
 
-    private double ds;    // temporary dy
     private boolean firstTime; //  when first activated
     // The constructor initiates the x and y coordinates and the visible variable.
     public BrokenBrick(int x, int y, int dx, int ds, Level level) {          

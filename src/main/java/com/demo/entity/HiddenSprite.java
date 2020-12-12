@@ -12,7 +12,6 @@ public abstract class HiddenSprite extends Sprite {
     public static int starmanID = 2;
     
     protected boolean reachedTop;   // True when the sprite reaches its upper limit during emerging
-    protected double ds;    // temporary dy
     protected int initY;  // Initial y
     protected boolean isActivated; // The hidden sprite is activated when the 
                                    // player hits the bottom of the InteractiveTile
@@ -31,6 +30,7 @@ public abstract class HiddenSprite extends Sprite {
         isActivated = false;
         reachedTop = false;
         ds = Commons.ITV0 - 0.5; // -3   to follow the interactive tile when hit on the bottom.
+        ground = y - height;
         wS = 2;
         hS = 2; 
         width = wS * PPS;

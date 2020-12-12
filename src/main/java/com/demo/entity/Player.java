@@ -16,13 +16,13 @@ public class Player extends Sprite {
  
     private InputHandler input;
     private SuperPusheen game;
-    public int invulnerableTime = 0; // the invulnerability time the player has when he is hit
-    public int immortalTime = 0; // the immortal time the player has when it eats the starman.
-    private double ds;  // y velocity     
+    public int invulnerableTime; // the invulnerability time the player has when he is hit
+    public int immortalTime; // the immortal time the player has when it eats the starman.
     private boolean crushedAlien, enlarged, fired, immortal;
     private boolean firstTime, reachedEnd, reachedPollBottom, flagReachedBottom, faceLeft, jumped, enteredCastle;
     private int leftCount;    
     private int netDx;
+    private int deathTime;  // Counts ticks after death
     
     public Player(InputHandler input, Level level, SuperPusheen board) {                
         super(level);        
@@ -32,175 +32,198 @@ public class Player extends Sprite {
         lives = 3;        
         scale = 4;
         
-        initPlayer();
+        init();
     }    
     
-    public void initPlayer() {
-        
-        width = height = ES;
-        wS = width / PPS;
-        hS = height / PPS;
-        unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
-        aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
-        
-        xS = 0;
-        yS = 10;
+    @Override
+    public void init() {
+        super.init();        
         
         // Initial coordinates of the player sprite.
         int START_X = Commons.PLAYER_XI;
-        setX(START_X);
-        
+        setX(START_X);        
         int START_Y = Commons.GROUND - height;
         setY(START_Y);       
-        ground = START_Y + height;
-        
-        dir = 3;    // facing right when first created
-        
-        xSpeed = 2;
-//        ySpeed = 2;
+        width = height = ES;
+        xS = 0;
+        yS = 10;
         
         dx = 0;
         dy = ySpeed;
         ds = 0;
+        dir = 3;    // facing right when first created
+        
+        ground = START_Y + height;         
+        wS = width / PPS;
+        hS = height / PPS;
+        xSpeed = 2;
+//        ySpeed = 2;
+        unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
+        aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
         score = 0;
         
-        crushedAlien = enlarged = fired = immortal = false;   
-        reachedEnd = reachedPollBottom = flagReachedBottom = faceLeft = jumped = enteredCastle = false;
+        invulnerableTime = 0; // the invulnerability time the player has when he is hit
+        immortalTime = 0;
+                
+        crushedAlien = enlarged = fired = immortal = false;           
         firstTime = true;
-        leftCount = 0;        
+        reachedEnd = reachedPollBottom = flagReachedBottom = faceLeft = jumped = enteredCastle = false;        
+        leftCount = netDx = deathTime = 0;        
     }    
         
     // Positions the player in horizontal direction.
     @Override
     public void tick() {  
-        super.tick();
-        
-        if (invulnerableTime > 0) invulnerableTime--; // if invulnerableTime is above 0, then minus it by 1.
-        if (immortalTime > 0) { // While Starman is in effect, 
-            immortalTime--; // minus it by 1.         
-            bNum = (bCounter / scale) % numStage;
-            bCounter++;          
-        }
-//        int xa = 0; // x acceleration
-//        int ya = 0; // y acceleration
-//        if (input.jump.down) 
-//            ya--;
-//        else
-//            ya++;// if the player presses up then his y acceleration will be -1
-//        if (input.left.down) xa--; // if the player presses left then his x acceleration will be -1
-//        if (input.right.down) xa++; // if the player presses up right his x acceleration will be 1
-//        dx = xa;
-//        dy = ya;
-                        
-        /* x increment. */
-        dx = 0;
-        if (input.left.down) dx = -xSpeed; // if the player presses left then his x acceleration will be -1 
-        if (input.right.clicked || input.right.down) dx = xSpeed;     
-        
-        /* y increment. */
-        int g = 8;  // gravitational force        
-        
-        if (grounded && y + height == ground)
-            ds = 1;
-        else if (topped) {
-            ds = 1;
-        }
-        else if (y + height + ds < Commons.BOARD_HEIGHT)
-            ds = ds + 0.5;
-        
-        if (input.jump.clicked && grounded)
-            ds = -g;
-        if (crushedAlien) { // Slightly jump over the enemy
-            ds = -3;
-            crushedAlien = false;
-        }
-        
-        dy = (int) ds;
-        
-        if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
-            int yt1 = y + dy + height;
-            int backoff = yt1 - (yt1 >> 4) * ES;
-            if (dy > 1 && backoff > 0)
-                dy -= backoff;
-        }
-        
-        /* Boundary controls. */
-        // right end of the screen
-        if (x + width >= level.W * ES)
-            x = level.W * ES - width;
-        
-        // top of the screen
-        if (y <= 0) 
-            y = 0;             
-        
-        // When falls to the bottom, die immediately and start over.
-        if (y > Commons.BOARD_HEIGHT) { 
-            lives--;
-            resetGame();
-        }
-        // Don't go beyond the left end of the screen.
-        int xScroll = level.getOffset();
-        if (x <= xScroll) 
-            x = xScroll;        
-        
-        // When reached the flag
-        reachedEnd = x + width >= Commons.X_MAX + ES / 2;     
-        if (reachedEnd) {
-            if (firstTime) {
-                gameWon();
-                ((FlagTile)Tile.flag).setScore((Commons.GROUND - y) / ES * 100);
-                firstTime = false;
-            }
-            dx = 0;
-            reachedPollBottom = y + height >= Commons.GROUND - ES;
-            flagReachedBottom = ((FlagTile)Tile.flag).reachedBottom();
-            enteredCastle = x + width>= Commons.X_MAX + 7 * ES;            
-            if (!reachedPollBottom) {
-                dy = 1;                
-            } else if (!flagReachedBottom) {
-                dy = 0;// wait                            
-            } else if (!faceLeft) {
-                if (leftCount == 0) {
-                    x += width;
-                    dir = 2; // change direction to left
-                    game.setPMax(Commons.PLAYER_XMAX + width);
-                } else if (leftCount > 10) {
-                    faceLeft = true;
-                }
-                leftCount++;            
-            } else if (!jumped){                
-                dx = xSpeed;
-                ds = -1.5;
-                jumped = true;                
-            } else if (!enteredCastle) {
-                dx = xSpeed;
-            } else {
-                setVisible(false);
-            }
-        }
-        
-        int oldX = x;
-        move(dx, dy);
-        netDx = x - oldX;
-        
-        /* Add a shot. */
-        if (fired && input.attack.clicked) {
-            Shot shot = new Shot(level);
-            int dxShot = 0;
-            int xShot = 0;
-            int yShot = y + (height-shot.height)/2;
-            if (dir == 2) { // facing left
-                dxShot = -1;
-                xShot = x - shot.width;
-            } 
-            else if (dir == 3) {// facing right 
-                dxShot = 1;
-                xShot = x + width;
-            } 
-            shot.setX(xShot);
-            shot.setY(yShot);
-            shot.setDx(dxShot);
-            level.add(shot);                       
+        if (deathTime != 0) {
+            if (deathTime < 40)
+                deathTime++;
+            else if (deathTime == 40) {    // Remove after 20 ticks.
+                lives--;
+                if (lives <= 0)  // If no more lives left, die.
+                    remove(); 
+                else
+                    resetGame();
+            }        
+        } else {
+            super.tick();
+
+          if (invulnerableTime > 0) invulnerableTime--; // if invulnerableTime is above 0, then minus it by 1.
+          if (immortalTime > 0) { // While Starman is in effect, 
+              immortalTime--; // minus it by 1.         
+              bNum = (bCounter / scale) % numStage;
+              bCounter++;          
+          }
+
+          if (dying) {
+              dx = 0;
+              dy = (int) ds;
+              if (dy < 5)
+                  ds += 0.3;     
+              x += dx;
+              y += dy;
+          } else {
+      //        int xa = 0; // x acceleration
+      //        int ya = 0; // y acceleration
+      //        if (input.jump.down) 
+      //            ya--;
+      //        else
+      //            ya++;// if the player presses up then his y acceleration will be -1
+      //        if (input.left.down) xa--; // if the player presses left then his x acceleration will be -1
+      //        if (input.right.down) xa++; // if the player presses up right his x acceleration will be 1
+      //        dx = xa;
+      //        dy = ya;
+
+              /* x increment. */
+              dx = 0;
+              if (input.left.down) dx = -xSpeed; // if the player presses left then his x acceleration will be -1 
+              if (input.right.clicked || input.right.down) dx = xSpeed;     
+
+              /* y increment. */
+              int g = 8;  // gravitational force        
+
+              if (grounded && y + height == ground)
+                  ds = 1;
+              else if (topped) {
+                  ds = 1;
+              }
+              else if (y + height + ds < Commons.BOARD_HEIGHT)
+                  ds = ds + 0.5;
+
+              if (input.jump.clicked && grounded)
+                  ds = -g;
+              if (crushedAlien) { // Slightly jump over the enemy
+                  ds = -3;
+                  crushedAlien = false;
+              }
+
+              dy = (int) ds;
+
+              if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
+                  int yt1 = y + dy + height;
+                  int backoff = yt1 - (yt1 >> 4) * ES;
+                  if (dy > 1 && backoff > 0)
+                      dy -= backoff;
+              }            
+
+              /* Ending of the game: When reached the flag. */
+              reachedEnd = x + width >= Commons.X_MAX + ES / 2;     
+              if (reachedEnd) {
+                  if (firstTime) {
+                      gameWon();
+                      ((FlagTile)Tile.flag).setScore((Commons.GROUND - y) / ES * 100);
+                      firstTime = false;
+                  }
+                  dx = 0;
+                  reachedPollBottom = y + height >= Commons.GROUND - ES;
+                  flagReachedBottom = ((FlagTile)Tile.flag).reachedBottom();
+                  enteredCastle = x + width>= Commons.X_MAX + 7 * ES;            
+                  if (!reachedPollBottom) {
+                      dy = 1;                
+                  } else if (!flagReachedBottom) {
+                      dy = 0;// wait                            
+                  } else if (!faceLeft) {
+                      if (leftCount == 0) {
+                          x += width;
+                          dir = 2; // change direction to left
+                          game.setPMax(Commons.PLAYER_XMAX + width);
+                      } else if (leftCount > 10) {
+                          faceLeft = true;
+                      }
+                      leftCount++;            
+                  } else if (!jumped){                
+                      dx = xSpeed;
+                      ds = -1.5;
+                      jumped = true;                
+                  } else if (!enteredCastle) {
+                      dx = xSpeed;
+                  } else {
+                      setVisible(false);
+                  }
+              }            
+
+              /* Make a movement. */
+              int oldX = x;
+              move(dx, dy);
+              netDx = x - oldX;
+          }
+
+          /* Boundary controls. */
+          // Don't go beyond the left end of the screen.
+          int offset = level.getOffset();
+          if (x <= offset) 
+              x = offset; 
+          // right end of the screen
+          if (x + width >= level.W * ES)
+              x = level.W * ES - width;        
+          // top of the screen
+          if (y <= 0) 
+              y = 0;    
+          // When falls to the bottom, die immediately and start over.
+          if (y > Commons.BOARD_HEIGHT) { 
+              deathTime++;
+  //            lives--;
+  //            resetGame();
+          }        
+
+          /* Add a shot. */
+          if (fired && input.attack.clicked) {
+              Shot shot = new Shot(level);
+              int dxShot = 0;
+              int xShot = 0;
+              int yShot = y + (height-shot.height)/2;
+              if (dir == 2) { // facing left
+                  dxShot = -1;
+                  xShot = x - shot.width;
+              } 
+              else if (dir == 3) {// facing right 
+                  dxShot = 1;
+                  xShot = x + width;
+              } 
+              shot.setX(xShot);
+              shot.setY(yShot);
+              shot.setDx(dxShot);
+              level.add(shot);                       
+          }  
         }
     }       
     
@@ -208,22 +231,23 @@ public class Player extends Sprite {
     @Override
     protected void touchedBy(Sprite sprite) {
         if (sprite instanceof Alien)  {// if the sprite is an enemy
-//            sprite.touchedBy(this); // calls the touchedBy() method in the sprite's class            
-            if (enlarged) {
-                width /= 2;
-                height /= 2;
-                wS = width / PPS;
-                hS = height / PPS;
-                unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (5 for 32 px, 4 for 16 px sprite, and 3 for 8px sprite)
-                aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
-                yS -= 4;
-                enlarged = false;
-                level.flower2Mushroom();    // change flowers back to mushrooms.
-                if (fired) {
-                    yS -= 8;
-                    fired = false;
-                }
-            }
+            if (dx == 0) // When player doesn't move, Alien's touchedby wouldn't be reached. 
+                sprite.touchedBy(this); // calls the touchedBy() method in the sprite's class            
+//            if (enlarged) {
+//                width /= 2;
+//                height /= 2;
+//                wS = width / PPS;
+//                hS = height / PPS;
+//                unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (5 for 32 px, 4 for 16 px sprite, and 3 for 8px sprite)
+//                aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
+//                yS -= 4;
+//                enlarged = false;
+//                level.flower2Mushroom();    // change flowers back to mushrooms.
+//                if (fired) {
+//                    yS -= 8;
+//                    fired = false;
+//                }
+//            }
         }
         if (sprite instanceof HiddenSprite && !sprite.removed)
             sprite.touchedBy(this);
@@ -275,7 +299,7 @@ public class Player extends Sprite {
         
         super.hurt(damage); // Actually change our health
         if (enlarged || fired) invulnerableTime = 100; // invulnerable time is set to 30        
-    }
+    }    
     
     /** What happens when the player wins */
     public void gameWon() {
@@ -321,12 +345,24 @@ public class Player extends Sprite {
         return enlarged;
     }
     
+    public void setEnlarged(boolean TF) {
+        enlarged = TF;
+    }
+    
     public void eatFlower(int score) {
         
         addScore(score);
         if (!fired)
             yS += 8;
         fired = true;        
+    }    
+    
+    public boolean isFired() {
+        return fired;
+    }
+    
+    public void setFired(boolean TF) {
+        fired = TF;
     }
     
     public void eatStarman(int score) {

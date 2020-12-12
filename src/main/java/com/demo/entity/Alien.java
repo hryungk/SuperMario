@@ -11,10 +11,8 @@ public class Alien extends Sprite {
     
     private int counter;
     private int curDx, initY;
-    private boolean activated, crushed, jumping;
-    private boolean isShot;
+    private boolean activated, crushed, isShot, jumping;
     private int deathTime;  // Counts ticks after death
-    private double ds;
     
     public Alien(int x, int y, Level level) {                
         super(level);
@@ -22,32 +20,31 @@ public class Alien extends Sprite {
     }    
     
     private void initAlien(int x, int y) {
-        
+        setX(x);
+        setY(y); 
+        width = height = ES;
         xS = 4;
         yS = 2;
-        width = height = ES;
-        wS = width / PPS;
-        hS = height / PPS;
         
-        setX(x);
-        setY(y);    
-        ground = y+height;
-        
-        xSpeed = 1;
-        
+        xSpeed = 1; 
         dx = -xSpeed;
         dy = ySpeed;
         ds = 1;
+        dir = 2; // Always face left
+        
+        ground = y + height;
+        wS = width / PPS;
+        hS = height / PPS;
+               
+        unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
+        aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
+        score = 100;
         
         counter = 0;
         curDx = dx;
         
         activated = crushed = isShot = jumping = false;
         deathTime = 0;
-        score = 100;
-        
-        unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
-        aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
     }    
         
     // Positions the alien in horizontal direction.
@@ -123,25 +120,44 @@ public class Alien extends Sprite {
      * @param sprite The sprite that this sprite is touched by. */    
     @Override
     protected void touchedBy(Sprite sprite) {
-        if (sprite instanceof Player) { // if the entity touches the player
-            boolean isOverTop = sprite.y + sprite.height <= y;
-            boolean willCrossTop = sprite.y + sprite.height + sprite.dy >= y;
-            boolean isXInRange = sprite.x + sprite.width > x && x + width > sprite.x;
+        if (sprite instanceof Player && !sprite.isDying()) { // if the entity touches the player
+            Player p = (Player) sprite;            
+            boolean isOverTop = p.y + p.height <= y;
+            boolean willCrossTop = p.y + p.height + p.dy >= y;
+            boolean isXInRange = p.x + p.width > x && x + width > p.x;
             if (isOverTop && willCrossTop && isXInRange && !crushed) { // player jumps onto the enemy
                 xS += 2;
                 crushed = true;
                 dx = 0;
-                ((Player)sprite).addScore(score); // gives the player 100 points of score
+                p.addScore(score); // gives the player 100 points of score
                 level.add(new ScoreString(x, y - height, score, level));
-                ((Player) sprite).setCrushedAlien(true);
+                p.setCrushedAlien(true);
             } else if (!crushed && !isShot) {   // regular encounter
-                if (((Player) sprite).isImortal()) { // when player is immortal (ate starman)
+                if (p.isImortal()) { // when player is immortal (ate starman)
                     setShot();
                 } else {    
-                    sprite.hurt(1); // hurts the player, damage is based on lvl.
-                    sprite.touchedBy(this);
+//                    p.touchedBy(this);                    
+                    if (p.isEnlarged()) {
+                        sprite.hurt(1); // hurts the player, damage is based on lvl.
+                        p.width /= 2;
+                        p.height /= 2;
+                        p.wS = p.width / PPS;
+                        p.hS = p.height / PPS;
+                        p.unit = (int) (Math.log10(p.width)/Math.log10(2)); // the size of block to be used (5 for 32 px, 4 for 16 px sprite, and 3 for 8px sprite)
+                        p.aTile = Math.min(Math.pow(2, 4 - p.unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
+                        p.yS -= 4;
+                        p.setEnlarged(false);
+                        level.flower2Mushroom();    // change flowers back to mushrooms.
+                        if (p.isFired()) {
+                            p.yS -= 8;
+                            p.setFired(false);
+                        }
+                    } else {
+                        p.setDying(true);
+                        p.ds = -5;
+                    }           
                 }
-            }            
+            }
         }
         
         if (sprite instanceof Alien) {

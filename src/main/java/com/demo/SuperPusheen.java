@@ -270,7 +270,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         level = new Level(numTileX, numTileY, levelNum, Commons.GAME_TIME); // creates the map        
         tiles = level.tileIds;        
         player = new Player(input, level, this);
-        player.initPlayer();
+        player.init();
         level.add(player);
         
         // Create aliens.        
@@ -299,7 +299,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         
         level = new Level(numTileX, numTileY, levelNum, Commons.GAME_TIME); // creates the map                
         player.level = level;
-        player.initPlayer();
+        player.init();
         level.add(player);        
         
         // Create aliens and hidden sprites.        
@@ -498,7 +498,7 @@ public class SuperPusheen extends JPanel implements Runnable {
                     }
                 } else {
                     if (timeLeft <= 0)
-                        player.hurt(player.health);
+                        player.hurt(player.getHealth());
                 }        
                 
                 level.tick(screen); // calls the tick() method in Level.java                

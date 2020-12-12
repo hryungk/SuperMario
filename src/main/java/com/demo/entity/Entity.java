@@ -6,21 +6,17 @@ import java.awt.image.DataBufferByte;
 public class Entity {
     private BufferedImage image;
     private byte[] pixels;
-    public int x, y;// x & y coordinates on the map    
-    int width, height; // width and height of the entity
     public boolean removed; // Determines if the entity should be removed from the level
+    // Below variables need to be defined in children classes. 
+    public int x, y;// x & y coordinates on the map    
+    int width, height; // width and height of the entity    
     protected int xS, yS; // Location on the sprite sheet    
 
-//
-//    /** Initialization method, called when the entity is created */
-//    public final void init(Level level) {
-//            this.level = level; // assigns the level (to this class) that the entity is on
-//    }
-
-//    /** Render method, (Look in the specific entity's class) */
-//    public abstract void render(Screen screen);
-
     public Entity () {
+        init();
+    }
+    
+    protected void init() {
         removed = false;
     }
     

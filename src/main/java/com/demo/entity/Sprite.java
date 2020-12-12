@@ -14,58 +14,67 @@ public abstract class Sprite extends Entity {
 
     public Level level; // the level that the entity is on
     public int maxHealth = 2; // The maximum amount of health the mob can have
-    public int health; // The amount of health we currently have, and set it to the maximum we can have
-    private boolean visible;
-    private boolean dying;
+    protected int health; // The amount of health we currently have, and set it to the maximum we can have
     protected final int ES = Commons.ENTITY_SIZE; // Default entity size (16 px)
     protected final int PPS = Commons.PPS;  // Pixels per square (8)
     protected final int MAX_JUMP = Commons.BOARD_HEIGHT - 2 * ES - Commons.Y96; // (64)
     protected int numS = 256 / PPS;    // number of squres in a row in the sprite sheet (32)
-    protected int dx, dy;
-    protected int walkDist = 0; // How far we've walked currently, incremented after each movement
-    protected int dir = 0; // The direction the mob is facing, used in attacking and rendering. 0 is down, 1 is up, 2 is left, 3 is right   
-    protected boolean grounded, topped; // Whether the sprite is on to a solid tile/touched a solid tile on the head.
+    protected int walkDist; // How far we've walked currently, incremented after each movement
+    private boolean visible;
+    protected boolean dying;    
+    protected boolean grounded, topped, isPunchedOnBottom; // Whether the sprite is on to a solid tile/touched a solid tile on the head.
+    // Need to be adjusted when creating a new child class.
+    protected int dx, dy;    
+    protected double ds; // temporary dy
+    protected int dir; // The direction the mob is facing, used in attacking and rendering. 0 is down, 1 is up, 2 is left, 3 is right   
+    // Below variables need to be defined in children classes. 
     protected int ground;    
     protected int wS, hS; // width and height of tile [squares]    
     protected int xSpeed, ySpeed;
     protected int lives;
     protected int unit;
-    protected double aTile;
-    
-    protected int score;    // score the player get when interact with the hidden sprite.
-        
-    protected int bCounter, bNum, scale, numStage, ay;    // for color change animation
-    
-    protected boolean isPunchedOnBottom;
+    protected double aTile;    
+    protected int score;    // score the player get when interact with the hidden sprite.        
+    protected int bCounter, bNum, scale, numStage, ay;    // for color change animation  
 
 // The constructor initiates the x and y coordinates and the visible variable.
     public Sprite(Level level) {
         super();
         this.level = level;  
-        initSprite();
+        init();
+        lives = 1;   
     }    
-    private void initSprite() {
-        visible = true;
+    
+    @Override
+    protected void init() {   
+        super.init();
         dx = 0;
         dy = 1;
+        ds = dy;
+        
+        walkDist = 0;
+        dir = 0;        
+        
+        visible = true;
+        dying = false;
         grounded = true;
         topped = false;
+        isPunchedOnBottom = false;
+        
         initHealth();
-        lives = 1;   
         
         ySpeed = 1; // By default, sprites are under gravity
-        
+        bCounter = bNum = 0;
         scale = 8;  // Higher the number, slower the transition.
         numStage = 4;   // Number of color schemes
-        ay = 2; // higher the number, slower the y movement when sprung out of the block
-        isPunchedOnBottom = false;
+        ay = 2; // higher the number, slower the y movement when sprung out of the block        
     }
     
     /** Update method, (Look in the specific entity's class) */
     public void tick() {
         
-        if (isDying())
-            die();   // Set visible false.
+//        if (isDying())
+//            die();   // Set visible false.
         
         if (health <= 0) {// Check if health is at a death-causing level (less than or equal to 0)
             lives--;      
@@ -84,13 +93,14 @@ public abstract class Sprite extends Entity {
 
     /** Draws the sprite on the screen
      * @param screen The screen to be displayed on. */
-    public abstract void render(Screen screen);
+    public abstract void render(Screen screen);    
     
     
     /** if this entity is touched by another entity (extended by sub-classes)
      * @param sprite The sprite that this sprite is touched by. */
     protected abstract void touchedBy(Sprite sprite);
-        
+    
+    
     public void die() { // Kill the mob, called when health drops to 0
         setVisible(false);
 //        remove();// Remove the mob, with the method inherited from Entity
@@ -525,5 +535,9 @@ public abstract class Sprite extends Entity {
     
     private void initHealth() {
         health = 1;
+    }
+    
+    public int getHealth() {
+        return health;
     }
 }
