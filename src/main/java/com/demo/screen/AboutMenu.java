@@ -25,13 +25,11 @@ public class AboutMenu extends Menu {
 
 		/* Font.draw Parameters: Font.draw(String text, Screen screen, int x, int y, int color) */
 		
-		Font.draw("About Minicraft", screen, 2 * 8 + 4, 1 * 8, Color.get(0, 555, 555, 555)); //draws Title text
-		Font.draw("Minicraft was made", screen, 0 * 8 + 4, 3 * 8, Color.get(0, 333, 333, 333)); // draws text
-		Font.draw("by Markus Persson", screen, 0 * 8 + 4, 4 * 8, Color.get(0, 333, 333, 333)); // draws text
-		Font.draw("For the 22'nd ludum", screen, 0 * 8 + 4, 5 * 8, Color.get(0, 333, 333, 333)); // draws text
-		Font.draw("dare competition in", screen, 0 * 8 + 4, 6 * 8, Color.get(0, 333, 333, 333)); // draws text
-		Font.draw("december 2011.", screen, 0 * 8 + 4, 7 * 8, Color.get(0, 333, 333, 333)); // draws text
-		Font.draw("it is dedicated to", screen, 0 * 8 + 4, 9 * 8, Color.get(0, 333, 333, 333)); // draws text
-		Font.draw("my father. <3", screen, 0 * 8 + 4, 10 * 8, Color.get(0, 333, 333, 333)); // draws text
+		Font.draw("About Super Pusheen", screen, 2 * 8 + 4, 1 * 8, Color.get(0, 555, 555, 555)); //draws Title text
+		Font.draw("Super Pusheen was made by Hyunryung", screen, 0 * 8 + 4, 3 * 8, Color.get(0, 333, 333, 333)); // draws text
+		Font.draw("Kim for a fun personal project in", screen, 0 * 8 + 4, 4 * 8 + 2, Color.get(0, 333, 333, 333)); // draws text
+		Font.draw("2020. It is a copycat of the ever", screen, 0 * 8 + 4, 5 * 8 + 4, Color.get(0, 333, 333, 333)); // draws text
+		Font.draw("so famous Super Mario Bros. by", screen, 0 * 8 + 4, 6 * 8 + 6, Color.get(0, 333, 333, 333)); // draws text		
+                Font.draw("©Nintendo.", screen, 0 * 8 + 4, 7 * 8 + 8, Color.get(0, 333, 333, 333)); // draws text		
 	}
 }

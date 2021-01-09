@@ -100,6 +100,7 @@ public class Player extends Sprite {
               if (dy < 5)
                   ds += 0.3;     
               x += dx;
+              netDx = 0;
               y += dy;
           } else {
       //        int xa = 0; // x acceleration

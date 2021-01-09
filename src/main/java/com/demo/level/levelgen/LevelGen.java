@@ -173,6 +173,8 @@ public class LevelGen {
         }        
         
         /* Add the flag. */ 
+        FlagTile flagTile = new FlagTile(6);
+        Tile.flag = flagTile;
         int x = ((FlagTile)Tile.flag).getX() / ES;
         int y = ((FlagTile)Tile.flag).getY() / ES;
         int i = x + y * w; // Current tile being edited.        
