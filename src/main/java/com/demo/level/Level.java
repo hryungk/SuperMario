@@ -62,7 +62,7 @@ public final class Level {
         brokenBricks = new ArrayList<>(); // A list of broken bricks
     }        
     
-    /** Update method, updates (ticks) 60 times a second (around every 17 ms)
+    /** Update method, TPS (around 60 times) updates (ticks) a second (around every 17 ms)
      * @param screen The current screen showing. */
     public void tick(Screen screen) {
         this.screen = screen;

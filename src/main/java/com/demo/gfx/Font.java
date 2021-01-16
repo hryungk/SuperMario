@@ -21,7 +21,7 @@ public class Font {
      * @param col An integer representing a color */
     public static void draw(String msg, Screen screen, int x, int y, int col) {
         int colNum = screen.sheet.width / PPS;  // Number of tiles in horizontal direction on the spritesheet. (256 / 8 = 32)  
-        int yTile = Commons.FONT_Y;
+        int yTile = 30; // Alphabets are located 30th row in the spritesheet. 
         msg = msg.toUpperCase(); // turns all the characters you type in into upper case letters.
         for (int i = 0; i < msg.length(); i++) { // Loops through all the characters that you typed
             int ix = chars.indexOf(msg.charAt(i)); // the current letter in the message loop

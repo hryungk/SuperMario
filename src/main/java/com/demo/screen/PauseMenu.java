@@ -6,43 +6,70 @@ import main.java.com.demo.gfx.Screen;
 //import main.sound.Sound;
 
 public class PauseMenu extends Menu {
-    private int selected = 0; // Currently selected option
 
-    private static final String[] OPTIONS = {"Restart game", "Go back to game", "How to play", "About"}; // Options that are on the main menu, each seperated by a comma.
+    private int selected = 0; // Currently selected option.
+
+    private static final String[] OPTIONS = {"Restart game", "Go back to game", 
+        "How to play", "About"}; // Available options on the menu
 
     public PauseMenu() {
     }
 
-     /** Update method used in menus. */
+    /**
+     * Update the menu screen,  TPS (around 60) updates per second.
+     */
     @Override
     public void tick() {
-        if (input.up.clicked) selected--; // If the player presses the up key, then move up 1 option in the list
-        if (input.down.clicked) selected++; // If the player presses the down key, then move down 1 option in the list
-
-        int len = OPTIONS.length; // The size of the list (normally 3 OPTIONS)
-        if (selected < 0) selected += len; // If the selected option is less than 0, then move it to the last option of the list.
-        if (selected >= len) selected -= len; // If the selected option is more than or equal to the size of the list, then move it back to 0;
-
-        if (input.attack.clicked || input.menu.clicked) { //If either the "Attack" or "Menu" keys are pressed then...
-            if (selected == 0) { //If the selection is 0 ("Start game")
-//                Sound.test.play(); // Play a sound
-                game.initGame(); // Initialize the game
-                game.setMenu(null); // Set the menu to null (No active menu)
+        // Choosing an option.
+        if (input.up.clicked) { // If the player presses the up key
+            selected--;  // Move one up in the option list.
+        }
+        if (input.down.clicked) { // If the player presses the down key
+            selected++;  // Move one down in the option list.
+        }
+        int len = OPTIONS.length; // The size of the list.
+        if (selected < 0) { // If the user goes up on the first option
+            selected += len;  // Move it to the last option on the list.
+        }
+        if (selected >= len) { // If the user goes down on the last option
+            selected -= len; // Move it to the first option on the list.
+        }
+        // If either the "Attack" or "Menu" keys are pressed,
+        if (input.attack.clicked || input.menu.clicked) { 
+            if (selected == 0) { // If the selection is 0 ("Restart game")
+//                Sound.test.play(); // Play a sound.
+                game.initGame(); // Initialize the game.
+                game.setMenu(null); // Set the menu to null (No active menu).
                 System.out.println("=============================Restart the game!=============================");
             }
-            if (selected == 1) game.setMenu(null); //If the selection is 1 ("How to play") then go to the instructions menu.
-            if (selected == 2) game.setMenu(new InstructionsMenu(this)); //If the selection is 1 ("How to play") then go to the instructions menu.
-            if (selected == 3) game.setMenu(new AboutMenu(this)); //If the selection is 2 ("About") then go to the about menu.
+            if (selected == 1) { // If the selection is 1 ("Go back to game")
+                game.setMenu(null);  // Go back to the game.
+            }
+            if (selected == 2) { // If the selection is 2 ("How to play")
+//                game.setMenu(new InstructionsMenu(this)); // Go to the instructions menu.
+                Menu tempMenu = game.getInstMenu();
+                ((ReadMenu)tempMenu).setParent(this);
+                game.setMenu(tempMenu);
+            }
+            if (selected == 3) { // If the selection is 3 ("About")
+//                game.setMenu(new AboutMenu(this));  // Go to the about menu.
+                Menu tempMenu = game.getAboutMenu();
+                ((ReadMenu)tempMenu).setParent(this);
+                game.setMenu(tempMenu);
+            }
         }
-        if (input.pause.clicked)
-            game.setMenu(null);
+
+        if (input.pause.clicked) { // If "Pause" key (esc) is pressed        
+            game.setMenu(null);    // Go back to the game.
+        }
     }
 
-    /** Render method used in menus.
-     * @param screen The current Screen object displayed. */
+    /**
+     * Render method, draws the logo and options on the screen.
+     * @param screen The current Screen object displayed.
+     */
     @Override
     public void render(Screen screen) {
-//        screen.clear(0);// Clears the screen to a black color.
 
         /* This section is used to display the minicraft title */
         int h = 11; // Number of squares in vertical direction (on the spritesheet)
@@ -53,7 +80,7 @@ public class PauseMenu extends Menu {
         int xo = (screen.W - w * PPS) / 2; // X location of the title
         int yo = 3 * PPS; // Y location of the title            
         int lastY = yo; // last y location of the displayed object
-        
+
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 lastY = yo + y * PPS;
@@ -61,9 +88,9 @@ public class PauseMenu extends Menu {
             }
         }
         lastY += PPS;
-        String copyright = "©1985 NINTENDO";
-        Font.draw(copyright, screen, xo+(w-copyright.length())*PPS, lastY, Color.get(0, 252, 188, 176)); // Draw text at the bottom
-        
+        String copyright = "©2020 HYUNRYUNGKIM";
+        Font.draw(copyright, screen, xo + (w - copyright.length()) * PPS, lastY, Color.get(0, 252, 188, 176)); // Draw text at the bottom
+
         /* This section is used to display this OPTIONS on the screen */
         for (int i = 0; i < OPTIONS.length; i++) { // Loops through all the OPTIONS in the list
             lastY += 2 * PPS;

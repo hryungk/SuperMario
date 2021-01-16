@@ -1,57 +1,48 @@
 package main.java.com.demo;
 
-
+/** Stores some constants used across the game. */
 public interface Commons {
     
-    int PPS = 8;    // Pixels per square in the spritesheet.
+    int GAME_TIME = 350;    
+    int DELAY = 17;         // Ticks the game every 17 ms.
+    int TPS = 1000 / DELAY; // Ticks per second.
+    
+    int PPS = 8;            // Pixels per square in the spritesheet.
+    int ENTITY_SIZE = 16;   // Default Width & height of tiles/entities [px]. 
+    
     int BOARD_WIDTH = 300;
-    int BOARD_HEIGHT = 240;    
-    int GAME_TIME = 350;
-    
-    int ENTITY_SIZE = 16;   // Width, height both is 16 by default.    
-
-    int NUMBER_OF_ALIENS_TO_DESTROY = 16;
-    int CHANCE = 5;
-    int DELAY = 17;    
-    int FONT_Y = 30;
-    
-    int NUM_GROUND_ROW = 2; // Number of rows of ground blocks
-    int GROUND = BOARD_HEIGHT - NUM_GROUND_ROW * ENTITY_SIZE;
+    int GROUND = 208;       // Height of the overground of the map.
     int GROUND_TILE = GROUND / ENTITY_SIZE;
+    int NUM_GBLOCK_ROW = 2; // Number of rows of ground blocks.
+    int BOARD_HEIGHT = GROUND + NUM_GBLOCK_ROW * ENTITY_SIZE;        
     
-    int PLAYER_XI = 42;
+    int PLAYER_XI = 42;     // Initial x-position of the player.
+    // Player's maximum x-position in the screen. Once the player reaches this 
+    // point, the map moves forward.
     int PLAYER_XMAX = BOARD_WIDTH / 2 - 2 * ENTITY_SIZE;    //(150 - 32 = 118)
-   
-    int Y96 = BOARD_HEIGHT - 96;  // y-position at 240-96 = 144
-    int Y160 = BOARD_HEIGHT - 160; // y-position at 240-160 = 80
+    int X_MAX = 3168;       // Location of the flag.
     
-    int X_MAX = 3168;   // Location of the flag 
+    int Y64 = GROUND - 64;  // y-position at 240-96 = 144
+    int Y128 = GROUND - 128;// y-position at 240-160 = 80
     
-    double ITV0 = -2.5; // beginning speed of the interactive tiles when hit.
+    double ITV0 = -2.5;     // Beginning speed of the interactive tiles when hit
     
-    // Ground map
-    int[][] GPOS = { // {beginning tile, ending tile}
+    /* Tile locations for the map. */
+    // Ground tile
+    int[][] GPOS = {   // {beginning tile, ending tile}
         {0, 1088}, {1136,1360}, {1424, 2432}, 
         {2480, 3568} 
     };
     
-    // Initial positions of aliens.
-    int A_GROUND = GROUND - ENTITY_SIZE;
-    int[][] APOS = {
-        {352, A_GROUND}, {640, A_GROUND}, {816, A_GROUND}, {840, A_GROUND}, 
-        {1280, Y160-ENTITY_SIZE}, {1312, Y160-ENTITY_SIZE}, {1552, A_GROUND}, 
-        {1576, A_GROUND}, {1824, A_GROUND}, {1848, A_GROUND}, {1984, A_GROUND},
-        {2008, A_GROUND}, {2048, A_GROUND}, {2072, A_GROUND}, {2784, A_GROUND}, 
-        {2808, A_GROUND}
+    // Pipes
+    int[][] PPOS = {   // {size, x position, y position}
+        {1, 448, GROUND - 32}, {2, 608,GROUND - 48}, {3, 736, GROUND -64}, 
+        {3, 912, GROUND - 64}, {1, 2608, GROUND - 32}, {1, 2864, GROUND - 32}
     };
-    // Size and initial (x, y) position of pipes.
-    int[][] PPOS = {
-        {1, 448, BOARD_HEIGHT-64}, {2, 608,BOARD_HEIGHT-80}, {3, 736, BOARD_HEIGHT-96}, 
-        {3, 912, BOARD_HEIGHT-96}, {1, 2608, BOARD_HEIGHT-64}, {1, 2864, BOARD_HEIGHT-64}
-    };
+    
     // Ascending blocks
-    int[][] BPOS_A = { 
-        // {x position of 1st block of base row,  number of blocks in the base row, number of rows}
+    int[][] BPOS_A = { // {x position of 1st block of base row,  number of
+                       //  blocks in the base row, number of rows}
          {2144, 4, 4}, {2368, 5, 4}, {2896, 9, 8}
      };
     // Descending blocks
@@ -60,33 +51,45 @@ public interface Commons {
      };    
     
     // Initial position of bricks
-    int[][] BRPOS = { //{x position, y position, number of bricks in this row}
-        {320, Y96, 1}, {352, Y96, 1}, {384, Y96, 1}, {1232, Y96, 1}, {1264, Y96, 1}, 
-        {1280, Y160, 8}, {1456, Y160, 3}, {1504, Y96, 1}, {1600, Y96, 2}, 
-        {1888, Y96, 1}, {1939, Y160, 3}, {2048, Y160, 1}, {2064, Y96, 2}, 
-        {2096, Y160, 1}, {2688, Y96, 2}, {2736, Y96, 1}
+    int[][] BRPOS = {  // {x position, y position, number of bricks in this row}
+        {320, Y64, 1}, {352, Y64, 1}, {384, Y64, 1}, {1232, Y64, 1},
+        {1264, Y64, 1}, {1280, Y128, 8}, {1456, Y128, 3}, {1504, Y64, 1},
+        {1600, Y64, 2}, {1888, Y64, 1}, {1939, Y128, 3}, {2048, Y128, 1}, 
+        {2064, Y64, 2}, {2096, Y128, 1}, {2688, Y64, 2}, {2736, Y64, 1}
     };
     
     // Initial position of question bricks.
-    int[][] QBRPOS = { //{x position, y position, number of bricks in this row}
-        {256, Y96, 1}, {336, Y96, 1}, {352, Y160, 1}, {368, Y96, 1}, {1248, Y96, 1}, 
-        {1504, Y160, 1}, {1696, Y96, 1}, {1744, Y96, 1}, {1744, Y160, 1}, 
-        {1792, Y96, 1}, {2064, Y160, 2}, {2720, Y96, 1}
+    int[][] QBRPOS = { // {x position, y position, number of bricks in this row}
+        {256, Y64, 1}, {336, Y64, 1}, {352, Y128, 1}, {368, Y64, 1}, 
+        {1248, Y64, 1}, {1504, Y128, 1}, {1696, Y64, 1}, {1744, Y64, 1}, 
+        {1744, Y128, 1}, {1792, Y64, 1}, {2064, Y128, 2}, {2720, Y64, 1}
+    };  
+        
+    /* Sprites' initial locations for the map. */
+    // Goomba
+    int A_GROUND = GROUND - ENTITY_SIZE;
+    int[][] APOS = {   // {initial x position, initial y position}
+        {352, A_GROUND}, {640, A_GROUND}, {816, A_GROUND}, {840, A_GROUND}, 
+        {1280, Y128-ENTITY_SIZE}, {1312, Y128-ENTITY_SIZE}, {1552, A_GROUND}, 
+        {1576, A_GROUND}, {1824, A_GROUND}, {1848, A_GROUND}, {1984, A_GROUND},
+        {2008, A_GROUND}, {2048, A_GROUND}, {2072, A_GROUND}, {2784, A_GROUND}, 
+        {2808, A_GROUND}
+    };
+    
+    // Coins
+    int[][] CPOS = {   // {initial x position, initial y position}
+        {256, Y64}, {352, Y128}, {368, Y64}, {1504, Y64}, {1504, Y128}, 
+        {1696, Y64}, {1744, Y64}, {1792, Y64}, {2064, Y128}, {2080, Y128},
+        {2720, Y64}
     };  
     
-    // Initial position of coins.
-    int[][] CPOS = { //{x position, y position}
-        {256, Y96}, {352, Y160}, {368, Y96}, {1504, Y96}, {1504, Y160}, 
-        {1696, Y96}, {1744, Y96}, {1792, Y96}, {2064, Y160}, {2080, Y160}, {2720, Y96}
+    // Mushrooms
+    int[][] MPOS = {   // {initial x position, initial y position}
+        {336, Y64}, {1248, Y64}, {1744, Y128}
     };  
     
-    // Initial position of mushrooms.
-    int[][] MPOS = { //{x position, y position}
-        {336, Y96}, {1248, Y96}, {1744, Y160}
-    };  
-    
-    // Initial position of starman.
-    int[][] SPOS = { //{x position, y position}
-        {1616, Y96}
+    // Starman
+    int[][] SPOS = {   // {initial x position, initial y position}
+        {1616, Y64}
     };   
 }

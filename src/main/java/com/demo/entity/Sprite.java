@@ -17,7 +17,7 @@ public abstract class Sprite extends Entity {
     protected int health; // The amount of health we currently have, and set it to the maximum we can have
     protected final int ES = Commons.ENTITY_SIZE; // Default entity size (16 px)
     protected final int PPS = Commons.PPS;  // Pixels per square (8)
-    protected final int MAX_JUMP = Commons.BOARD_HEIGHT - 2 * ES - Commons.Y96; // (64)
+    protected final int MAX_JUMP = Commons.BOARD_HEIGHT - 2 * ES - Commons.Y64; // (64)
     protected int numS = 256 / PPS;    // number of squres in a row in the sprite sheet (32)
     protected int walkDist; // How far we've walked currently, incremented after each movement
     private boolean visible;

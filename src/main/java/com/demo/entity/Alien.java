@@ -120,7 +120,7 @@ public class Alien extends Sprite {
      * @param sprite The sprite that this sprite is touched by. */    
     @Override
     protected void touchedBy(Sprite sprite) {
-        if (sprite instanceof Player && !sprite.isDying()) { // if the entity touches the player
+        if (sprite instanceof Player && !sprite.isDying()) { // if this alien touches the player
             Player p = (Player) sprite;            
             boolean isOverTop = p.y + p.height <= y;
             boolean willCrossTop = p.y + p.height + p.dy >= y;

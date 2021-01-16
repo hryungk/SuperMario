@@ -5,12 +5,12 @@ import java.awt.event.KeyAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-/* This class is used for handling your inputs and translating them as booleans */
+/* A class that handles keyboard inputs and translates them as booleans. */
 public class InputHandler extends KeyAdapter {
 	
-    public List<Key> keys = new ArrayList<Key>(); // List of keys used in the game
+    public List<Key> keys = new ArrayList<>(); // List of keys used in the game.
 
-    /* Action keys */
+    // Action keys.
     public Key up = new Key();
     public Key down = new Key();
     public Key left = new Key();
@@ -20,100 +20,104 @@ public class InputHandler extends KeyAdapter {
     public Key menu = new Key();
     public Key pause = new Key();
 
-    public InputHandler() { //Board game) {
-//        game.addKeyListener(this); // Adds this to Game.java so it can detect when a key is being pressed.
-    }
         
     @Override
+    /** Triggered when a key is pressed. */
     public void keyPressed(KeyEvent ke) {
-        toggle(ke, true); // triggered when a key is pressed.
+        toggle(ke, true); 
     }
 
     @Override
+    /** Triggered when a key is let go. */
     public void keyReleased(KeyEvent ke) {
-        toggle(ke, false); // triggered when a key is let go.
+        toggle(ke, false);
     }
 
-    /** This method is used to turn keyboard key presses into actions */
+    /* Turns keyboard key presses into actions. */
     private void toggle(KeyEvent ke, boolean pressed) {
-        if (ke.getKeyCode() == KeyEvent.VK_NUMPAD4) left.toggle(pressed); //press keypad 4, moves left
-        if (ke.getKeyCode() == KeyEvent.VK_NUMPAD6) right.toggle(pressed); //press keypad 6, moves right        
-        if (ke.getKeyCode() == KeyEvent.VK_NUMPAD8) up.toggle(pressed); //press keypad 8, moves up
-        if (ke.getKeyCode() == KeyEvent.VK_NUMPAD2) down.toggle(pressed); //press keypad 2, moves down
-        if (ke.getKeyCode() == KeyEvent.VK_A) left.toggle(pressed); //press A, moves left
-        if (ke.getKeyCode() == KeyEvent.VK_D) right.toggle(pressed); //press D, moves right        
-        if (ke.getKeyCode() == KeyEvent.VK_W) up.toggle(pressed); //press W, moves up
-        if (ke.getKeyCode() == KeyEvent.VK_S) down.toggle(pressed); //press D, moves down
-        if (ke.getKeyCode() == KeyEvent.VK_LEFT) left.toggle(pressed); //press left arrow, moves left
-        if (ke.getKeyCode() == KeyEvent.VK_RIGHT) right.toggle(pressed); //press right arrow, moves right
-        if (ke.getKeyCode() == KeyEvent.VK_UP) up.toggle(pressed); //press up arrow, moves up
-        if (ke.getKeyCode() == KeyEvent.VK_DOWN) down.toggle(pressed); //press down arrow, moves down        
+        // Numpads system
+        if (ke.getKeyCode() == KeyEvent.VK_NUMPAD4) // If numpad 4 is pressed,            
+            left.toggle(pressed);                   // left Key is toggled.
+        if (ke.getKeyCode() == KeyEvent.VK_NUMPAD6) right.toggle(pressed);   
+        if (ke.getKeyCode() == KeyEvent.VK_NUMPAD8) up.toggle(pressed); 
+        if (ke.getKeyCode() == KeyEvent.VK_NUMPAD2) down.toggle(pressed); 
+        // ADWS system
+        if (ke.getKeyCode() == KeyEvent.VK_A) left.toggle(pressed); 
+        if (ke.getKeyCode() == KeyEvent.VK_D) right.toggle(pressed); 
+        if (ke.getKeyCode() == KeyEvent.VK_W) up.toggle(pressed); 
+        if (ke.getKeyCode() == KeyEvent.VK_S) down.toggle(pressed);
+        // Arrow keys
+        if (ke.getKeyCode() == KeyEvent.VK_LEFT) left.toggle(pressed); 
+        if (ke.getKeyCode() == KeyEvent.VK_RIGHT) right.toggle(pressed); 
+        if (ke.getKeyCode() == KeyEvent.VK_UP) up.toggle(pressed); 
+        if (ke.getKeyCode() == KeyEvent.VK_DOWN) down.toggle(pressed);
         
-        if (ke.getKeyCode() == KeyEvent.VK_SPACE) jump.toggle(pressed); //press space, attack toggled
+        if (ke.getKeyCode() == KeyEvent.VK_SPACE)   // If space bar is pressed,
+            jump.toggle(pressed);                   // jump Key is toggled.
         
-        if (ke.getKeyCode() == KeyEvent.VK_CONTROL) attack.toggle(pressed); //press Ctrl, attack toggled
-        if (ke.getKeyCode() == KeyEvent.VK_NUMPAD0) attack.toggle(pressed); //press keypad 0, attack toggled
-        if (ke.getKeyCode() == KeyEvent.VK_C) attack.toggle(pressed); // press C, attack toggled
+        if (ke.getKeyCode() == KeyEvent.VK_CONTROL) // if ctrl is pressed,
+            attack.toggle(pressed);                 // attack Key is toggled.
         
-        if (ke.getKeyCode() == KeyEvent.VK_ENTER) menu.toggle(pressed); //press Enter, menu toggled
-        if (ke.getKeyCode() == KeyEvent.VK_X) menu.toggle(pressed); //press X, menu toggled
+        if (ke.getKeyCode() == KeyEvent.VK_ENTER)   // if enter is pressed,
+            menu.toggle(pressed);                   // menu Key is toggled.
         
-        if (ke.getKeyCode() == KeyEvent.VK_ESCAPE) pause.toggle(pressed); //press X, menu toggled
+        if (ke.getKeyCode() == KeyEvent.VK_ESCAPE)  // if esc is pressed,
+            pause.toggle(pressed);                  // pause Key is toggled.
     }
 
     
-    /** This is used to stop all of the actions when the game is out of focus. */
+    /** Stops all of the actions when the game is out of focus. */
     public void releaseAll() {
         for (int i = 0; i < keys.size(); i++) {
-            keys.get(i).down = false; //turns all the keys down value to false
+            keys.get(i).down = false; // Turns all the keys' down value to false
         }
     }
 
+    /** Ticks every key to see if it is pressed. */
     public void tick() {
         for (int i = 0; i < keys.size(); i++) {
-            keys.get(i).tick(); //Ticks every key to see if it is pressed.
+            keys.get(i).tick();
         }
     }
 
-    /****************************************************************************/
-    /*                                Class Key                                 */
-    /****************************************************************************/
+    /**************************************************************************/
+    /*                                Class Key                               */
+    /**************************************************************************/
     /** An inner class representing a key. */    
     public class Key {
-        public int presses, absorbs; // presses determine how long you held it down, absorbs will determined if you clicked or held it down.
-        public boolean down, clicked; // booleans to tell if the player has clicked the button, or held down the button.
+        public int presses, absorbs; // presses: How long you held it down, 
+                                     // absorbs: If you clicked or held it down.
+        public boolean down, clicked;// Tells if the player has held down or 
+                                     // clicked the button.
 
         public Key() {
-            keys.add(this); //Adds this object to a list of Keys used in the game.
+            presses = absorbs = 0;
+            down = clicked = false;
+            keys.add(this);          // Adds this Key to a list of Keys in use.
         }
 
+        /** Updates variables when the key is toggled.
+         * @param pressed True if the key is toggled. */
         public void toggle(boolean pressed) {
-            if (pressed != down) { 
-                down = pressed; //If the key is being pressed, then down is true.
+            if (pressed != down) {   // If the key is being pressed,
+                down = pressed;      // then down is true.
             }
-            if (pressed) {
-                presses++; //If pressed, then presses value goes up.                
-            } else { // if not down, reset 
+            if (pressed) {           // If pressed, 
+                presses++;           // then presses value goes up.                
+            } else {                 // If not pressed down, reset counts.
                 presses = 0; 
                 absorbs = 0;
-            }
-            
-//            if (this.equals(jump)) 
-//                System.out.println("down: " + down + ", presses: " + presses);     
+            }  
         }
-
-        public void tick() {
-            
-//            if (this.equals(jump)) {  
-//                System.out.println("clicked: " + clicked + ", down: " + down +
-//                    ", presses: " + presses + ", absorbs: " + absorbs);    
-//            }
-            
-            if (absorbs < presses) { //if presses are above absorbs
-                absorbs++;//increase the absorbs value
-                if (presses == 1) clicked = true;//clicked is true only when key is first down.
-            } else {
-                clicked = false;//else clicked is false
+        
+        /** Updates the key status. */
+        public void tick() {            
+            if (absorbs < presses) { // If presses are greater than absorbs
+                absorbs++;           // Increase the absorbs value.
+                if (presses == 1)    // Only if key is first down,
+                    clicked = true;  // clicked is true.
+            } else {                 // Else, clicked is false.
+                clicked = false;
             }                             
         }
     }

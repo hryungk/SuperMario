@@ -1,0 +1,7 @@
+HOW TO PLAY
+Move your character with the left
+and right arrow keys.
+Press space bar to jump.
+Once you eat the fire flower,
+press Ctrl to shoot fire.
+Reach the castle to win the game!

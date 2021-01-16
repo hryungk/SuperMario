@@ -32,8 +32,20 @@ public class TitleMenu extends Menu {
                 game.setMenu(null); // Set the menu to null (No active menu)
                 System.out.println("=============================Start the game!=============================");
             }
-            if (selected == 1) game.setMenu(new InstructionsMenu(this)); //If the selection is 1 ("How to play") then go to the instructions menu.
-            if (selected == 2) game.setMenu(new AboutMenu(this)); //If the selection is 2 ("About") then go to the about menu.
+//            if (selected == 1) game.setMenu(new InstructionsMenu(this)); //If the selection is 1 ("How to play") then go to the instructions menu.
+//            if (selected == 2) game.setMenu(new AboutMenu(this)); //If the selection is 2 ("About") then go to the about menu.
+            if (selected == 1) { // If the selection is 1 ("How to play")
+//                game.setMenu(new InstructionsMenu(this)); // Go to the instructions menu.
+                Menu tempMenu = game.getInstMenu();
+                ((ReadMenu)tempMenu).setParent(this);
+                game.setMenu(tempMenu);
+            }
+            if (selected == 2) { // If the selection is 2 ("About")
+//                game.setMenu(new AboutMenu(this));  // Go to the about menu.
+                Menu tempMenu = game.getAboutMenu();
+                ((ReadMenu)tempMenu).setParent(this);
+                game.setMenu(tempMenu);
+            }
         }
     }
 
@@ -60,7 +72,7 @@ public class TitleMenu extends Menu {
             }
         }
         lastY += PPS;
-        String copyright = "©1985 NINTENDO";
+        String copyright = "©2020 HYUNRYUNGKIM";
         Font.draw(copyright, screen, xo+(w-copyright.length())*PPS, lastY, Color.get(0, 252, 188, 176)); // Draw text at the bottom
         
         /* This section is used to display this OPTIONS on the screen */
