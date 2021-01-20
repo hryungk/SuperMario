@@ -47,7 +47,7 @@ public class BrickTile extends InteractiveTile {
     @Override
     public void tick(int xt, int yt, Level level) {
         
-        if (dying) { // This is to delay one more tick so that aliens on the brick will die when punched. 
+        if (dying) { // This is to delay one more tick so that enemies on the brick will die when punched. 
             removed = true;
             level.setTile(xt, yt, sky); 
             return;

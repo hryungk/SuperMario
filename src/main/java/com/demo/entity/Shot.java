@@ -55,10 +55,10 @@ public class Shot extends Sprite {
     
     /** What happens when the player touches an entity */    
     protected void touchedBy(Sprite sprite) {
-        if (sprite instanceof Alien) { 
+        if (sprite instanceof Enemy) { 
             hurt(health); // hurt the shot
-            if (!((Alien) sprite).isShot()) {                
-                ((Alien) sprite).setShot();
+            if (!((Enemy) sprite).isShot()) {                
+                ((Enemy) sprite).setShot();
             }
         }
     }

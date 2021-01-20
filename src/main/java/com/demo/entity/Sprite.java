@@ -36,11 +36,13 @@ public abstract class Sprite extends Entity {
     protected double aTile;    
     protected int score;    // score the player get when interact with the hidden sprite.        
     protected int bCounter, bNum, scale, numStage, ay;    // for color change animation  
+    private int w_map; // Width of the level's map
 
 // The constructor initiates the x and y coordinates and the visible variable.
     public Sprite(Level level) {
         super();
         this.level = level;  
+        w_map = level.getWidth();
         init();
         lives = 1;   
     }    
@@ -173,8 +175,9 @@ public abstract class Sprite extends Entity {
      * @return True if this sprite can move to (x+dx, y + dy). */
     protected boolean move2(int dx, int dy) {
         /* If the x acceleration and y acceleration are BOTH NOT 0, then throw an error */
-        if (dx != 0 && dy != 0) throw new IllegalArgumentException("Move2 can only move along one axis at a time!");
-
+        if (dx != 0 && dy != 0) 
+            throw new IllegalArgumentException("Move2 can only move along one axis at a time!");
+        
         /* Note: I was tired when typing this part, please excuse grammar quirks in the writing. (Or just re-write it to make it more sensible, lol) */            
 //        int xto0 = (x - Math.min(ES, width)) >> unit; // gets the tile coordinate of the position to the left of the sprite
 //        int yto0 = (y - Math.min(ES, height)) >> unit; // gets the tile coordinate of the position to the top of the sprite
@@ -201,9 +204,9 @@ public abstract class Sprite extends Entity {
         if (x <= 0)  // When going beyond the left most point of the map
             grounded = !(level.getTile(xto1-aTile, yt1, unit).mayPass()) ||
                 ((x % ES != 0) && !(level.getTile(xto1, yt1, unit).mayPass()));       
-        else if (x + width >= level.W * ES) // When going beyond the right of the screen
+        else if (x + width >= w_map * ES) // When going beyond the right of the screen
             grounded = !(level.getTile(xto1-aTile, yt1, unit).mayPass());
-        else if (level.W * ES - ES <= x + width && x + width < level.W * ES) // When less than one tile close to the right of the screen
+        else if (w_map * ES - ES <= x + width && x + width < level.getWidth() * ES) // When less than one tile close to the right of the screen
             grounded = !(level.getTile(xto1, yt1, unit).mayPass());
         else if (y + height > Commons.GROUND) // when falling beyond the ground
             grounded = false;
@@ -277,9 +280,9 @@ public abstract class Sprite extends Entity {
 
         /* Check right stopped. */
         boolean rightStopped;
-        if (x + width >= level.W * ES) // When going beyond the right of the screen
+        if (x + width >= w_map * ES) // When going beyond the right of the screen
             rightStopped = true; 
-        else if (level.W * ES - ES <= x + width && x + width < level.W * ES) // When in between one tile to the right of the screen
+        else if (w_map * ES - ES <= x + width && x + width < w_map * ES) // When in between one tile to the right of the screen
             rightStopped = false;
         else if (y + dy > Commons.BOARD_HEIGHT) // When going beyond the bottom most point of the map
             rightStopped = false;
@@ -310,10 +313,10 @@ public abstract class Sprite extends Entity {
         else if (x < ES) {  // When going beyond the left most point + unit tile of the map
             tile = level.getTile(xt1, yt0T, unit);
             topped = !(tile.mayPass()); 
-        } else if (x + width >= level.W * ES) { // When going beyond the right of the screen
+        } else if (x + width >= w_map * ES) { // When going beyond the right of the screen
             tile = level.getTile(xt1-aTile, yt0T, unit);
             topped = !(tile.mayPass());
-        } else if (level.W * ES - ES <= x + width && x + width < level.W * ES) { // When in between one tile to the right of the screen
+        } else if (w_map * ES - ES <= x + width && x + width < w_map * ES) { // When in between one tile to the right of the screen
             tile = level.getTile(xto1, yt0T, unit);
             topped = !(tile.mayPass());
         } else {             
@@ -483,9 +486,9 @@ public abstract class Sprite extends Entity {
         if (x <= level.getOffset()) // When on the left end, don't check xt1-1
             return !(level.getTile(xt1, yt1, unit).mayPass());     
 //            return ((x + dx) % ES != 0) && !(level.getTile(xt1, yt1).mayPass(xt1, yt1, this));  
-        else if (x + dx + width >= level.W * ES) 
+        else if (x + dx + width >= w_map * ES) 
             return !(level.getTile(xt1-aTile, yt1, unit).mayPass());
-        else if (level.W * ES - ES <= x + dx + width && x + dx + width < level.W * ES) 
+        else if (w_map * ES - ES <= x + dx + width && x + dx + width < w_map * ES) 
             return !(level.getTile(xt1, yt1, unit).mayPass());
         else
             return !(level.getTile(xt1-aTile, yt1, unit).mayPass()) ||

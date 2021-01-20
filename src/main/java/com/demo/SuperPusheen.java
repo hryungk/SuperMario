@@ -59,9 +59,9 @@ public class SuperPusheen extends JPanel implements Runnable {
     public int timeLeft;    // Time left before the game is over.    
     private boolean inGame; // This stores if the game is running or paused.    
     private int deadTime;   // Paused time when you die before the dead menu 
-    // shows up.
+                            // shows up.
     private int wonTimer;   // A timer starting after you win to count until the
-    // win menu shows up.
+                            // win menu shows up.
 
     // image is what is drawn on the screen. source is the map image.
     private BufferedImage image, source;
@@ -96,24 +96,26 @@ public class SuperPusheen extends JPanel implements Runnable {
         the x value by 16. (2x2x2x2 = 16)
         Likewise, xt << 4 is equivalent to xt * (2^4). This means it's 
         multiplying the xt tile value by 16. */
+    
     public SuperPusheen() {
 
-        input = new InputHandler();
-        try {
-            createReadMenu();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        input = new InputHandler();        
+        createReadMenu();        
         initBoard();
     }
     
     /* Create AboutMenu and InstructionsMenu. */
-    private void createReadMenu() throws IOException {
+    private void createReadMenu() {
                 
-        String path = "src/main/resources/AboutMenuText.txt";
-        aboutMenu = new ReadMenu(parseStr(path)); // Create AboutMenu.
-        path = "src/main/resources/InstMenuText.txt";
-        instMenu = new ReadMenu(parseStr(path));  // Create InstructionsMenu.
+        try {
+            String path = "src/main/resources/AboutMenuText.txt";
+            aboutMenu = new ReadMenu(parseStr(path));// Create AboutMenu.
+            path = "src/main/resources/InstMenuText.txt";
+            instMenu = new ReadMenu(parseStr(path)); // Create InstructionsMenu.
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        
     }
     
     /* Parse strings from a txt file. */
@@ -164,9 +166,9 @@ public class SuperPusheen extends JPanel implements Runnable {
     private void bgInit() throws IOException {
 
         // Set up the screen, loads the iconsPusheen.png spritesheet.
-        String bgpath = "src/main/resources/iconsPusheen.png";
+        String sheetPath = "src/main/resources/iconsPusheen.png";
         screen = new Screen(B_WIDTH, B_HEIGHT, new SpriteSheet(
-                ImageIO.read(new File(bgpath))));
+                ImageIO.read(new File(sheetPath))));
 
         image = new BufferedImage(B_WIDTH, B_HEIGHT,
                 BufferedImage.TYPE_INT_RGB);
@@ -179,14 +181,14 @@ public class SuperPusheen extends JPanel implements Runnable {
         pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
         // Load background image.
-        String path = "src/main/resources/bg_1-1.png";
-        source = ImageIO.read(new File(path));
+        String bgPath = "src/main/resources/bg_1-1.png";
+        source = ImageIO.read(new File(bgPath));
         sourcePixels = ImageTool.convertTo2D(source);
         numTileX = source.getWidth() / ES;  // 224
         numTileY = source.getHeight() / ES; // 15
 
         // Extract level numbers from the background image name.
-        Scanner scan = new Scanner(path);
+        Scanner scan = new Scanner(bgPath);
         scan.useDelimiter("\\D*");  // Zero or more occurences of any character 
         // other than a digit.
         int ii = 0;

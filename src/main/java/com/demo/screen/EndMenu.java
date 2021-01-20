@@ -31,7 +31,7 @@ public class EndMenu extends Menu {
         } else if (input.attack.clicked || input.menu.clicked) {
             // Once the delay time is over, 
             game.setMenu(new TitleMenu(game));  // The user can go back to the 
-                                                // title menu.
+                                            // title menu.
         }
     }
 

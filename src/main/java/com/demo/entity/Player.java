@@ -21,7 +21,7 @@ public class Player extends Sprite {
     private SuperPusheen game;
     public int invulnerableTime; // the invulnerability time the player has when he is hit
     public int immortalTime; // the immortal time the player has when it eats the starman.
-    private boolean crushedAlien, enlarged, fired, immortal;
+    private boolean crushedEnemy, enlarged, fired, immortal;
     private boolean firstTime, reachedEnd, reachedPollBottom, flagReachedBottom, faceLeft, jumped, enteredCastle;
     private int leftCount;
     private int netDx;
@@ -68,7 +68,7 @@ public class Player extends Sprite {
         invulnerableTime = 0; // the invulnerability time the player has when he is hit
         immortalTime = 0;
 
-        crushedAlien = enlarged = fired = immortal = false;
+        crushedEnemy = enlarged = fired = immortal = false;
         firstTime = true;
         reachedEnd = reachedPollBottom = flagReachedBottom = faceLeft = jumped = enteredCastle = false;
         leftCount = netDx = deathTime = 0;
@@ -145,9 +145,9 @@ public class Player extends Sprite {
                 if (input.jump.clicked && grounded) {
                     ds = -g;
                 }
-                if (crushedAlien) { // Slightly jump over the enemy
+                if (crushedEnemy) { // Slightly jump over the enemy
                     ds = -3;
-                    crushedAlien = false;
+                    crushedEnemy = false;
                 }
 
                 dy = (int) ds;
@@ -209,8 +209,8 @@ public class Player extends Sprite {
                 x = offset;
             }
             // right end of the screen
-            if (x + width >= level.W * ES) {
-                x = level.W * ES - width;
+            if (x + width >= level.getWidth() * ES) {
+                x = level.getWidth() * ES - width;
             }
             // top of the screen
             if (y <= 0) {
@@ -249,8 +249,8 @@ public class Player extends Sprite {
      */
     @Override
     protected void touchedBy(Sprite sprite) {
-        if (sprite instanceof Alien) {// if the sprite is an enemy
-            if (dx == 0) // When player doesn't move, Alien's touchedby wouldn't be reached. 
+        if (sprite instanceof Enemy) {// if the sprite is an enemy
+            if (dx == 0) // When player doesn't move, Enemy's touchedby wouldn't be reached. 
             {
                 sprite.touchedBy(this); // calls the touchedBy() method in the sprite's class            
             }//            if (enlarged) {
@@ -347,8 +347,8 @@ public class Player extends Sprite {
         game.resetGame();
     }
 
-    public void setCrushedAlien(boolean crushed) {
-        crushedAlien = crushed;
+    public void setCrushedEnemy(boolean crushed) {
+        crushedEnemy = crushed;
     }
 
     public void addCoinCount() {

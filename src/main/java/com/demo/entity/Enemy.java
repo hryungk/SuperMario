@@ -4,22 +4,22 @@ import main.java.com.demo.Commons;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
-/** Represents an alien as a sprite.
+/** Represents an enemy as a sprite.
  *  Keeps the image of the sprite and the coordinates of the sprite.
     @author zetcode.com */
-public class Alien extends Sprite {
+public class Enemy extends Sprite {
     
     private int counter;
     private int curDx, initY;
     private boolean activated, crushed, isShot, jumping;
     private int deathTime;  // Counts ticks after death
     
-    public Alien(int x, int y, Level level) {                
+    public Enemy(int x, int y, Level level) {                
         super(level);
-        initAlien(x, y);        
+        initEnemy(x, y);        
     }    
     
-    private void initAlien(int x, int y) {
+    private void initEnemy(int x, int y) {
         setX(x);
         setY(y); 
         width = height = ES;
@@ -47,7 +47,7 @@ public class Alien extends Sprite {
         deathTime = 0;
     }    
         
-    // Positions the alien in horizontal direction.
+    // Positions the enemy in horizontal direction.
     @Override
     public void tick() {
         super.tick();     
@@ -87,7 +87,7 @@ public class Alien extends Sprite {
                 dy = ySpeed; // By default, there is gravity.
             
             /* Update x position. */
-            // Moves in x direction every other tick. This is to slow down alien.
+            // Moves in x direction every other tick. This is to slow down enemy.
             if (counter % 2 == 0) 
                 dx = curDx;
             else  {
@@ -120,7 +120,7 @@ public class Alien extends Sprite {
      * @param sprite The sprite that this sprite is touched by. */    
     @Override
     protected void touchedBy(Sprite sprite) {
-        if (sprite instanceof Player && !sprite.isDying()) { // if this alien touches the player
+        if (sprite instanceof Player && !sprite.isDying()) { // if this enemy touches the player
             Player p = (Player) sprite;            
             boolean isOverTop = p.y + p.height <= y;
             boolean willCrossTop = p.y + p.height + p.dy >= y;
@@ -131,7 +131,7 @@ public class Alien extends Sprite {
                 dx = 0;
                 p.addScore(score); // gives the player 100 points of score
                 level.add(new ScoreString(x, y - height, score, level));
-                p.setCrushedAlien(true);
+                p.setCrushedEnemy(true);
             } else if (!crushed && !isShot) {   // regular encounter
                 if (p.isImortal()) { // when player is immortal (ate starman)
                     setShot();
@@ -161,13 +161,13 @@ public class Alien extends Sprite {
             }
         }
         
-        if (sprite instanceof Alien) {
-            if (!((Alien) sprite).isCrushed()) {
+        if (sprite instanceof Enemy) {
+            if (!((Enemy) sprite).isCrushed()) {
                 if (dx != 0) {
                     dx = -dx;
                     curDx = dx; 
                     sprite.dx = -sprite.dx;
-                    ((Alien) sprite).curDx = sprite.dx;
+                    ((Enemy) sprite).curDx = sprite.dx;
                 }          
             }
         }
