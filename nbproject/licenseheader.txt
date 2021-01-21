@@ -1,0 +1,8 @@
+<#if licenseFirst??>
+${licenseFirst}
+</#if>
+${licensePrefix}SuperPusheen
+${licensePrefix}Hyunryung Kim, all rights reserved.${licensePrefix}
+<#if licenseLast??>
+${licenseLast}
+</#if>

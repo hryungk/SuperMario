@@ -288,10 +288,10 @@ public class Player extends Sprite {
 
         int sw = screen.getSheet().width;   // width of sprite sheet (256)
         int colNum = sw / PPS;    // Number of squares in a row (32)    
-//        screen.render(x + PPS * flip1, y, xS + yt * colNum, flip1); // render the top-left part of the sprite         
-//        screen.render(x - PPS * flip1 + PPS, y, (xS + 1) + yt * colNum, flip1);  // render the top-right part of the sprite
-//        screen.render(x + PPS * flip1, y + PPS, xS + (yt + 1) * colNum, flip1); // render the bottom-left part of the sprite
-//        screen.render(x - PPS * flip1 + PPS, y + PPS, xS + 1 + (yt + 1) * colNum, flip1); // render the bottom-right part of the sprite
+//        screen.renderFont(x + PPS * flip1, y, xS + yt * colNum, flip1); // renderFont the top-left part of the sprite         
+//        screen.renderFont(x - PPS * flip1 + PPS, y, (xS + 1) + yt * colNum, flip1);  // renderFont the top-right part of the sprite
+//        screen.renderFont(x + PPS * flip1, y + PPS, xS + (yt + 1) * colNum, flip1); // renderFont the bottom-left part of the sprite
+//        screen.renderFont(x - PPS * flip1 + PPS, y + PPS, xS + 1 + (yt + 1) * colNum, flip1); // renderFont the bottom-right part of the sprite
 
         int doRender = 1;
         if (invulnerableTime > 0 && !reachedEnd) {
@@ -311,7 +311,7 @@ public class Player extends Sprite {
                     xeff = (wS - 1) - ii;  // Reverses the pixel for a mirroring effect
                 }
                 for (int jj = 0; jj < hS; jj++) {
-                    screen.render(x + xeff * PPS, y + jj * PPS, (xSCur + ii) + (yt + jj) * colNum, flip1); // render the top-left part of the sprite         
+                    screen.render(x + xeff * PPS, y + jj * PPS, (xSCur + ii) + (yt + jj) * colNum, flip1); // renderFont the top-left part of the sprite         
                 }
             }
         }

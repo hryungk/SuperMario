@@ -1,16 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package main.java.com.demo.level.tile;
 
-import main.java.com.demo.entity.Entity;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
 /**
- *
+ * A class that represents a block tile.
  * @author HRK
  */
 public class BlockTile extends Tile {
@@ -23,18 +17,12 @@ public class BlockTile extends Tile {
     }
 
     @Override
-    public void render(Screen screen, Level level, int x, int y) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void render(int x, int y, Level level, Screen screen) {
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
     public void tick(int xt, int yt, Level level) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void bumpedInto(int xt, int yt, Entity entity) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }    
 }

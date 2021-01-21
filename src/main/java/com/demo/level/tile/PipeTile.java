@@ -1,16 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package main.java.com.demo.level.tile;
 
-import main.java.com.demo.entity.Entity;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
 /**
- *
+ * A class that represents a pipe tile.
  * @author HRK
  */
 public class PipeTile extends Tile {
@@ -29,19 +23,28 @@ public class PipeTile extends Tile {
         pipeSize = size;        
     }
 
-    @Override
-    public void render(Screen screen, Level level, int x, int y) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
+    /**
+     * Update method.
+     *
+     * @param xt x tile position of the current level [tile]
+     * @param yt y tile position of the current level [tile]
+     * @param level Current level
+     */
     @Override
     public void tick(int xt, int yt, Level level) {
         
-    }
-
-    @Override
-    public void bumpedInto(int xt, int yt, Entity entity) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    }    
     
+    /**
+     * Render method, used in sub-classes.
+     *     
+     * @param xt x tile position of the current level [tile]
+     * @param yt x tile position of the current level [tile]
+     * @param level Current level
+     * @param screen Current screen     
+     */
+    @Override
+    public void render(int xt, int yt, Level level, Screen screen) {
+        
+    }
 }

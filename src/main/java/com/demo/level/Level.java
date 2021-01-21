@@ -170,7 +170,7 @@ public final class Level {
     /**
      * Renders all the sprites on the screen.
      *
-     * @param screen The screen to render.
+     * @param screen The screen to renderFont.
      * @param xScroll The x offset of the map to display on the screen.
      * @param yScroll The y offset of the map to display on the screen.
      */
@@ -191,7 +191,7 @@ public final class Level {
         // If the flag is located on the screen
         if (xsot <= xtFlag && xtFlag <= xsot + ws) {
             // Renders the flag tile on the screen.
-            fTile.render(screen, this, xtFlag, ytFlag); 
+            fTile.render(xtFlag, ytFlag, this, screen); 
         }
         
         // Render sprites on the screen.
@@ -243,7 +243,7 @@ public final class Level {
                 // Only bricks might have changed. 
                 if (tile.ID == Tile.brickID || tile.ID == Tile.QbrickID) {
                     // Renders the tile on the screen.
-                    tile.render(screen, this, x, y); 
+                    tile.render(x, y, this, screen); 
                 }
             }
         }

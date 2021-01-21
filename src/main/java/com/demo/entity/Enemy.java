@@ -180,23 +180,23 @@ public class Enemy extends Sprite {
                        
         int sw = screen.getSheet().width;   // width of sprite sheet (256)
         int colNum = sw / PPS;    // Number of squares in a row (32)    
-//        screen.render(x, y, xS + yS * colNum, flip1); // draws the top-left tile
+//        screen.renderFont(x, y, xS + yS * colNum, flip1); // draws the top-left tile
         
         if (isVisible()) {
             if (crushed) {  // crushed into half the height
-                screen.render(x, y + PPS, xS + yS * colNum, 0); // render the top-left part of the sprite         
-                screen.render(x + PPS, y + PPS, (xS + 1) + yS * colNum, 0);  // render the top-right part of the sprite
+                screen.render(x, y + PPS, xS + yS * colNum, 0); // renderFont the top-left part of the sprite         
+                screen.render(x + PPS, y + PPS, (xS + 1) + yS * colNum, 0);  // renderFont the top-right part of the sprite
             } else if (isShot) {    // Upside down
                 flip1 = 0;
-                screen.render(x + PPS * flip1, y + PPS, xS + yS * colNum, 2); // render the top-left part of the sprite         
-                screen.render(x - PPS * flip1 + PPS, y + PPS, (xS + 1) + yS * colNum, 2);  // render the top-right part of the sprite
-                screen.render(x + PPS * flip1, y, xS + (yS + 1) * colNum, 2); // render the bottom-left part of the sprite
-                screen.render(x - PPS * flip1 + PPS, y, xS + 1 + (yS + 1) * colNum, 2); // render the bottom-right part of the sprite        
+                screen.render(x + PPS * flip1, y + PPS, xS + yS * colNum, 2); // renderFont the top-left part of the sprite         
+                screen.render(x - PPS * flip1 + PPS, y + PPS, (xS + 1) + yS * colNum, 2);  // renderFont the top-right part of the sprite
+                screen.render(x + PPS * flip1, y, xS + (yS + 1) * colNum, 2); // renderFont the bottom-left part of the sprite
+                screen.render(x - PPS * flip1 + PPS, y, xS + 1 + (yS + 1) * colNum, 2); // renderFont the bottom-right part of the sprite        
             } else { // Normal state
-                screen.render(x + PPS * flip1, y, xS + yS * colNum, flip1); // render the top-left part of the sprite         
-                screen.render(x - PPS * flip1 + PPS, y, (xS + 1) + yS * colNum, flip1);  // render the top-right part of the sprite
-                screen.render(x + PPS * flip1, y + PPS, xS + (yS + 1) * colNum, flip1); // render the bottom-left part of the sprite
-                screen.render(x - PPS * flip1 + PPS, y + PPS, xS + 1 + (yS + 1) * colNum, flip1); // render the bottom-right part of the sprite        
+                screen.render(x + PPS * flip1, y, xS + yS * colNum, flip1); // renderFont the top-left part of the sprite         
+                screen.render(x - PPS * flip1 + PPS, y, (xS + 1) + yS * colNum, flip1);  // renderFont the top-right part of the sprite
+                screen.render(x + PPS * flip1, y + PPS, xS + (yS + 1) * colNum, flip1); // renderFont the bottom-left part of the sprite
+                screen.render(x - PPS * flip1 + PPS, y + PPS, xS + 1 + (yS + 1) * colNum, flip1); // renderFont the bottom-right part of the sprite        
             }
         }               
     }    

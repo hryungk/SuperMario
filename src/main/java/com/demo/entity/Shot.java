@@ -68,10 +68,10 @@ public class Shot extends Sprite {
                 
         int sw = screen.getSheet().width;   // width of sprite sheet (256)
         int colNum = sw / Commons.PPS;    // Number of squares in a row (32)    
-//        screen.render(x, y, xS + yS * colNum, 0); // draws the top-left tile
+//        screen.renderFont(x, y, xS + yS * colNum, 0); // draws the top-left tile
         for (int ys = 0; ys < hS; ys++) {
             for (int xs = 0; xs < wS; xs++) {
-                screen.render(x + xs * PPS, y + ys * PPS, (xS + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to render them all on the screen.                    
+                screen.render(x + xs * PPS, y + ys * PPS, (xS + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to renderFont them all on the screen.                    
             }
         }
     }

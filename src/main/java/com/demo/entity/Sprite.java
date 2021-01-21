@@ -160,9 +160,6 @@ public abstract class Sprite extends Entity {
                 
             } 
             if (!stopped && y < Commons.BOARD_HEIGHT) { // if the sprite is able to move then...
-                int xTile = x >> unit; // the x tile coordinate that the entity is standing on.
-                int yTile = y >> unit; // the y tile coordinate that the entity is standing on.
-                level.getTile(xTile, yTile, unit).steppedOn(this); // Calls the steppedOn() method in a tile's class. (like sand or lava)
                 if (dx != 0) walkDist++; // Increment our walking/movement counter
             }
             return !stopped; // returns the opposite of stopped

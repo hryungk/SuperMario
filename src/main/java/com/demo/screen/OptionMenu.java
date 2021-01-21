@@ -58,7 +58,7 @@ public class OptionMenu extends Menu {
         int yo = 3 * PPS;   // y location of the title on screen       
         int lastY = yo;     // Last y location of the displayed object
 
-        // Loops through all the squares to render the title on the screen.
+        // Loops through all the squares to renderFont the title on the screen.
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 lastY = yo + y * PPS;

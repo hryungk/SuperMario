@@ -80,7 +80,7 @@ public class BrokenBrick extends Sprite {
 
             for (int ys = 0; ys < hS; ys++) {
                 for (int xs = 0; xs < wS; xs++) {
-                    screen.render(x + xs * PPS, y + ys * PPS, (xSCur + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to render them all on the screen.                    
+                    screen.render(x + xs * PPS, y + ys * PPS, (xSCur + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to renderFont them all on the screen.                    
                 }
             }
         }

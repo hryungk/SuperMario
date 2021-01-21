@@ -115,7 +115,7 @@ public class Starman extends HiddenSprite {
 
                 for (int jj = 0; jj < hS; jj++) {
                     for (int ii = 0; ii < wS; ii++) {
-                        screen.render(x + ii * PPS, y + jj * PPS, (xSCur + ii) + (yS + jj) * colNum, 0); // Loops through all the squares to render them all on the screen.                    
+                        screen.render(x + ii * PPS, y + jj * PPS, (xSCur + ii) + (yS + jj) * colNum, 0); // Loops through all the squares to renderFont them all on the screen.                    
                     }
                 }
             }   

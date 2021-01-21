@@ -114,10 +114,10 @@ public class Mushroom extends HiddenSprite {
                 if (dir == 2) // dx < 0
                     flip = 1;
 
-                screen.render(x + PPS * flip, y, xS + yS * colNum, flip); // render the top-left part of the sprite         
-                screen.render(x - PPS * flip + PPS, y, (xS + 1) + yS * colNum, flip);  // render the top-right part of the sprite
-                screen.render(x + PPS * flip, y + PPS, xS + (yS + 1) * colNum, flip); // render the bottom-left part of the sprite
-                screen.render(x - PPS * flip + PPS, y + PPS, xS + 1 + (yS + 1) * colNum, flip); // render the bottom-right part of the sprite
+                screen.render(x + PPS * flip, y, xS + yS * colNum, flip); // renderFont the top-left part of the sprite         
+                screen.render(x - PPS * flip + PPS, y, (xS + 1) + yS * colNum, flip);  // renderFont the top-right part of the sprite
+                screen.render(x + PPS * flip, y + PPS, xS + (yS + 1) * colNum, flip); // renderFont the bottom-left part of the sprite
+                screen.render(x - PPS * flip + PPS, y + PPS, xS + 1 + (yS + 1) * colNum, flip); // renderFont the bottom-right part of the sprite
             }               
         }
     }    

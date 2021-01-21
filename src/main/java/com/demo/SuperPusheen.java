@@ -27,6 +27,7 @@ import main.java.com.demo.screen.*;
 import main.java.com.demo.entity.*;
 import main.java.com.demo.gfx.*;
 import main.java.com.demo.level.Level;
+import main.java.com.demo.level.tile.QuestionBrickTile;
 import main.java.com.demo.level.tile.Tile;
 
 /**
@@ -457,7 +458,7 @@ public class SuperPusheen extends JPanel implements Runnable {
                     yGap + PPS + yGap, main.java.com.demo.gfx.Color.WHITE);
         }
 
-        // If there is an active menu, then it will render it.
+        // If there is an active menu, then it will renderFont it.
         if (menu != null) {
             menu.render(screen);
         }
@@ -582,7 +583,7 @@ public class SuperPusheen extends JPanel implements Runnable {
                 level.tick(screen);     // Calls the tick() method in Level.java                
             }
             // Increases the tickCount in Tile.java. Used for QuestionBrick.java
-            Tile.tickCount++;
+            QuestionBrickTile.tickCount++;
         }
     }
 
