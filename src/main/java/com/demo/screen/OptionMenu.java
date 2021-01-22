@@ -62,7 +62,7 @@ public class OptionMenu extends Menu {
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 lastY = yo + y * PPS;
-                int sheetLoc = (xS + x) + (yS + y) * COLNUM;
+                int sheetLoc = (xS + x) + (yS + y) * colNum;
                 screen.render(xo + x * PPS, lastY, sheetLoc, 0);
             }
         }

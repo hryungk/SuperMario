@@ -4,131 +4,162 @@ import main.java.com.demo.Commons;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
-/** Represents a sprite.
- *  Keeps the image of the sprite and the coordinates of the sprite.
-    @author zetcode.com */
+/**
+ * Represents a mushroom under an InteractiveTile.
+ *
+ * @author HRK
+ */
 public class Mushroom extends HiddenSprite {
-    
-    private boolean doneFollowing, jumping;
+
+    private boolean jumping;
+
+    /**
+     * Constructor. Initializes the x and y coordinates and other variables.
+     *
+     * @param x x coordinate of the hidden sprite [pixel].
+     * @param y x coordinate of the hidden sprite [pixel].
+     * @param level The Level in which the player currently is.
+     */
     public Mushroom(int x, int y, Level level) {
-        super(x, y, level);        
-        initCoin();
-    }    
-    
-    private void initCoin() {
-        initY = y;
+        super(x, y, level);
+        initMushroom();
+    }
+
+    /**
+     * Initialize variables of the mushroom.
+     *
+     * @param x x coordinate of the mushroom [pixel].
+     * @param y x coordinate of the mushroom [pixel].
+     */
+    private void initMushroom() {
+        // Variables from Entity class.
         xS = 0;
-        yS = 8;         
+        yS = 8;
+
+        // Variables from Sprite class.        
         dx = 1;
         dy = -1;
-        
-        width = height = ES;
-        wS = width / PPS;
-        hS = height / PPS;
-        
-        score = 1000; 
-        
-        doneFollowing = jumping = false;
+        score = 1000;
+        jumping = false;
     }
-    
-    /** Update method, (Look in the specific entity's class) */
-    public void tick() {   
-                
+
+    /**
+     * Update method.
+     */
+    @Override
+    public void tick() {
+
         if (isActivated) {
             bNum = (bCounter / scale) % numStage;
-            bCounter++;  
-            
-            if (!doneFollowing) { // First the mushroom follows the InteractiveTile's movement
+            bCounter++;
+
+            // At first the coin follows the InteractiveTile's movement
+            if (!doneFollowing) {
                 ds = ds + 0.5;
                 y = (int) (y + ds);
-                if (ds >= 0)
+                if (ds >= 0) {
                     doneFollowing = true;
-            } else if (!reachedTop) {    // After the InteractiveTile reaches the top, this mushroom continues to move at a constant speed. 
-                ds = -1;
-                if (bCounter % ay == 0)
+                    ds = -1;
+                }
+            // Once done following the tile, move at a constant speed to the top
+            } else if (!reachedTop) {
+                if (bCounter % ay == 0) {
                     y = (int) (y + ds);
+                }
                 if (y <= initY - ES) {
                     reachedTop = true;
                     dy = -dy;
-                } 
-            } else { // Move normally                
-                // When punched from below, die.            
-                if (grounded && isPunchedOnBottom) {                
+                }
+            // Once reaching the top, move normally.
+            } else {
+                // When punched from below, jump.            
+                if (grounded && isPunchedOnBottom) {
                     ds = -4;
                     initY = y;
                     jumping = true;
                 }
-                
-                /* Update y position. */
-                if (jumping) {
-                    dy = (int) ds;
-                    ds += 0.5;
-                    if (y + dy >= initY)
-                        jumping = false;
-                } else if (!grounded)
-                    dy++;            
-                else
-                    dy = ySpeed; // By default, there is gravity.
 
+                // Update dy.
+                if (jumping) {              // While jumping
+                    dy = (int) ds;
+                    ds += 0.5;              // Accelerate.
+                    if (y + dy >= initY) {  // Once come back to the ground
+                        jumping = false;
+                    }
+                } else if (!grounded) {     // If flying in the air
+                    dy++;                   // Accelerate.
+                } else {                    // When grounded,
+                    dy = ySpeed;            // By default, there is gravity.
+                }
+                
                 // Adjust dy when facing a ground tile.
-                if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
+                if (dy > 0 && y + height < Commons.GROUND && willBeGrounded()) {
                     int yt1 = y + dy + ES;
-                    int backoff = yt1 - (yt1 >> 4) * 16;
-                    if (backoff > 1)
+                    int backoff = yt1 - (yt1 >> unit) * ES;
+                    if (backoff > 1) {
                         dy -= backoff;
-                }                  
-                
+                    }
+                }
+                                
                 boolean stopped = !move(dx, dy);     // Updates x and y.
-                
-                if (stopped && dx != 0)    // Has met a wall
-                    dx = - dx;   
+
+                if (stopped && dx != 0)   // If it has met a wall                
+                    dx = -dx;             // Change x direction to the opposite.
                 
                 // Update visibility on the screen.
+                // In x-direction
                 int offset = level.getOffset();
-                if (x <= 0)
-                    remove();        
-                else if (x+width <= offset && offset + Commons.BOARD_WIDTH <= x)
-                    setVisible(false);     
+                if (x <= 0)           // Once it reaches the left end of the map
+                    remove();         // Remove it from the level.
+                else if (x + width <= offset || // Once it's out of screen
+                        offset + Commons.BOARD_WIDTH <= x) 
+                    setVisible(false);          // Make invisible.                
+                // In y-direction
+                if (y > Commons.BOARD_HEIGHT)   // If if falls to the bottom
+                    remove();                   // Remove it from the level.                             
+            }   
+        }
+    }
 
-                if (y > Commons.BOARD_HEIGHT)
-                    remove();       
-                
-//                // When falling, add acceleration to y.
-//                int effDy = y - oldY;
-//                if (effDy != 0) // actual y displacement                
-
-            } // end if (following the InteractiveTile)            
-        } // end if(isActivated)
-    }    
-
-    /** Draws the sprite on the screen
-     * @param screen The screen to be displayed on. */
+    /**
+     * Draws the sprite on the screen
+     *
+     * @param screen The screen to be displayed on.
+     */
     @Override
     public void render(Screen screen) {
-                
+        super.render(screen);
         if (isActivated) {
-            if (isVisible()) {
-                int sw = screen.getSheet().width;   // width of sprite sheet (256)
-                int colNum = sw / PPS;    // Number of squares in a row (32)         
-                int flip = 0; // dx > 0
-                if (dir == 2) // dx < 0
+            if (isVisible()) {                
+                int flip = 0;               // dx > 0
+                if (dir == 2) {             // dx < 0                
                     flip = 1;
+                }
 
-                screen.render(x + PPS * flip, y, xS + yS * colNum, flip); // renderFont the top-left part of the sprite         
-                screen.render(x - PPS * flip + PPS, y, (xS + 1) + yS * colNum, flip);  // renderFont the top-right part of the sprite
-                screen.render(x + PPS * flip, y + PPS, xS + (yS + 1) * colNum, flip); // renderFont the bottom-left part of the sprite
-                screen.render(x - PPS * flip + PPS, y + PPS, xS + 1 + (yS + 1) * colNum, flip); // renderFont the bottom-right part of the sprite
-            }               
+                // Render the sprite.
+                screen.render(x + PPS * flip, y, xS + yS * colNum, 
+                        flip);                              // Top-left part
+                screen.render(x - PPS * flip + PPS, y, (xS + 1) + yS * colNum, 
+                        flip);                              // Top-right part           
+                screen.render(x + PPS * flip, y + PPS, xS + (yS + 1) * colNum, 
+                        flip);                              // Bottom-left part     
+                screen.render(x - PPS * flip + PPS, y + PPS, 
+                        xS + 1 + (yS + 1) * colNum, flip);  // Bottom-right part
+            }
         }
-    }    
-    
+    }
+
+    /**
+     * What happens when this entity is touched by another entity.
+     *
+     * @param sprite The sprite that this sprite is touched by.
+     */
     @Override
-    protected void touchedBy(Sprite sprite) {     
+    protected void touchedBy(Sprite sprite) {
         super.touchedBy(sprite);
         if (sprite instanceof Player && isActivated) {
-            ((Player)sprite).eatMushroom(score);
-//            scoreStr = Integer.toString(score);
-            level.add(new ScoreString(x + 4, y + height/2, score, level));
+            ((Player) sprite).eatMushroom(score);
+            level.add(new ScoreString(x + 4, y + height / 2, score, level));
             remove();
         }
     }

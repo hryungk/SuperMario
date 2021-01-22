@@ -4,107 +4,154 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 
 public class Entity {
-    private BufferedImage image;
-    private byte[] pixels;
-    public boolean removed; // Determines if the entity should be removed from the level
-    // Below variables need to be defined in children classes. 
-    public int x, y;// x & y coordinates on the map    
-    int width, height; // width and height of the entity    
-    protected int xS, yS; // Location on the sprite sheet    
 
-    public Entity () {
+    public boolean removed;       // Determines if the entity should be removed.
+    // Variables below need to be defined in children classes. 
+    private BufferedImage image;  // Image representing the entity
+    private byte[] pixels;        // Pixels for the image
+    int width, height;            // Width and height of the entity    
+    public int x, y;              // x & y coordinates on the map [pixel]
+    protected int xS, yS;         // Location on the sprite sheet  [square]  
+
+    /**
+     * Constructor.
+     */
+    public Entity() {
         init();
     }
-    
-    protected void init() {
+
+    /**
+     * Initialize variables.
+     */
+    private void init() {
         removed = false;
     }
-    
+
+    /**
+     * Sets the image of the entity.
+     *
+     * @param image The image to be assigned to this entity.
+     */
     public void setImage(BufferedImage image) {
         this.image = image;
-        pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();  
+        pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
         width = image.getWidth();
-        height = image.getHeight();                
+        height = image.getHeight();
     }
-    
+
+    /**
+     * Gets the image of the entity.
+     *
+     * @return Image object for this entity.
+     */
     public BufferedImage getImage() {
         return image;
     }
-    
+
+    /**
+     * Gets the pixels for the image.
+     *
+     * @return A byte array containing pixels of the image of the entity.
+     */
     public byte[] getPixels() {
         return pixels;
     }
-    
-    /** Removes the entity from the world */
+
+    /**
+     * Removes the entity from the world.
+     */
     public void remove() {
-        removed = true; // sets the removed value to true
+        removed = true;
     }
-    
-    public void setX (int x) {
+
+    /**
+     * Sets the x position to a value.
+     *
+     * @param x An integer containing x coordinate of the entity.
+     */
+    public void setX(int x) {
         this.x = x;
     }
-    
-    public void setY (int y) {
+
+    /**
+     * Sets the y position to a value.
+     *
+     * @param y An integer containing y coordinate of the entity.
+     */
+    public void setY(int y) {
         this.y = y;
     }
-    
-    public int getX() {        
+
+    /**
+     * Gets the x position of the entity.
+     *
+     * @return An integer containing the x coordinate of the entity.
+     */
+    public int getX() {
         return x;
     }
 
-    public int getY() {        
+    /**
+     * Gets the y position of the entity.
+     *
+     * @return An integer containing the y coordinate of the entity.
+     */
+    public int getY() {
         return y;
-    }    
-    
+    }
+
+    /**
+     * Gets the width of the entity image.
+     *
+     * @return An integer containing the width of the entity image.
+     */
     public int getWidth() {
         return width;
     }
-    
+
+    /**
+     * Gets the height of the entity image.
+     *
+     * @return An integer containing the height of the entity image.
+     */
     public int getHeight() {
         return height;
     }
-    
-    /** Checks if this entity intersects with a rectangle.
+
+    /**
+     * Checks if this entity intersects with a rectangle.
+     *
      * @param x0 x position of the top left corner of the rectangle.
      * @param y0 y position of the top left corner of the rectangle.
      * @param x1 x position of the bottom right corner of the rectangle.
      * @param y1 y position of the bottom right corner of the rectangle.
-     * @return  True if the current entity and the rectangle intersects. */
+     * @return True if the current entity and the rectangle intersect.
+     */
     public boolean intersects(int x0, int y0, int x1, int y1) {
-        /* if (x position + horizontal radius) is NOT smaller than x0 AND... 
-         * if (y position + vertical radius) is NOT smaller than y0 AND... 
-         * if (x position - horizontal radius) is NOT larger than x1 AND... 
-         * if (y position - vertical radius) is NOT larger than y1. Then return true.
-         *  */
-//        int xr = width / 2;
-//        int yr = height / 2;
-//        return !(x + xr < x0 || y + yr < y0 || x - xr > x1 || y - yr > y1); 
-        int w = width;
-        int h = height;
-        return !(x + w < x0 || y + h < y0 || x1 < x || y1 < y); 
+        return !(x + width < x0 || y + height < y0 || x1 < x || y1 < y);
     }
-    
+
+    /**
+     * Checks if this entity intersects with another entity.
+     *
+     * @param e An entity to check the intersection with current entity.
+     * @return True if the current entity and e intersect.
+     */
     public boolean intersects(Entity e) {
-        /* if (x position + horizontal radius) is NOT smaller than x0 AND... 
-         * if (y position + vertical radius) is NOT smaller than y0 AND... 
-         * if (x position - horizontal radius) is NOT larger than x1 AND... 
-         * if (y position - vertical radius) is NOT larger than y1. Then return true.
-         *  */
-//        int xr = width / 2;
-//        int yr = height / 2;
-//        return !(x + xr < x0 || y + yr < y0 || x - xr > x1 || y - yr > y1); 
         int x0 = e.getX();
         int y0 = e.getY();
         int x1 = x0 + e.getWidth();
         int y1 = y0 + e.getHeight();
-        int w = width;
-        int h = height;
-        return !(x + w < x0 || y + h < y0 || x1 < x || y1 < y); 
+        return intersects(x0, y0, x1, y1);
     }
-    
-    /** Extended in Sprite.java.
+
+    /**
+     * Extended in Sprite.java.
+     *
      * @param e The entity that wants to interact with this entity.
-     * @return  true if this entity blocks e, false if this entity lets e pass it. */
+     * @return True if this entity blocks e, false if this entity lets e pass
+     * it.
+     */
     public boolean blocks(Entity e) {
         return true;
     }

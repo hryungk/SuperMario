@@ -8,32 +8,41 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import main.java.com.demo.SuperPusheen;
 
-/** Represents a sprite.
- *  Keeps the image of the sprite and the coordinates of the sprite.
-    @author zetcode.com */
+/**
+ * Represents a block. Keeps the image and the coordinates of the block.
+ *
+ * @author HRK
+ */
 public class Block extends RigidEntity {
-
-    // The constructor initiates the x and y coordinates and the visible variable.
-    public Block(int x, int y) {          
-        super();
+    
+    /**
+     * Constructor. Initiates the x and y coordinates and the visible variable.
+     * 
+     * @param x x coordinate on the map [pixel]
+     * @param y y coordinate on the map [pixel]
+     */
+    public Block(int x, int y) {
+        super();      
+        init(x, y);
+    }
+    
+    private void init(int x, int y) {
         
-        var pipeImg = "src/main/resources/block.png";
-//        var ii = new ImageIcon(pipeImg);        
-//        setImage(ii.getImage());
-        
+        // Set image.        
         try {
-            BufferedImage source = ImageIO.read(new File(pipeImg));
+            var imgPath = "src/main/resources/block.png";
+            BufferedImage source = ImageIO.read(new File(imgPath));
             setImage(source);
         } catch (IOException ex) {
-            Logger.getLogger(SuperPusheen.class.getName()).log(
-                    Level.SEVERE, null, ex);
+            Logger.getLogger(SuperPusheen.class.getName()).log(Level.SEVERE, 
+                    null, ex);
         }
-                
-        // Initial coordinates of the player sprite.
-        setX(x);        
-        setY(y);    
         
+        // Initial coordinates of the block.
+        setX(x);
+        setY(y);
+
         xS = 6;
         yS = 0;
-    }    
+    }
 }

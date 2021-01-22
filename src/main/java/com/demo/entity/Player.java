@@ -35,12 +35,11 @@ public class Player extends Sprite {
         lives = 3;
         scale = 4;
 
-        init();
+        initPlayer();
     }
 
-    @Override
-    public void init() {
-        super.init();
+    
+    public void initPlayer() {
 
         // Initial coordinates of the player sprite.
         int START_X = Commons.PLAYER_XI;

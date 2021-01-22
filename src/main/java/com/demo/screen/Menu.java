@@ -8,7 +8,7 @@ import main.java.com.demo.gfx.Screen;
 public abstract class Menu {
 
     protected final int PPS = Commons.PPS; // Size of square in the sprite sheet
-    protected int COLNUM;      // Number of squres in a row in the sprite sheet.
+    protected int colNum;      // Number of squres in a row in the sprite sheet.
     protected SuperPusheen game;   // Game object used in Menu classes.
     protected InputHandler input;  // Input handler object used in Menu classes.
 
@@ -20,7 +20,7 @@ public abstract class Menu {
     public void init(SuperPusheen game, InputHandler input) {
         this.input = input;
         this.game = game;
-        COLNUM = game.getColNum();
+        colNum = game.getColNum();
     }
 
     /**

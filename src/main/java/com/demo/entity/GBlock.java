@@ -8,32 +8,42 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import main.java.com.demo.SuperPusheen;
 
-/** Represents a ground block.
- *  Keeps the image of the sprite and the coordinates of the sprite.
-    @author zetcode.com */
+/**
+ * Represents a ground block. Keeps the image and the coordinates of the ground 
+ * block.
+ *
+ * @author HRK
+ */
 public class GBlock extends RigidEntity {
 
-    // The constructor initiates the x and y coordinates and the visible variable.
-    public GBlock(int x, int y) {          
+    /**
+     * Constructor. Initiates the x and y coordinates and the visible variable.
+     * 
+     * @param x x coordinate on the map [pixel]
+     * @param y y coordinate on the map [pixel]
+     */
+    public GBlock(int x, int y) {
         super();
-        
-        var pipeImg = "src/main/resources/ground.png";
-//        var ii = new ImageIcon(pipeImg);        
-//        setImage(ii.getImage());
-        
+        init(x, y);
+    }
+    
+    private void init(int x, int y) {       
+
+        // Set image.
         try {
-            BufferedImage source = ImageIO.read(new File(pipeImg));
+            var imgPath = "src/main/resources/ground.png";
+            BufferedImage source = ImageIO.read(new File(imgPath));
             setImage(source);
         } catch (IOException ex) {
-            Logger.getLogger(SuperPusheen.class.getName()).log(
-                    Level.SEVERE, null, ex);
+            Logger.getLogger(SuperPusheen.class.getName()).log(Level.SEVERE, 
+                    null, ex);
         }
-                
+
         // Initial coordinates of the player sprite.
-        setX(x);        
-        setY(y);    
-        
+        setX(x);
+        setY(y);
+
         xS = 4;
         yS = 0;
-    }    
+    }
 }

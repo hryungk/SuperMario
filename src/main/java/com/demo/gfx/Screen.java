@@ -12,7 +12,7 @@ public class Screen {
     public int xOffset;         // x offset of the screen [pixel]
     public int yOffset;         // y offset of the screen [pixel]  
     public int[] pixels;        // Pixels to be drawn on the screen
-    public SpriteSheet sheet;   // Sprite sheet used in the game   
+    private final SpriteSheet sheet;   // Sprite sheet used in the game   
     public static final int BIT_MIRROR_X = 0x01;    // Mirroring horizontally
     public static final int BIT_MIRROR_Y = 0x02;    // Mirroring vertically
 

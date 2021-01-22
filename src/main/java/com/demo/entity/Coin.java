@@ -3,89 +3,104 @@ package main.java.com.demo.entity;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
-/** Represents a sprite.
- *  Keeps the image of the sprite and the coordinates of the sprite.
-    @author zetcode.com */
+/**
+ * Represents a coin under an InteractiveTile.
+ *
+ * @author HRK
+ */
 public class Coin extends HiddenSprite {
-        
-    // The constructor initiates the x and y coordinates and the visible variable.
+
+    /**
+     * Constructor. Initializes the x and y coordinates and other variables.
+     *
+     * @param x x coordinate of the hidden sprite [pixel].
+     * @param y x coordinate of the hidden sprite [pixel].
+     * @param level The Level in which the player currently is.
+     */
     public Coin(int x, int y, Level level) {
         super(x, y, level);
         initCoin();
-    }    
-    
+    }
+
+    /**
+     * Initialize variables of the coin.
+     *
+     * @param x x coordinate of the coin [pixel].
+     * @param y x coordinate of the coin [pixel].
+     */
     private void initCoin() {
-        initY = y;
+        // Variables from Entity class.        
         xS = 0;
-        yS = 4;         
+        yS = 4;
+
+        // Variables from Sprite class.
         dx = 0;
-        dy = -2;        
-        
-        width = height = ES;
-        wS = width / PPS;
-        hS = height / PPS;
-        
+        dy = -2;
         score = 200;
     }
-    
-    /** Update method, (Look in the specific entity's class) */
+
+    /**
+     * Update method.
+     */
     @Override
-    public void tick() {   
-                
-        if (isActivated) {
-            
-            if (firstTime) {
-                level.player.addScore(score); // gives the player 100 points of score
-                level.player.addCoinCount();
-                firstTime = false;
-            }
-            
-            
-            if (ds < 0) { // First the coin follows the InteractiveTile's movement
+    public void tick() {
+
+        if (isActivated) {            
+            bNum = (bCounter / scale) % numStage;
+            bCounter++;            
+
+            // At first the coin follows the InteractiveTile's movement
+            if (!doneFollowing) { 
                 ds = ds + 0.5;
                 y = (int) (y + ds);
-            } else {    // After the InteractiveTile reaches the top, this coin continues to move at a constant speed. 
-                if (y <= initY) {
-                    if (y <= initY - 3 * ES && !reachedTop) {
-                        reachedTop = true;
-                        dy = -dy;
-                    }
-                    y += dy;  
+                if (ds >= 0) {
+                    doneFollowing = true;                    
+                }
+            // Once done following the tile, move at a constant speed to the top
+            } else if (!reachedTop) {            
+                y += dy; 
+                if (y <= initY - 3 * ES) {
+                    reachedTop = true;
+                    dy = -dy;
                 }                
-            }        
-
-            if (y >= initY && reachedTop) {
-                die(); // Make invisible                
+            // Once reaching the top, this coin falls at a constant speed.
+            } else if (y <= initY) {
+                y += dy;
             }
 
-            bNum = (bCounter / scale) % numStage;
-            bCounter++;        
-                        
             if (reachedTop && y >= initY - height || !isVisible()) {
-//                scoreStr = Integer.toString(score);
-                level.add(new ScoreString(x + 4, y + height/2, score, level));
+                level.add(new ScoreString(x + 4, y + height / 2, score, level));
                 remove();
-            }            
+            }
+                        
+            if (firstTime) {                    // If first time,
+                level.player.addScore(score);   // Gives the player points. 
+                level.player.addCoinCount();    // Add coint couts.
+                firstTime = false;
+            }
         }
-    }    
+    }
 
-    /** Draws the sprite on the screen
-     * @param screen The screen to be displayed on. */
+    /**
+     * Draws the sprite on the screen
+     *
+     * @param screen The screen to be displayed on.
+     */
     @Override
-    public void render(Screen screen) {                
+    public void render(Screen screen) {
+        super.render(screen);
         if (isActivated) {
-            if (isVisible()) {
-                int sw = screen.getSheet().width;   // width of sprite sheet (256)
-                int colNum = sw / PPS;    // Number of squares in a row (32)                   
-
-                int xSCur = xS + bNum * wS; // animation based on walk distance (0 is standing still and 2 is moving)                  
-
+            if (isVisible()) {     
+                // Animation through 4 different colors.
+                int xSCur = xS + bNum * wS;                 
+                // Loops through all the squares to render them on the screen.
                 for (int ys = 0; ys < hS; ys++) {
                     for (int xs = 0; xs < wS; xs++) {
-                        screen.render(x + xs * PPS, y + ys * PPS, (xSCur + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to renderFont them all on the screen.                    
+                        screen.render(x + xs * PPS, y + ys * PPS, 
+                                (xSCur + xs) + (yS + ys) * colNum, 0); 
                     }
                 }
-            }                    
+            }
         }
     }
 }

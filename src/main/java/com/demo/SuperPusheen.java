@@ -236,7 +236,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         int[][] PPOS = Commons.PPOS; // Size and initial x/y position of pipes.
         pipes = new ArrayList<>(PPOS.length);
         for (int[] p : PPOS) {
-            Pipe pipe = new Pipe(p[0], p[1], p[2]);
+            Pipe pipe = new Pipe(p[1], p[2], p[0]);
             pipes.add(pipe);    // Add the pipe to the pipe array.
             int[][] pipePixels = ImageTool.convertTo2D(pipe.getImage());
             // Add the pipe to the background.
@@ -334,7 +334,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         level = new Level(numTileX, numTileY, levelNum, Commons.GAME_TIME);
         tiles = level.tileIds;
         player = new Player(input, level, this);
-        player.init();
+        player.initPlayer();
         level.add(player);
 
         // Create enemies and hidden sprites.     
@@ -366,7 +366,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         // Create the map.
         level = new Level(numTileX, numTileY, levelNum, Commons.GAME_TIME);
         player.level = level;
-        player.init();
+        player.initPlayer();
         level.add(player);
 
         // Create enemies and hidden sprites.
@@ -629,7 +629,7 @@ public class SuperPusheen extends JPanel implements Runnable {
      * sprite sheet.
      */
     public int getColNum() {
-        return screen.sheet.width / Commons.PPS;
+        return screen.getSheet().width / Commons.PPS;
     }
 
     /**

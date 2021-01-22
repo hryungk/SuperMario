@@ -34,7 +34,7 @@ public class Font {
      */
     public static void draw(String msg, Screen screen, int x, int y, int col) {
         // Number of tiles in a row on the sprite sheet. (256 / 8 = 32).
-        int colNum = screen.sheet.width / PPS;  
+        int colNum = screen.getSheet().width / PPS;  
         int yTile = 30;     // Letters are located 30th row in the sprite sheet. 
         msg = msg.toUpperCase(); // Turns all the characters in into upper case.
         // Loops through all the characters in msg.
