@@ -4,15 +4,17 @@ import main.java.com.demo.Commons;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
-/** Represents an enemy as a sprite.
- *  Keeps the image of the sprite and the coordinates of the sprite.
-    @author zetcode.com */
+/**
+ * Represents an enemy as a sprite.
+ *
+ * @author HRK
+ */
 public class Enemy extends Sprite {
     
-    private int counter;
-    private int curDx, initY;
-    private boolean activated, crushed, isShot, jumping;
+    private int counter;    // Tick counter. This is to slow down enemy.
     private int deathTime;  // Counts ticks after death
+    private int curDx, initY;    
+    private boolean activated, crushed, isShot, jumping;    
     
     public Enemy(int x, int y, Level level) {                
         super(level);
@@ -20,104 +22,38 @@ public class Enemy extends Sprite {
     }    
     
     private void initEnemy(int x, int y) {
+        // Initialize variables from Entity class.
         setX(x);
         setY(y); 
         width = height = ES;
         xS = 4;
         yS = 2;
         
+        // Initialize variables from Sprite class.
         xSpeed = 1; 
         dx = -xSpeed;
         dy = ySpeed;
         ds = 1;
-        dir = 2; // Always face left
         
         ground = y + height;
         wS = width / PPS;
         hS = height / PPS;
-               
-        unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
-        aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
-        score = 100;
+        score = 100;     
+        unit = (int) (Math.log10(width)/Math.log10(2)); 
+        aTile = Math.min(Math.pow(2, 4 - unit), 1); 
         
-        counter = 0;
-        curDx = dx;
-        
-        activated = crushed = isShot = jumping = false;
-        deathTime = 0;
-    }    
-        
-    // Positions the enemy in horizontal direction.
-    @Override
-    public void tick() {
-        super.tick();     
-                
-        if (deathTime == 20) {    // Remove after 20 ticks.
-            remove();
-        } else if ((crushed) && !removed)   // increase tick when attacked but not removed
-            deathTime++;
-        else if (isShot) {
-            dy = (int) ds;
-            if (dy < 4)
-                ds += 0.5;     
-
-            x += dx;
-            y += dy;
-            
-            // Update visibility on the screen.
-            updateVisibility();     
-            
-        } else {  // unaffected and moves               
-            // When punched from below, die.            
-            if (grounded && isPunchedOnBottom) {     
-                initY = y;
-                jumping = true;
-                setShot();                
-            }
-            
-            /* Update y position. */
-            if (jumping) {
-                dy = (int) ds;
-                ds += 0.5;
-                if (y + dy >= initY)
-                    jumping = false;
-            } else if (!grounded)
-                dy++;            
-            else
-                dy = ySpeed; // By default, there is gravity.
-            
-            /* Update x position. */
-            // Moves in x direction every other tick. This is to slow down enemy.
-            if (counter % 2 == 0) 
-                dx = curDx;
-            else  {
-                dx = 0;
-            }
-            counter++;      
+        // Initialize variables for this class.
+        counter = deathTime = 0;
+        curDx = dx; 
+        initY = y;
+        activated = crushed = isShot = jumping = false;        
+    }           
     
-            // Adjust dy when facing a ground tile.
-            if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
-                int yt1 = y + dy + ES;
-                int backoff = yt1 - (yt1 >> 4) * 16;
-                if (backoff > 1)
-                    dy -= backoff;
-            }            
-            
-            /* Update y position. */
-            boolean stopped = !move(dx, dy);     // Updates x and y.
-                        
-            if (stopped && dx != 0) {   // Has met a wall
-                dx = - dx;
-                curDx = dx;                    
-            }
-            
-            // Update visibility on the screen.
-            updateVisibility();
-        }        
-    }  
-    
-    /** What happens when the player touches an entity.
-     * @param sprite The sprite that this sprite is touched by. */    
+    /** 
+     * What happens when the enemy touches a sprite.
+     * 
+     * @param sprite The sprite that this sprite is touched by. 
+     */    
     @Override
     protected void touchedBy(Sprite sprite) {
         if (sprite instanceof Player && !sprite.isDying()) { // if this enemy touches the player
@@ -133,7 +69,7 @@ public class Enemy extends Sprite {
                 level.add(new ScoreString(x, y - height, score, level));
                 p.setCrushedEnemy(true);
             } else if (!crushed && !isShot) {   // regular encounter
-                if (p.isImortal()) { // when player is immortal (ate starman)
+                if (p.isImmortal()) { // when player is immortal (ate starman)
                     setShot();
                 } else {    
                     sprite.hurt(1); // hurts the player, damage is based on lvl.
@@ -153,10 +89,6 @@ public class Enemy extends Sprite {
                             p.setFired(false);
                         }
                     } 
-//                    else {
-//                        p.setDying(true);
-//                        p.ds = -5;
-//                    }           
                 }
             }
         }
@@ -172,31 +104,120 @@ public class Enemy extends Sprite {
             }
         }
     }
-
+    
+    /**
+     * Update method.
+     */
     @Override
-    public void render(Screen screen) {        
-        // Becomes 1 every other square (8 pixels)
-        int flip1 = (walkDist >> 2) & 1; // This will either be a 1 or a 0 depending on the walk distance (Used for walking effect by mirroring the sprite)
-                       
-        int sw = screen.getSheet().width;   // width of sprite sheet (256)
-        int colNum = sw / PPS;    // Number of squares in a row (32)    
-//        screen.renderFont(x, y, xS + yS * colNum, flip1); // draws the top-left tile
+    public void tick() {
+        super.tick();     
+        
+        // If it was crushed by the Player
+        if (crushed) { 
+            if (deathTime == 20)    // When death time is over
+                hurt(health);       // Remove.
+            else
+                deathTime++;        // Increment death timer.            
+        } // If it was shot by the Shot 
+        else if (isShot) {
+            dy = (int) ds;
+            if (dy < 4)             // Accelerate until reaching g-force of 4.
+                ds += 0.5;     
+
+            x += dx;                // Keep moving.
+            y += dy;            
+            
+        }  // Otherwise, move normally.
+        else {
+            // When punched from below, die.            
+            if (grounded && isPunchedOnBottom) {     
+                initY = y;
+                jumping = true;
+                setShot();                
+            }
+            
+            // Update dy. 
+            if (jumping) {           // While jumping from punched on the bottom
+                dy = (int) ds;
+                ds += 0.5;              // Accelerate vertical speed.
+                if (y + dy >= initY)    // When falls back to original position
+                    jumping = false;    // Jumping state is over.
+            } else if (!grounded)   // While falling
+                dy++;                   // Accelerate faster 
+            else                    // Otherwise, grounded
+                dy = ySpeed;            // By default, there is gravity.
+            
+            // Update dx. 
+            // To slow down enemy, move every other tick.
+            if (counter % 2 == 0)   // In every other tick
+                dx = curDx;         // dx has a value.
+            else  {
+                dx = 0;
+            }
+            counter++;              // Increment tick counter.
+    
+            // If falling on the ground in the next tick
+            if (dy > 0  && y + height < Commons.GROUND && willBeGrounded()) {
+                int yt1 = y + dy + ES;
+                int backoff = yt1 - (yt1 >> 4) * 16;
+                if (backoff > 1)
+                    dy -= backoff;  // Adjust dy so that it doesn't go over
+            }                       // the ground.
+            
+            // Make a movement.
+            boolean stopped = !move(dx, dy);     // Updates x and y.
+                        
+            if (stopped && dx != 0) {   // Has met a wall
+                dx = - dx;      // Change direction to the opposite. 
+                curDx = dx;     // Update currnet dx accordingly.                
+            }            
+        }
+        // Update visibility on the screen.
+        updateVisibility();        
+    }  
+    
+    /**
+     * Draws the sprite on the screen.
+     *
+     * @param screen The screen to be displayed on.
+     */
+    @Override
+    public void render(Screen screen) {     
+        super.render(screen);
+        
+        // Animation based on walking distance.
+        // ((walkDist >> 2) & 1) will either be a 1 or a 0 depending on walkDist
+        // Becomes 1 every half square (4 pixels)
+        int flip1 = (walkDist >> 2) & 1;
         
         if (isVisible()) {
-            if (crushed) {  // crushed into half the height
-                screen.render(x, y + PPS, xS + yS * colNum, 0); // renderFont the top-left part of the sprite         
-                screen.render(x + PPS, y + PPS, (xS + 1) + yS * colNum, 0);  // renderFont the top-right part of the sprite
-            } else if (isShot) {    // Upside down
+            // If crushed into half the height
+            if (crushed) {      
+                screen.render(x, y + PPS, 
+                        xS + yS * colNum, 0);           // Top-left 
+                screen.render(x + PPS, y + PPS,
+                        (xS + 1) + yS * colNum, 0);     // Top-right 
+            } // If is shot (upside down)
+            else if (isShot) {
                 flip1 = 0;
-                screen.render(x + PPS * flip1, y + PPS, xS + yS * colNum, 2); // renderFont the top-left part of the sprite         
-                screen.render(x - PPS * flip1 + PPS, y + PPS, (xS + 1) + yS * colNum, 2);  // renderFont the top-right part of the sprite
-                screen.render(x + PPS * flip1, y, xS + (yS + 1) * colNum, 2); // renderFont the bottom-left part of the sprite
-                screen.render(x - PPS * flip1 + PPS, y, xS + 1 + (yS + 1) * colNum, 2); // renderFont the bottom-right part of the sprite        
-            } else { // Normal state
-                screen.render(x + PPS * flip1, y, xS + yS * colNum, flip1); // renderFont the top-left part of the sprite         
-                screen.render(x - PPS * flip1 + PPS, y, (xS + 1) + yS * colNum, flip1);  // renderFont the top-right part of the sprite
-                screen.render(x + PPS * flip1, y + PPS, xS + (yS + 1) * colNum, flip1); // renderFont the bottom-left part of the sprite
-                screen.render(x - PPS * flip1 + PPS, y + PPS, xS + 1 + (yS + 1) * colNum, flip1); // renderFont the bottom-right part of the sprite        
+                screen.render(x + PPS * flip1, y + PPS, 
+                        xS + yS * colNum, 2);           // Top-left        
+                screen.render(x - PPS * flip1 + PPS, y + PPS, 
+                        (xS + 1) + yS * colNum, 2);     // Top-right 
+                screen.render(x + PPS * flip1, y, 
+                        xS + (yS + 1) * colNum, 2);     // Bottom-left 
+                screen.render(x - PPS * flip1 + PPS, y,
+                        xS + 1 + (yS + 1) * colNum, 2); // Bottom-right 
+            } // If normal state 
+            else {           
+                screen.render(x + PPS * flip1, y, 
+                        xS + yS * colNum, flip1);       // Top-left 
+                screen.render(x - PPS * flip1 + PPS, y,
+                        (xS + 1) + yS * colNum, flip1); // Top-right 
+                screen.render(x + PPS * flip1, y + PPS, 
+                        xS + (yS + 1) * colNum, flip1); // Bottom-left 
+                screen.render(x - PPS * flip1 + PPS, y + PPS, 
+                        xS + 1 + (yS + 1) * colNum, flip1); // Bottom-right 
             }
         }               
     }    
@@ -209,12 +230,10 @@ public class Enemy extends Sprite {
         return activated;
     }
     
-    @Override
-    public boolean blocks(Sprite e) {
-//        if (crushed) return true;
-//        else 
-            return false;
-    }   
+//    @Override
+//    public boolean blocks(Entity e) {
+//        return crushed;
+//    }   
     
     public boolean isCrushed() {
         return crushed;
@@ -232,17 +251,19 @@ public class Enemy extends Sprite {
         level.add(new ScoreString(x, y - height, score, level));
     }
     
-    private void updateVisibility() {
-        // Update visibility on the screen.
+    private void updateVisibility() {        
         int offset = level.getOffset();
+        // If going beyond the left end of the map
         if (x <= 0)
-            remove();   //hurt(health);     
-        else if (x+width <= offset && offset + Commons.BOARD_WIDTH <= x)
-            setVisible(false);   
+            hurt(health);       // Die.
+        // If going outside of the screen
+        else if (x+width <= offset || offset + Commons.BOARD_WIDTH <= x)
+            setVisible(false);  // Set invisible
+        // Otherwise
         else
-            setVisible(true);   
-
+            setVisible(true);   // Set visible.
+        // If going down beyond the screen
         if (y > Commons.BOARD_HEIGHT)
-            remove();              
+            hurt(health);              
     }
 }

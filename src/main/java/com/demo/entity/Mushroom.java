@@ -122,13 +122,14 @@ public class Mushroom extends HiddenSprite {
     }
 
     /**
-     * Draws the sprite on the screen
+     * Draws the sprite on the screen.
      *
      * @param screen The screen to be displayed on.
      */
     @Override
     public void render(Screen screen) {
         super.render(screen);
+        
         if (isActivated) {
             if (isVisible()) {                
                 int flip = 0;               // dx > 0

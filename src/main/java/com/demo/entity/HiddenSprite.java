@@ -66,7 +66,7 @@ public abstract class HiddenSprite extends Sprite {
     }
 
     /**
-     * Draws the sprite on the screen
+     * Draws the sprite on the screen.
      *
      * @param screen The screen to be displayed on.
      */
@@ -85,7 +85,7 @@ public abstract class HiddenSprite extends Sprite {
     }
 
     /**
-     * What happens when this entity is touched by another entity.
+     * What happens when this sprite is touched by another sprite.
      *
      * @param sprite The sprite that this sprite is touched by.
      */

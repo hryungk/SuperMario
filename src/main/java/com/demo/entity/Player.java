@@ -10,22 +10,23 @@ import main.java.com.demo.level.tile.FlagTile;
 import main.java.com.demo.level.tile.Tile;
 
 /**
- * Represents a player as a sprite. Keeps the image of the sprite and the
- * coordinates of the sprite.
+ * Represents a player as a sprite.
  *
- * @author zetcode.com
+ * @author HRK
  */
 public class Player extends Sprite {
 
-    private InputHandler input;
-    private SuperPusheen game;
-    public int invulnerableTime; // the invulnerability time the player has when he is hit
-    public int immortalTime; // the immortal time the player has when it eats the starman.
+    private final InputHandler input;
+    private final SuperPusheen game;
+    public int invulnerableTime;    // Time for when the player is hurt by enemy
+    public int immortalTime;        // Time for when the player eats the starman    
+    private int leftCount;          // Counter during facing left
+    private int netDx;              // The effective dx
+    private int deathTime;          // Counts ticks after death.
     private boolean crushedEnemy, enlarged, fired, immortal;
-    private boolean firstTime, reachedEnd, reachedPollBottom, flagReachedBottom, faceLeft, jumped, enteredCastle;
-    private int leftCount;
-    private int netDx;
-    private int deathTime;  // Counts ticks after death
+    // Booleans for ending movement.
+    private boolean firstTime, reachedEnd, reachedPollBottom, flagReachedBottom, 
+                    faceLeft, jumped, enteredCastle;    
 
     public Player(InputHandler input, Level level, SuperPusheen board) {
         super(level);
@@ -37,134 +38,150 @@ public class Player extends Sprite {
 
         initPlayer();
     }
-
     
     public void initPlayer() {
-
-        // Initial coordinates of the player sprite.
-        int START_X = Commons.PLAYER_XI;
-        setX(START_X);
-        int START_Y = Commons.GROUND - height;
-        setY(START_Y);
+        // Initialize variables from Entity class.
         width = height = ES;
+        setX(Commons.PLAYER_XI);
+        int START_Y = Commons.GROUND - height;
+        setY(START_Y);        
         xS = 0;
         yS = 10;
 
+        // Initialize variables from Sprite class.
         dx = 0;
         dy = ySpeed;
         ds = 0;
-        dir = 3;    // facing right when first created
+        dir = 3;    // Face right when first created.
 
-        ground = START_Y + height;
+        ground = Commons.GROUND;
         wS = width / PPS;
         hS = height / PPS;
         xSpeed = 2;
-//        ySpeed = 2;
-        unit = (int) (Math.log10(width) / Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
-        aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
         score = 0;
-
-        invulnerableTime = 0; // the invulnerability time the player has when he is hit
-        immortalTime = 0;
-
+        unit = (int) (Math.log10(width) / Math.log10(2));
+        aTile = Math.min(Math.pow(2, 4 - unit), 1); 
+        
+        // Initialize variables for this class.
+        invulnerableTime = immortalTime = 0;
+        leftCount = netDx = deathTime = 0;
         crushedEnemy = enlarged = fired = immortal = false;
         firstTime = true;
-        reachedEnd = reachedPollBottom = flagReachedBottom = faceLeft = jumped = enteredCastle = false;
-        leftCount = netDx = deathTime = 0;
+        reachedEnd = reachedPollBottom = flagReachedBottom = faceLeft = jumped 
+                = enteredCastle = false;
+        
+    }    
+    
+    /** 
+     * What happens when the player touches a sprite
+     * 
+     * @param sprite The sprite that this sprite is touched by. 
+     */
+    @Override
+    protected void touchedBy(Sprite sprite) {
+        // If the player is touched by an enemy
+        if (sprite instanceof Enemy) {
+            // Call the enemy's touchedBy only when player doesn't move.
+            if (dx == 0) {
+                sprite.touchedBy(this); 
+            }
+        }
+        // If the player is touched by a hidden sprite
+        if (sprite instanceof HiddenSprite && !sprite.removed) {
+            sprite.touchedBy(this); // Call the hidden sprite's touchedBy.
+        }
     }
 
-    // Positions the player in horizontal direction.
+    /**
+     * Update method.
+     */
     @Override
-    public void tick() {
-        if (deathTime != 0) { // When fell to the bottom
-            if (deathTime < 40) {
-                deathTime++;
-            } else if (deathTime == 40) {    // Remove after 20 ticks.
-                lives--;
-                if (lives <= 0) // If no more lives left, die.
-                {
-                    remove();
-                } else {
-                    resetGame();
+    public void tick() {        
+        // When fell to the bottom
+        if (deathTime != 0) {       
+            if (deathTime < 40) {   // If deathTime is not over
+                deathTime++;        // Keep counting.
+            } else if (deathTime == 40) {   // If deathTime is over
+                lives--;                    // Decrease life by 1.
+                if (lives <= 0) {   // If no more lives left
+                    remove();       // Die. Game over.
+                } else {            // If there are lives left
+                    resetGame();    // Restart the game.
                 }
             }
-        } else { // Still playing
+        } 
+        // If still playing
+        else {    
             super.tick();
 
-            if (invulnerableTime > 0) { // Right after special effect is gone
-                invulnerableTime--; // if invulnerableTime is above 0, then minus it by 1.
+            if (invulnerableTime > 0) { // If player is in invulrnerable state
+                invulnerableTime--;     // Keep counting down the timer.
             }
             if (immortalTime > 0) { // While Starman is in effect, 
-                immortalTime--; // minus it by 1.         
-                bNum = (bCounter / scale) % numStage;
-                bCounter++;
+                immortalTime--;     // Keep counting down the timer.
+                bNum = (bCounter / scale) % numStage; // Index for animation
+                bCounter++;         // Increment animation counter.
             }
 
-            if (dying) { // Dying, not playable
-                dx = 0;
-                dy = (int) ds;
-                if (dy < 5) {
-                    ds += 0.3;
-                }
-                x += dx;
+            if (dying) { // If dying, not playable
+                dx = 0; // Stop moving horizontally.
                 netDx = 0;
+                dy = (int) ds;
+                if (dy < 5) {   // Accelerate until g-force becomes 5.
+                    ds += 0.3;
+                }                
                 y += dy;
-            } else {
-//                int xa = 0; // x acceleration
-//                int ya = 0; // y acceleration
-//                if (input.jump.down) 
-//                    ya--;
-//                else
-//                    ya++;// if the player presses up then his y acceleration will be -1
-//                if (input.left.down) xa--; // if the player presses left then his x acceleration will be -1
-//                if (input.right.down) xa++; // if the player presses up right his x acceleration will be 1
-//                dx = xa;
-//                dy = ya;
-
-                /* x increment. */
+            } else { // If not dying, still playable
+                // Update x increment.
                 dx = 0;
-                if (input.left.down) {
-                    dx = -xSpeed; // if the player presses left then his x acceleration will be -1 
-                }
-                if (input.right.clicked || input.right.down) {
-                    dx = xSpeed;
+                if (input.left.down) {  // If the user presses left
+                    dx = -xSpeed;       // Player's x acceleration will be -2.
+                }                
+                if (input.right.clicked || 
+                        input.right.down) { // If the user presses left
+                    dx = xSpeed;            // Player's x acceleration will be 2 
                 }
 
-                /* y increment. */
-                int g = 8;  // gravitational force        
-
+                // Update y increment.
+                // If the player is grounded
                 if (grounded && y + height == ground) {
-                    ds = 1;
-                } else if (topped) {
-                    ds = 1;
-                } else if (y + height + ds < Commons.BOARD_HEIGHT) {
-                    ds = ds + 0.5;
+                    ds = ySpeed;        // Default g-force
+                } // Once topped to a tile 
+                else if (topped) {    
+                    ds = ySpeed;        // Start falling.
+                } // If going beyond the bottom end of the screen
+                else if (y + height + ds < Commons.BOARD_HEIGHT) {
+                    ds = ds + 0.5;      // Accelerate vertically.
                 }
 
-                if (input.jump.clicked && grounded) {
-                    ds = -g;
+                // If the user clicked jump key
+                if (input.jump.clicked && grounded) { 
+                    ds = -8;            // Move upward
                 }
-                if (crushedEnemy) { // Slightly jump over the enemy
-                    ds = -3;
+                // If jumped on top of the enemy
+                if (crushedEnemy) {     
+                    ds = -3;            // Slightly jump over the enemy
                     crushedEnemy = false;
                 }
 
-                dy = (int) ds;
+                dy = (int) ds;          // Update dy
 
+                // If falling on the ground in the next tick
                 if (dy > 0 && y + height < Commons.GROUND && willBeGrounded()) {
                     int yt1 = y + dy + height;
                     int backoff = yt1 - (yt1 >> 4) * ES;
                     if (dy > 1 && backoff > 0) {
-                        dy -= backoff;
-                    }
+                        dy -= backoff;  // Adjust dy so that it doesn't go over
+                    }                   // the ground.
                 }
 
-                /* Ending of the game: When reached the flag. */
+                // Ending of the game: When reached the flag. 
                 reachedEnd = x + width >= Commons.X_MAX + ES / 2;
                 if (reachedEnd) {
-                    if (firstTime) {
+                    if (firstTime) {    // Only when first reached the end.
                         gameWon();
-                        ((FlagTile) Tile.flag).setScore((Commons.GROUND - y) / ES * 100);
+                        int flagScore = (Commons.GROUND - y) / ES * 100;
+                        ((FlagTile) Tile.flag).setScore(flagScore);
                         firstTime = false;
                     }
                     dx = 0;
@@ -172,33 +189,33 @@ public class Player extends Sprite {
                     flagReachedBottom = ((FlagTile) Tile.flag).reachedBottom();
                     enteredCastle = x + width >= Commons.X_MAX + 7 * ES;
                     if (!reachedPollBottom) {
-                        dy = 1;
+                        dy = ySpeed;    // Keep going down to the poll bottom.
                     } else if (!flagReachedBottom) {
-                        dy = 0;// wait                            
+                        dy = 0;         // Wait until flag reaches the bottom.                         
                     } else if (!faceLeft) {
                         if (leftCount == 0) {
                             x += width;
-                            dir = 2; // change direction to left
+                            dir = 2;    // Face left to go over the flag.
                             game.setPMax(Commons.PLAYER_XMAX + width);
                         } else if (leftCount > 10) {
                             faceLeft = true;
                         }
                         leftCount++;
                     } else if (!jumped) {
-                        dx = xSpeed;
-                        ds = -1.5;
+                        dx = xSpeed;    // Move to the right.
+                        ds = -1.5;      // Jump slightly out of the platform.
                         jumped = true;
                     } else if (!enteredCastle) {
-                        dx = xSpeed;
-                    } else {
-                        setVisible(false);
+                        dx = xSpeed;    // Move to the right to the castle.
+                    } else {            // Once entered the castle
+                        setVisible(false);  // Set invisible.
                     }
                 }
 
-                /* Make a movement. */
+                // Make a movement.
                 int oldX = x;
-                move(dx, dy);
-                netDx = x - oldX;
+                move(dx, dy);       // Updates x and y.
+                netDx = x - oldX;   // Updates net dx.
             }
 
             /* Boundary controls. */
@@ -207,19 +224,17 @@ public class Player extends Sprite {
             if (x <= offset) {
                 x = offset;
             }
-            // right end of the screen
+            // Right end of the screen
             if (x + width >= level.getWidth() * ES) {
                 x = level.getWidth() * ES - width;
             }
-            // top of the screen
+            // Top of the screen
             if (y <= 0) {
                 y = 0;
             }
-            // When falls to the bottom, die immediately and start over.
+            // When falls to the bottom, start death timer.
             if (y > Commons.BOARD_HEIGHT) {
                 deathTime++;
-                //            lives--;
-                //            resetGame();
             }
 
             /* Add a shot. */
@@ -228,11 +243,11 @@ public class Player extends Sprite {
                 int dxShot = 0;
                 int xShot = 0;
                 int yShot = y + (height - shot.height) / 2;
-                if (dir == 2) { // facing left
-                    dxShot = -1;
+                if (dir == 2) {     // If facing left
+                    dxShot = -1;    // Shot moves to the left.
                     xShot = x - shot.width;
-                } else if (dir == 3) {// facing right 
-                    dxShot = 1;
+                } else if (dir == 3) {  // If facing right 
+                    dxShot = 1;         // Shot moves to the right.
                     xShot = x + width;
                 }
                 shot.setX(xShot);
@@ -244,98 +259,76 @@ public class Player extends Sprite {
     }
 
     /**
-     * What happens when the player touches an entity.
+     * Draws the sprite on the screen.
+     *
+     * @param screen The screen to be displayed on.
      */
     @Override
-    protected void touchedBy(Sprite sprite) {
-        if (sprite instanceof Enemy) {// if the sprite is an enemy
-            if (dx == 0) // When player doesn't move, Enemy's touchedby wouldn't be reached. 
-            {
-                sprite.touchedBy(this); // calls the touchedBy() method in the sprite's class            
-            }//            if (enlarged) {
-//                width /= 2;
-//                height /= 2;
-//                wS = width / PPS;
-//                hS = height / PPS;
-//                unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (5 for 32 px, 4 for 16 px sprite, and 3 for 8px sprite)
-//                aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
-//                yS -= 4;
-//                enlarged = false;
-//                level.flower2Mushroom();    // change flowers back to mushrooms.
-//                if (fired) {
-//                    yS -= 8;
-//                    fired = false;
-//                }
-//            }
-        }
-        if (sprite instanceof HiddenSprite && !sprite.removed) {
-            sprite.touchedBy(this);
-        }
-    }
-
-    @Override
     public void render(Screen screen) {
-        int yt = yS;
-
-        int flip1 = 0; // flip1 will equal 0.
-        if (dir == 2) { // if the direction is 2 (left)
-            flip1 = 1; // mirror the sprite (because we only have facing right image)
-        }
-        // ((walkDist >> 3) & 1) will either be a 1 or a 0 depending on the walk distance (Used for walking effect by mirroring the sprite)
+        super.render(screen);
+                
+        int flip1 = 0; 
+        if (dir == 2) { // If facing left
+            flip1 = 1;  // Mirror the sprite (because we only have facing right
+        }               // image)
+        // Animation based on walking distance.
+        // ((walkDist >> 3) & 1) will either be a 1 or a 0 depending on walkDist
         // Becomes 1 every other square (8 pixels)
-        yt += ((walkDist >> 3) & 1) * (height / PPS); // animation based on walk distance (0 is standing still and 2 or 4 is moving)            
-
-        int sw = screen.getSheet().width;   // width of sprite sheet (256)
-        int colNum = sw / PPS;    // Number of squares in a row (32)    
-//        screen.renderFont(x + PPS * flip1, y, xS + yt * colNum, flip1); // renderFont the top-left part of the sprite         
-//        screen.renderFont(x - PPS * flip1 + PPS, y, (xS + 1) + yt * colNum, flip1);  // renderFont the top-right part of the sprite
-//        screen.renderFont(x + PPS * flip1, y + PPS, xS + (yt + 1) * colNum, flip1); // renderFont the bottom-left part of the sprite
-//        screen.renderFont(x - PPS * flip1 + PPS, y + PPS, xS + 1 + (yt + 1) * colNum, flip1); // renderFont the bottom-right part of the sprite
-
+        int ySCur = yS + ((walkDist >> 3) & 1) * (height / PPS); 
+ 
         int doRender = 1;
+        // If in invulnerable state during the game
         if (invulnerableTime > 0 && !reachedEnd) {
-            doRender = (invulnerableTime >> 1) & 1;
+            doRender = (invulnerableTime >> 1) & 1; // Blink every two ticks.
         }
 
         if (doRender == 1) {
             int xSCur = xS;
-            if (immortalTime > 0) // if immortalTime is above 0, 
-            {
-                xSCur = xS + bNum * wS;  // animation based on walk distance (bNum cycles through 0-3.)   
+            if (immortalTime > 0) { // If in immortal state            
+                xSCur = xS + bNum * wS;  // Animation based on bNum.
             }
-            boolean mirrorX = (flip1 == 1); // determines if the image should be mirrored horizontally.
+            // Determines if the image should be mirrored horizontally.
+            boolean mirrorX = (flip1 == 1); 
+            // Loop through each square to render.
             for (int ii = 0; ii < wS; ii++) {
-                int xeff = ii; // effective x pixel
+                int xeff = ii; // Effective x pixel
                 if (mirrorX) {
-                    xeff = (wS - 1) - ii;  // Reverses the pixel for a mirroring effect
+                    xeff = (wS - 1) - ii;  // Reverses the pixel for mirroring 
                 }
                 for (int jj = 0; jj < hS; jj++) {
-                    screen.render(x + xeff * PPS, y + jj * PPS, (xSCur + ii) + (yt + jj) * colNum, flip1); // renderFont the top-left part of the sprite         
+                    screen.render(x + xeff * PPS, y + jj * PPS, 
+                            (xSCur + ii) + (ySCur + jj) * colNum, flip1);  
                 }
             }
-        }
-    }
-
-    @Override
-    public void hurt(int damage) { // mob hurts this sprite
-        if (invulnerableTime > 0 || immortalTime > 0) {
-            return; // if hurt time OR invulnerableTime is above 0, then skip the rest of the code.
-        }
-//        super.hurt(damage); // Actually change our health
-        if (enlarged || fired) {
-            invulnerableTime = 100; // invulnerable time is set to 30        
-        } else {
-            setDying(true);
-            ds = -5;
         }
     }
 
     /**
-     * What happens when the player wins
+     * The sprite is hurt by another sprite.
+     * 
+     * @param damage An integer containing damage to this sprite.
+     */
+    @Override
+    public void hurt(int damage) { 
+        // If in immortal OR invulnerable state,
+        if (invulnerableTime > 0 || immortalTime > 0) {
+            return;  // Skip the rest of the code.
+        }
+        
+        if (enlarged || fired) { // If enlarged or have eaten flower
+            invulnerableTime = Commons.TPS * 2; // Set invulnerable time to 2s.
+        } else {            // If in original state
+            setDying(true); // Dies.
+            ds = -5;        // Jumps to the air.
+        }
+    }
+
+    /**
+     * What happens when the player wins.
      */
     public void gameWon() {
-        invulnerableTime = Commons.TPS * 5; // sets the invulnerable time to 300
-        game.won(); // win the game
+        invulnerableTime = Commons.TPS * 5; // Sets the invulnerable time to 5s.
+        game.won();                         // Set the game won.
     }
 
     public int getLives() {
@@ -361,13 +354,12 @@ public class Player extends Sprite {
             height *= 2;
             wS = width / PPS;
             hS = height / PPS;
-            unit = (int) (Math.log10(width) / Math.log10(2)); // the size of block to be used (5 for 32 px, 4 for 16 px sprite, and 3 for 8px sprite)
-            aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)            
+            unit = (int) (Math.log10(width) / Math.log10(2)); 
+            aTile = Math.min(Math.pow(2, 4 - unit), 1); 
             yS += 4;
             health++;
-//            if (grounded)
             y -= ES;
-            level.mushroom2Flower();    // change mushrooms to flowers.
+            level.mushroom2Flower();    // Change mushrooms to flowers.
         }
         enlarged = true;
     }
@@ -400,11 +392,11 @@ public class Player extends Sprite {
     public void eatStarman(int score) {
 
         addScore(score);
-        immortalTime = 500;
+        immortalTime = Commons.TPS * 9;
         immortal = true;
     }
 
-    public boolean isImortal() {
+    public boolean isImmortal() {
         return immortal;
     }
 

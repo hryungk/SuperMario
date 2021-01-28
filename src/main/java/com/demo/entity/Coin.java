@@ -82,7 +82,7 @@ public class Coin extends HiddenSprite {
     }
 
     /**
-     * Draws the sprite on the screen
+     * Draws the sprite on the screen.
      *
      * @param screen The screen to be displayed on.
      */

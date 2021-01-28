@@ -30,9 +30,6 @@ public class Starman extends HiddenSprite {
 
     /**
      * Initialize variables of the Starman.
-     *
-     * @param x x coordinate of the Starman [pixel].
-     * @param y x coordinate of the Starman [pixel].
      */
     private void initStarman() {
         // Variables from Entity class.
@@ -136,7 +133,7 @@ public class Starman extends HiddenSprite {
     }
 
     /**
-     * Draws the sprite on the screen
+     * Draws the sprite on the screen.
      *
      * @param screen The screen to be displayed on.
      */

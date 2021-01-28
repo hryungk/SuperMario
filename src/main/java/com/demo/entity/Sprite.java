@@ -85,17 +85,23 @@ public abstract class Sprite extends Entity {
         dx = 0;
         dy = 1;
         ds = dy;
-        dir = 2;        
+        dir = 2;        // Face left by default.
         ySpeed = 1;     // By default, sprites are under gravity               
     }
 
     /**
+     * What happens when this sprite is touched by another sprite.
+     *
+     * @param sprite The sprite that this sprite is touched by.
+     */
+    protected abstract void touchedBy(Sprite sprite);
+    
+    /**
      * Update method, (Look in the specific entity's class)
      */
     public void tick() {
-
-        if (health <= 0) {  // If there is no health left
-            lives--;        // Reduce life by 1.
+        if (health <= 0) {      // If there is no health left
+            lives--;            // Reduce life by 1.
             if (this instanceof Player && lives > 0) {  // For the player,
                 Player p = (Player) this;
                 p.resetGame();  // Restart the game.
@@ -103,13 +109,13 @@ public abstract class Sprite extends Entity {
             }
         }
 
-        if (lives <= 0) {   // If no more lives left
-            remove();       // Die.
+        if (lives <= 0) {       // If no more lives left
+            remove();           // Die.
         }
     }
 
     /**
-     * Draws the sprite on the screen
+     * Draws the sprite on the screen.
      *
      * @param screen The screen to be displayed on.
      */
@@ -117,13 +123,6 @@ public abstract class Sprite extends Entity {
         if (colNum == 0)
             colNum = screen.getSheet().width / PPS;
     }
-
-    /**
-     * What happens when this entity is touched by another entity.
-     *
-     * @param sprite The sprite that this sprite is touched by.
-     */
-    protected abstract void touchedBy(Sprite sprite);
 
     /**
      * Make the sprite invisible from the map.
@@ -241,41 +240,45 @@ public abstract class Sprite extends Entity {
                     + " axis at a time!");
         }
         
-//        double xto0 = (x - Math.min(ES, width)) / Math.pow(2, unit); // gets the tile coordinate of the position to the left of the sprite
-//        double yto0 = (y - Math.min(ES, height)) / Math.pow(2, unit); // gets the tile coordinate of the position to the top of the sprite
-        double xto1 = (x + width) / Math.pow(2, unit); // gets the tile coordinate of the position to the right of the sprite
-//        double yto1 = (y + height) / Math.pow(2, unit); // gets the tile coordinate of the position to the bottom of the sprite
-//        double xto = x / Math.pow(2, unit);
+        // Get tile coordinate of the position relative to the sprite.
+//        double xto0 = (x - Math.min(ES, width)) / Math.pow(2, unit); // Left 
+//        double yto0 = (y - Math.min(ES, height)) / Math.pow(2, unit); // Top 
+        double xto1 = (x + width) / Math.pow(2, unit); // Right 
+//        double yto1 = (y + height) / Math.pow(2, unit); // Bottom 
+//        double xto = x / Math.pow(2, unit);  // Right at the sprite
 
-        double xt0 = ((x + dx) - Math.min(ES, width)) / Math.pow(2, unit); // gets the tile coordinate of the position to the left of the sprite + the horizontal acceleration
-//        double yt0 = ((y + dy) - Math.min(ES, height)) / Math.pow(2, unit); // gets the tile coordinate of the position to the top of the sprite + the vertical acceleration
-        double xt1 = ((x + dx) + width) / Math.pow(2, unit); // gets the tile coordinate of the position to the right of the sprite + the horizontal acceleration
-        double yt1 = ((y + dy) + height) / Math.pow(2, unit); // gets the tile coordinate of the position to the bottom of the sprite + the vertical acceleration
-        double xt = (x + dx) / Math.pow(2, unit);
-        double yt = (y + dy) / Math.pow(2, unit);
+        // Get tile coordinate of the position relative to the sprite + acc.
+        double xt0 = ((x + dx) - Math.min(ES, width)) / Math.pow(2, unit); // L
+//        double yt0 = ((y + dy) - Math.min(ES, height)) / Math.pow(2, unit);//T
+        double xt1 = ((x + dx) + width) / Math.pow(2, unit); // R
+        double yt1 = ((y + dy) + height) / Math.pow(2, unit); // B
+        double xt = (x + dx) / Math.pow(2, unit); // Right at the sprite, x
+        double yt = (y + dy) / Math.pow(2, unit); // Right at the sprite, y
 
-        /* Check grounded. */
-        if (x <= 0) // When going beyond the left most point of the map
-        {
-            grounded = !(level.getTile(xto1 - aTile, yt1, unit).mayPass())
-                    || ((x % ES != 0) && !(level.getTile(xto1, yt1, unit).mayPass()));
-        } else if (x + width >= W_MAP * ES) // When going beyond the right of the screen
-        {
+        
+        // Check grounded.
+        // When going beyond the left end of the map
+        if (x <= 0) {
+            grounded = !(level.getTile(xto1 - aTile, yt1, unit).mayPass())|| 
+                ((x % ES != 0) && !(level.getTile(xto1, yt1, unit).mayPass()));
+         // When going beyond the right end of the screen
+        } else if (x + width >= W_MAP * ES) {        
             grounded = !(level.getTile(xto1 - aTile, yt1, unit).mayPass());
-        } else if (W_MAP * ES - ES <= x + width && x + width < level.getWidth() * ES) // When less than one tile close to the right of the screen
-        {
+        // When less than one tile close to the right end of the screen    
+        } else if (W_MAP * ES - ES <= x + width && 
+                x + width < level.getWidth() * ES) {         
             grounded = !(level.getTile(xto1, yt1, unit).mayPass());
-        } else if (y + height > Commons.GROUND) // when falling beyond the ground
-        {
+        // When falling beyond the ground
+        } else if (y + height > Commons.GROUND) {         
             grounded = false;
         } else {
-
             boolean[] tempBool = new boolean[2];
             int nn = 0;
             for (double xx = xt1; xx > xt; xx -= aTile) {
                 Tile t1 = level.getTile(xx - aTile, yt1, unit);
                 Tile t2 = level.getTile(xx, yt1, unit);
-                boolean temp = !(t1.mayPass()) || ((x % ES != 0) && !(t2.mayPass()));
+                boolean temp = !(t1.mayPass()) || 
+                        ((x % ES != 0) && !(t2.mayPass()));
                 tempBool[nn] = temp;
                 nn++;
             }
@@ -286,26 +289,46 @@ public abstract class Sprite extends Entity {
             grounded = finalBool;
         }
 
-        // Find whether the ground is punched
+        // Find whether the ground is punched.
         if (grounded) {
-            Tile t1 = level.getTile(xt1 - aTile, yt1, unit);
-            Tile t2 = level.getTile(xt1, yt1, unit);
-            boolean temp1 = !(t1.mayPass()) && ((t1 instanceof InteractiveTile) && !this.equals(((InteractiveTile) t1).getHiddenSprite()) && ((InteractiveTile) t1).getInitY() != ((InteractiveTile) t1).getY());
-            boolean temp2 = ((x % ES != 0) && !(t2.mayPass())) && ((t2 instanceof InteractiveTile) && !this.equals(((InteractiveTile) t2).getHiddenSprite()) && ((InteractiveTile) t2).getInitY() != ((InteractiveTile) t2).getY());
+            Tile tL = level.getTile(xt1 - aTile, yt1, unit);    // Left tile
+            Tile tR = level.getTile(xt1, yt1, unit);            // Right tile
+            boolean temp1 = false;
+            if (tL instanceof InteractiveTile) {
+                InteractiveTile tL1 = (InteractiveTile) tL;
+                temp1 = !(tL1.mayPass()) 
+                        && !this.equals(tL1.getHiddenSprite()) 
+                        && (tL1.getInitY() != tL1.getY());
+            }
+            boolean temp2 = false;
+            if (tR instanceof InteractiveTile) {
+                InteractiveTile tR1 = (InteractiveTile) tR;
+                temp2 = ((x % ES != 0) && !(tR1.mayPass())) 
+                        && !this.equals(tR1.getHiddenSprite()) 
+                        && (tR1.getInitY() != tR1.getY());
+            }            
+//            boolean temp1 = !(t1.mayPass()) && 
+//            ((t1 instanceof InteractiveTile) && 
+//            !this.equals(((InteractiveTile) t1).getHiddenSprite()) && 
+//            ((InteractiveTile) t1).getInitY() != ((InteractiveTile) t1).getY());
+//            boolean temp2 = ((x % ES != 0) && !(t2.mayPass())) && 
+//            ((t2 instanceof InteractiveTile) && 
+//            !this.equals(((InteractiveTile) t2).getHiddenSprite()) && 
+//            ((InteractiveTile) t2).getInitY() != ((InteractiveTile) t2).getY());
             isPunchedOnBottom = temp1 || temp2;
 
             if (dx != 0) {
-                if (temp1) {
-                    dir = 3;
-                    this.dx = Math.abs(dx);
-                } else if (temp2) {
-                    dir = 2;
-                    this.dx = -Math.abs(dx);
+                if (temp1) {        // If puhcned on the bottom left
+                    dir = 3;        // Face right
+                    this.dx = Math.abs(dx); // Move to right
+                } else if (temp2) { // If puhcned on the bottom right
+                    dir = 2;        // Face left
+                    this.dx = -Math.abs(dx); // Move to left
                 }
             }
         }
 
-        // if the increment is negative, round up the tile coordinates.
+        // If the increment is negative, round up the tile coordinates.
         if (dy < 0) {
 //            yto0 = (Math.ceil((y - Math.min(ES, height)) / (double) height));
 //            yto1 = (Math.ceil((y + height) / (double) height));
@@ -313,71 +336,80 @@ public abstract class Sprite extends Entity {
             yt1 = (Math.ceil((y + height + dy) / (double) height));
         }
         
-        /* Check right stopped. */
+        
+        // Check right stopped. 
         boolean rightStopped;
-        if (x + width >= W_MAP * ES) // When going beyond the right of the screen
-        {
+        // When going beyond the right end of the screen
+        if (x + width >= W_MAP * ES) {
             rightStopped = true;
-        } else if (W_MAP * ES - ES <= x + width && x + width < W_MAP * ES) // When in between one tile to the right of the screen
-        {
+        // When in between one tile to the right end of the screen
+        } else if (W_MAP * ES - ES <= x + width && x + width < W_MAP * ES) {
             rightStopped = false;
-        } else if (y + dy > Commons.BOARD_HEIGHT) // When going beyond the bottom most point of the map
-        {
+        // When going beyond the bottom end of the map
+        } else if (y + dy > Commons.BOARD_HEIGHT) {
             rightStopped = false;
-        } else if (y + height > Commons.GROUND) { // when falling beyond the ground, the tile at the most upper-right determins the right stop.
+        // When falling beyond the ground
+        } else if (y + height > Commons.GROUND) { 
+            // The tile at the most upper-right determines the right stop.
             double ytFall = Commons.GROUND / Math.pow(2, unit);
             rightStopped = !(level.getTile(xt1, ytFall, unit).mayPass());
         } else {
-            rightStopped = !(level.getTile(xt1, yt1 - aTile, unit).mayPass())
-                    || (((y + dy) % ES != 0) && !(level.getTile(xt1, yt1, unit).mayPass()));
+            rightStopped = !(level.getTile(xt1, yt1 - aTile, unit).mayPass())|| 
+                    (((y + dy) % ES != 0) && 
+                    !(level.getTile(xt1, yt1, unit).mayPass()));
         }
 
-        /* Check topped. */
+        
+        // Check topped. 
         double yt_raw = (y - Math.min(ES, height) + dy) / (double) height;
         double yt_ceil = Math.ceil(yt_raw);
         double yt0T = yt_ceil;
-        if (unit == 5 && yt_ceil - yt_raw >= 0.5) // When big Pusheen, 0.5 is the unit tile
-        {
+        // When big Pusheen, 0.5 is the unit tile.
+        if (unit == 5 && yt_ceil - yt_raw >= 0.5) {
             yt0T = yt_ceil - 0.5;
         }
-        Tile tile = null; // Need to check whether it is a interactive tile
-        if (y <= 0) // When going beyond the top most point of the map
-        {
+        Tile tile = null; // Need to check whether it is a interactive tile.
+        // When going beyond the top end of the map
+        if (y <= 0) {
             topped = true;
-        } else if (0 < y && y <= ES) // When in between one tile to the top of the map
-        {
+        // When in between one tile to the top of the map
+        } else if (0 < y && y <= ES) {
             topped = false;
-        } else if (y + dy > Commons.BOARD_HEIGHT) // When going beyond the bottom most point of the map
-        {
+        // When going beyond the bottom end of the map
+        } else if (y + dy > Commons.BOARD_HEIGHT) {
             topped = false;
-        } else if (x < ES) {  // When going beyond the left most point + unit tile of the map
+        // When going beyond the left end + unit tile of the map
+        } else if (x < ES) {  
             tile = level.getTile(xt1, yt0T, unit);
             topped = !(tile.mayPass());
-        } else if (x + width >= W_MAP * ES) { // When going beyond the right of the screen
+        // When going beyond the right end of the screen
+        } else if (x + width >= W_MAP * ES) { 
             tile = level.getTile(xt1 - aTile, yt0T, unit);
             topped = !(tile.mayPass());
-        } else if (W_MAP * ES - ES <= x + width && x + width < W_MAP * ES) { // When in between one tile to the right of the screen
+        // When in between one tile to the right end of the screen
+        } else if (W_MAP * ES - ES <= x + width && x + width < W_MAP * ES) { 
             tile = level.getTile(xto1, yt0T, unit);
             topped = !(tile.mayPass());
         } else {
             boolean[] tempBool = new boolean[2];
             int nn = 0;
             for (double xx = xt1; xx > xt; xx -= aTile) {
-                Tile tile1 = level.getTile(xx - aTile, yt0T, unit);
-                Tile tile2 = level.getTile(xx, yt0T, unit);
-                boolean topped1 = !(tile1.mayPass()); // top-left or top
-                boolean topped2 = ((x + dx) % ES != 0) && !(tile2.mayPass()); // top-right                     
-                boolean temp = topped1 || topped2;
-                tempBool[nn] = temp;
+                Tile tL = level.getTile(xx - aTile, yt0T, unit); // Top(-left) 
+                Tile tR = level.getTile(xx, yt0T, unit); // Top-right tile
+                boolean toppedL = !(tL.mayPass()); 
+                boolean toppedR = ((x + dx) % ES != 0) && !(tR.mayPass()); 
+                tempBool[nn] = toppedL || toppedR;
                 nn++;
 
-                if (topped1 && topped2) {   // When both top-left and top-right are blocking
-                    double xt1T = Math.round((x + dx) / (double) width);  // choose the tile closer to the player.
+                // When both top-left and top-right are blocking
+                if (toppedL && toppedR) {   
+                    // Choose the tile closer to the player.
+                    double xt1T = Math.round((x + dx) / (double) width);  
                     tile = level.getTile(xt1T, yt0T, unit);
-                } else if (topped1) {
-                    tile = tile1;
-                } else if (topped2) {
-                    tile = tile2;
+                } else if (toppedL) {
+                    tile = tL;
+                } else if (toppedR) {
+                    tile = tR;
                 }
             }
             boolean finalBool = false;
@@ -387,14 +419,17 @@ public abstract class Sprite extends Entity {
             topped = finalBool;
         }
 
+        // When the player is hitting an interactive tile
         if (tile instanceof InteractiveTile && this instanceof Player) {
             InteractiveTile t = (InteractiveTile) tile;
             if (topped && dy < 0) {
                 if (!t.isHitBottom()) {
-                    HiddenSprite hs = level.removeHiddenSprite(t.getX(), t.getY());
+                    // Return a hidden sprite under this tile, if any.
+                    HiddenSprite hs = 
+                            level.removeHiddenSprite(t.getX(), t.getY());
                     if (hs != null) {
-                        hs.activate();
-                        t.setHiddenSprite(hs);
+                        hs.activate();         // Activate the hidden sprite.
+                        t.setHiddenSprite(hs); // Add hidden sprite to the tile.
                     }
                 }
                 t.hurt();
@@ -406,21 +441,29 @@ public abstract class Sprite extends Entity {
             xt0 = Math.ceil((x - Math.min(ES, width) + dx) / (double) width);
         }
        
-        /* Check left stopped. */
+        
+        // Check left stopped.
         boolean leftStopped;
-        if (x <= 0) {// When going beyond the left most point of the map        
+        // When going beyond the left end of the map 
+        if (x <= 0) {       
             leftStopped = true;
-        } else if (0 < x && x <= 0 + ES) {// When in between one tile to the left of the map        
+        // When in between one tile to the left end of the map
+        } else if (0 < x && x <= 0 + ES) {        
             leftStopped = false;
-        } else if (y + dy > Commons.BOARD_HEIGHT) {// When going beyond the bottom most point of the map        
+        // When going beyond the bottom end of the map
+        } else if (y + dy > Commons.BOARD_HEIGHT) {        
             leftStopped = false;
-        } else if (y + height > Commons.GROUND) { // when falling beyond the ground                
+        // when falling beyond the ground  
+        } else if (y + height > Commons.GROUND) {               
             leftStopped = !(level.getTile(xt0, yt, unit).mayPass());
         } else {
-            leftStopped = !(level.getTile(xt0, yt1 - aTile, unit).mayPass())
-                    || (((y + dy) % ES != 0) && !(level.getTile(xt0, yt1, unit).mayPass()));
+            leftStopped = !(level.getTile(xt0, yt1 - aTile, unit).mayPass()) || 
+                    (((y + dy) % ES != 0) && 
+                    !(level.getTile(xt0, yt1, unit).mayPass()));
         }
 
+        
+        // Determine move or not.
         if (grounded && dy > 0) {
             int yground = (((y + dy) + height) >> 4) * ES;
             dy = yground - (y + height);
@@ -438,103 +481,108 @@ public abstract class Sprite extends Entity {
             return false;
         }
 
-        List<Sprite> wasInside = level.getEntities(x, y, x + width, y + height); // gets all of the entities that are inside this entity (aka: colliding)
-        List<Sprite> isInside = level.getEntities(x + dx, y + dy, x + width + dx, y + height + dy); // gets the entities that this entity will touch.
-        for (int i = 0; i < isInside.size(); i++) { // loops through isInside list
-            Sprite e = isInside.get(i); // current entity in the list
-            if (e == this) {
-                continue; // if the entity happens to be this one that is calling this method, then skip to the next entity.
+        
+        // Gets all of the entities that are inside this entity.
+        List<Sprite> wasInside = level.getEntities(x, y, x + width, y + height); 
+        // Gets the entities that this entity will touch.
+        List<Sprite> isInside = level.getEntities(x + dx, y + dy, 
+                x + width + dx, y + height + dy); 
+        // Loops through isInside list.
+        for (int i = 0; i < isInside.size(); i++) { 
+            Sprite e = isInside.get(i); // Current entity in the list
+            if (e == this) {            // If the current sprite is this object
+                continue;               // Skip to the next entity.
             }
-            e.touchedBy(this); // calls the touchedBy(entity) method in that entity's class
+            e.touchedBy(this);
         }
-        isInside.removeAll(wasInside); // removes all the entities that are in the wasInside from the isInside list.
-        for (int i = 0; i < isInside.size(); i++) { // loops through isInside list
-            Sprite e = isInside.get(i); // current entity in the list
-            if (e == this) {
-                continue; // if the entity happens to be this one that is calling this method, then skip to the next entity.            
+        // Removes all the sprites in the wasInside from the isInside list.
+        isInside.removeAll(wasInside); 
+        // Loops through isInside list (only new sprites).
+        for (int i = 0; i < isInside.size(); i++) { 
+            Sprite e = isInside.get(i); // Current entity in the list
+            if (e == this) {            // If the current sprite is this object
+                continue;               // Skip to the next entity.
             }
             if (e.blocks(this)) {
-                if (!(!grounded && dy > 0)) {
-                    return false;
-                } else {// When falling
-                    dy = e.y - (y + height);
+                if (!grounded && dy > 0) {      // When falling
+                    dy = e.y - (y + height);    // Adjust dy
                     this.dy = dy;
+                } else {                // When not falling
+                    return false;       // Not gonna move.
                 }
-            } // if the entity can block this entity then... return false.            
+            }         
         }
 
-        x += dx; // moves horizontally based on the x acceleration
-        y += dy; // moves vertically based on the y acceleration
-        return true; // return true
+        x += dx;        // Moves horizontally based on the x acceleration
+        y += dy;        // Moves vertically based on the y acceleration
+        return true;    // If it went through all the requirement, then move!
     }
 
-    public boolean blocks(Sprite e) {
+    /**
+     * Extended in Sprite.java.
+     *
+     * @param e The entity that wants to interact with this entity.
+     * @return True if this entity blocks e, false if this entity lets e pass
+     * it.
+     */
+    @Override
+    public boolean blocks(Entity e) {
         return false;
     }
 
-    protected boolean isGrounded() {
-
-        double xto1 = (x + width) / Math.pow(2, unit); // gets the tile coordinate of the position to the right of the sprite
-        double yto1 = (y + height) / Math.pow(2, unit); // gets the tile coordinate of the position to the bottom of the sprite
-
-        return !(level.getTile(xto1 - aTile, yto1, unit).mayPass())
-                || ((x % ES != 0) && !(level.getTile(xto1, yto1, unit).mayPass()));
-    }
-
+    /**
+     * Check whether the sprite will be grounded with the acceleration.
+     * @return True if the sprite will be grounded 
+     */
     protected boolean willBeGrounded() {
 
-        double xt1 = ((x + dx) + width) / Math.pow(2, unit); // gets the tile coordinate of the position to the right of the sprite + the horizontal acceleration        
-        double yt1 = ((y + dy) + width) / Math.pow(2, unit); // gets the tile coordinate of the position to the bottom of the sprite + the vertical acceleration
+        // Get tile coordinate of the position relative to the sprite + acc.
+        double xt1 = ((x + dx) + width) / Math.pow(2, unit); // Right
+        double yt1 = ((y + dy) + width) / Math.pow(2, unit); // Bottom 
 
-        // if the increment is negative, round up the tile coordinates.
+        // If the increment is negative, round up the tile coordinates.
         if (dy < 0) {
             yt1 = (Math.ceil((y + width + dy) / (double) width));
         }
 
-        if (x <= level.getOffset()) // When on the left end, don't check xt1-1
-        {
-            return !(level.getTile(xt1, yt1, unit).mayPass());
-        } 
-        else if (x + dx + width >= W_MAP * ES) {
-            return !(level.getTile(xt1 - aTile, yt1, unit).mayPass());
-        } else if (W_MAP * ES - ES <= x + dx + width && x + dx + width < W_MAP * ES) {
-            return !(level.getTile(xt1, yt1, unit).mayPass());
+        boolean temp1 = !(level.getTile(xt1 - aTile, yt1, unit).mayPass());
+        boolean temp2 = !(level.getTile(xt1, yt1, unit).mayPass());
+        // When beyond the left end of the screen, don't check xt1-1
+        if (x <= level.getOffset()) {
+            return temp2;
+        // When beyond the right end of the map, don't check xt1
+        } else if (x + dx + width >= W_MAP * ES) {
+            return temp1;
+        // When one tile away from the right end of the map, don't check xt1-1
+        } else if (W_MAP * ES - ES <= x + dx + width && 
+                x + dx + width < W_MAP * ES) {
+            return temp2;
         } else {
-            return !(level.getTile(xt1 - aTile, yt1, unit).mayPass())
-                    || (((x + dx) % ES != 0) && !(level.getTile(xt1, yt1, unit).mayPass()));
+            return temp1 || (((x + dx) % ES != 0) && temp2);
         }
     }
 
-    protected boolean checkTopped() {
-
-        double yt0 = Math.ceil((y + dy - Math.min(ES, height)) / (double) width); // gets the tile coordinate of the position to the top of the sprite + the vertical acceleration
-        double xt1 = ((x + dx) + width) / Math.pow(2, unit); // gets the tile coordinate of the position to the right of the sprite + the horizontal acceleration
-
-
-        // When right at the grid, only need to check the neighboring tile
-        // When in between, check both tiles that the player spans.        
-        if (dx < 0) {
-            xt1 = Math.ceil((x + width + dx) / (double) width);
-        }
-
-        if (y <= 0) {
-            return true;
-        } else if (0 < y && y <= ES) {
-            return false;
-        } else {
-            return !(level.getTile(xt1 - aTile, yt0, unit).mayPass())
-                    || (((x + dx) % ES != 0) && !(level.getTile(xt1, yt0, unit).mayPass()));
-        }
+    /**
+     * The sprite is hurt by another sprite.
+     * 
+     * @param damage An integer containing damage to this sprite.
+     */
+    public void hurt(int damage) { 
+        health -= damage; 
     }
 
-    public void hurt(int damage) { // mob hurts this sprite
-        health -= damage; // Actually change our health
-    }
-
+    /**
+     * Initialize health to 1.
+     */
     private void initHealth() {
         health = 1;
     }
 
+    /**
+     * Returns current health of the sprite.
+     * 
+     * @return An integer containing the health of the sprite.
+     */
     public int getHealth() {
         return health;
     }

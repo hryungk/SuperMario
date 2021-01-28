@@ -28,7 +28,6 @@ import main.java.com.demo.entity.*;
 import main.java.com.demo.gfx.*;
 import main.java.com.demo.level.Level;
 import main.java.com.demo.level.tile.QuestionBrickTile;
-import main.java.com.demo.level.tile.Tile;
 
 /**
  * Create a Super Pusheen game. This game is a copycat of Super Mario Bros game

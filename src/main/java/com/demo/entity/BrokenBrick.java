@@ -4,88 +4,112 @@ import main.java.com.demo.Commons;
 import main.java.com.demo.gfx.Screen;
 import main.java.com.demo.level.Level;
 
-/** Represents a sprite.
- *  Keeps the image of the sprite and the coordinates of the sprite.
-    @author zetcode.com */
+/**
+ * Represents a broken brick as a sprite.
+ *
+ * @author HRK
+ */
 public class BrokenBrick extends Sprite {
 
-    private boolean firstTime; //  when first activated
-    // The constructor initiates the x and y coordinates and the visible variable.
+    private boolean firstTime; //  When first activated
+    
     public BrokenBrick(int x, int y, int dx, int ds, Level level) {          
-        super(level);
-        // Initial coordinates of the player sprite.
-        setX(x);        
-        setY(y);    
+        super(level);          
         
         this.dx = dx; 
         this.ds = ds;
         
-        initBrokenBrick();        
+        initBrokenBrick(x, y);        
     }    
     
-    private void initBrokenBrick() {
-        width = height = ES / 2;
-        
-        wS = width / PPS;
-        hS = height / PPS;
-        
+    private void initBrokenBrick(int x, int y) {
+        // Initialize variables from Entity class.
+        setX(x);        
+        setY(y);  
+        width = height = ES / 2;        
         xS = 8;
         yS = 2;
                
-        unit = (int) (Math.log10(width)/Math.log10(2)); // the size of block to be used (4 for 16 px sprite and 3 for 8px sprite)
-        aTile = Math.min(Math.pow(2, 4 - unit), 1); // 1 for unit 3, 1 for unit 4, 0.5 for unit 5 (big Pusheen)
+        // Initialize variables from Sprite class.
+        wS = width / PPS;
+        hS = height / PPS;
         
-//        scale = 8;  // Higher the number, slower the transition.
-//        numStage = 4;   // Number of color schemes
+        unit = (int) (Math.log10(width)/Math.log10(2)); 
+        aTile = Math.min(Math.pow(2, 4 - unit), 1); 
+        
         numStage = 2;
+        health = lives = 1;
         
+        // Initialize variables for this class.
         firstTime = true;
     }
 
+    /**
+     * Update method.
+     */
     @Override
     public void tick() {
+        super.tick();
+        
         if (firstTime) { // This is to delay one more tick. 
             firstTime = false;
             return;
         }
         dy = (int) ds;
-        if (dy < 4)
+        if (dy < 4)     // Accelerate until reaching g-force of 4.
             ds += 0.5;     
-                
+        // Keep moving.
         x += dx;
         y += dy;
         
         // Update visibility on the screen.
         int offset = level.getOffset();
+        // If going beyond the left end of the map
         if (x <= 0)
-            remove();        
-        else if (x+width <= offset && offset + Commons.BOARD_WIDTH <= x)
-            setVisible(false);     
-
+            hurt(health);       // Die.
+        // If going outside of the screen
+        else if (x+width <= offset || offset + Commons.BOARD_WIDTH <= x)
+            setVisible(false);  // Set invisible
+        // Otherwise
+        else
+            setVisible(true);   // Set visible.
+        // If going down beyond the screen
         if (y > Commons.BOARD_HEIGHT)
-            remove();      
+            hurt(health);    
         
         // Update bNum
         bNum = (bCounter / scale) % numStage;
         bCounter++;
     }
     
+    /**
+     * Draws the sprite on the screen.
+     *
+     * @param screen The screen to be displayed on.
+     */
     @Override
     public void render(Screen screen) {
+        super.render(screen);
+        
         if (isVisible()) {
-            int sw = screen.getSheet().width;   // width of sprite sheet (256)
-            int colNum = sw / PPS;    // Number of squares in a row (32)
-
-            int xSCur = xS + bNum * wS; // animation based on walk distance (0 is standing still and 2 is moving)          
-
+            // Animation based on bNum.
+            int xSCur = xS + bNum * wS; 
+            // Loops through all the squares to render them on the screen.                    
             for (int ys = 0; ys < hS; ys++) {
                 for (int xs = 0; xs < wS; xs++) {
-                    screen.render(x + xs * PPS, y + ys * PPS, (xSCur + xs) + (yS + ys) * colNum, 0); // Loops through all the squares to renderFont them all on the screen.                    
+                    screen.render(x + xs * PPS, y + ys * PPS, 
+                            (xSCur + xs) + (yS + ys) * colNum, 0); 
                 }
             }
         }
     }
 
+    /**
+     * Nothing happens when the broken brick is touched by another sprite.
+     *
+     * @param sprite The sprite that this broken brick is touched by.
+     */
     @Override
-    protected void touchedBy(Sprite sprite) {}
+    protected void touchedBy(Sprite sprite) {
+    }
 }
