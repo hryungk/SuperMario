@@ -39,7 +39,9 @@ public class Player extends Sprite {
         initPlayer();
     }
     
-    public void initPlayer() {
+    public void initPlayer() {        
+        super.initSprite();
+        
         // Initialize variables from Entity class.
         width = height = ES;
         setX(Commons.PLAYER_XI);

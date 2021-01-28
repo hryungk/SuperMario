@@ -60,26 +60,20 @@ public abstract class Sprite extends Entity {
         this.level = level;
         W_MAP = level.getWidth();   
         colNum = 0;
-        initSprite();        
+        init();        
     }
 
     /**
      * Initialize variables.
      */
-    private void initSprite() {
-        initHealth();
+    private void init() {
+        initSprite();
         
-        walkDist = 0;
-        bCounter = bNum = 0;
         scale = 8;      // Higher the number, slower the transition.
         numStage = 4;   // Number of color schemes
         ay = 2;         // Higher the number, slower the y movement when sprung 
-                        // out of the block         
-        visible = true;
-        dying = false;
-        grounded = true;
-        topped = isPunchedOnBottom = false;
-        
+                        // out of the block        
+                
         // Variables below need to be adjusted when creating a new child class.
         lives = 1;
         dx = 0;
@@ -88,6 +82,22 @@ public abstract class Sprite extends Entity {
         dir = 2;        // Face left by default.
         ySpeed = 1;     // By default, sprites are under gravity               
     }
+    
+    /**
+     * Initialize variables for reset.
+     */
+    public void initSprite() {
+        initHealth();
+        
+        walkDist = 0;
+        bCounter = bNum = 0;
+        
+        visible = true;
+        dying = false;
+        grounded = true;
+        topped = isPunchedOnBottom = false;
+    }
+    
 
     /**
      * What happens when this sprite is touched by another sprite.
