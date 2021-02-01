@@ -574,8 +574,7 @@ public class SuperPusheen extends JPanel implements Runnable {
                         }
                     }
                 } else { // If the player hasn't reached the end
-                    if (timeLeft <= 0) // If the time runs out
-                    {
+                    if (timeLeft <= 0) {// If the time runs out                    
                         player.hurt(player.getHealth()); // Player loses a life.
                     }
                 }

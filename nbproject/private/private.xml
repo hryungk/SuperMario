@@ -3,12 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/entity/Player.java</file>
             <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/entity/Sprite.java</file>
-            <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/GameLauncher.java</file>
+            <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/Commons.java</file>
             <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/SuperPusheen.java</file>
-            <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/entity/Entity.java</file>
-            <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/entity/HiddenSprite.java</file>
-            <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/entity/Mushroom.java</file>
+            <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/GameLauncher.java</file>
         </group>
     </open-files>
 </project-private>
