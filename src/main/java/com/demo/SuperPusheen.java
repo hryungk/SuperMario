@@ -537,7 +537,7 @@ public class SuperPusheen extends JPanel implements Runnable {
             input.releaseAll();
         } else {
             // If in the middle of playing the game,
-            if (!player.removed && !hasWon && menu == null) {
+            if (!player.isDying() && !hasWon && menu == null) {
                 gameTime++; // Increases time count by 1.
                 // This is used for the timer displayed on the GUI.
                 timeLeft = level.getTimeLim() - 2 * gameTime / TPS;
@@ -574,7 +574,7 @@ public class SuperPusheen extends JPanel implements Runnable {
                         }
                     }
                 } else { // If the player hasn't reached the end
-                    if (timeLeft <= 0) {// If the time runs out                    
+                    if (timeLeft <= 0 && !player.isDying()) {// If the time runs out                    
                         player.hurt(player.getHealth()); // Player loses a life.
                     }
                 }
