@@ -31,6 +31,7 @@ public abstract class Sprite extends Entity {
     protected boolean dying;    // True if dying.
     protected boolean grounded; // If the sprite is on to a solid tile
     protected boolean topped;   // If the sprite touches a tile on the head
+    private boolean leftStopped, rightStopped; // If stopped by a tile on side.
     protected boolean isPunchedOnBottom;    // If the tile on which the sprite 
                                             // stands is punched from the bottom    
     
@@ -348,7 +349,7 @@ public abstract class Sprite extends Entity {
         
         
         // Check right stopped. 
-        boolean rightStopped;
+//        boolean rightStopped;
         // When going beyond the right end of the screen
         if (x + width >= W_MAP * ES) {
             rightStopped = true;
@@ -454,7 +455,7 @@ public abstract class Sprite extends Entity {
        
         
         // Check left stopped.
-        boolean leftStopped;
+//        boolean leftStopped;
         // When going beyond the left end of the map 
         if (x <= 0) {       
             leftStopped = true;
@@ -549,11 +550,14 @@ public abstract class Sprite extends Entity {
 
         // Get tile coordinate of the position relative to the sprite + acc.
         double xt1 = ((x + dx) + width) / Math.pow(2, unit); // Right
-        double yt1 = ((y + dy) + width) / Math.pow(2, unit); // Bottom 
+        double yt1 = ((y + dy) + height) / Math.pow(2, unit); // Bottom 
 
+        if (dx < 0 && leftStopped) {
+            xt1 =(x + dx + width) / (double) width + aTile;
+        }
         // If the increment is negative, round up the tile coordinates.
         if (dy < 0) {
-            yt1 = (Math.ceil((y + width + dy) / (double) width));
+            yt1 = (Math.ceil((y + height + dy) / (double) height));
         }
 
         boolean temp1 = !(level.getTile(xt1 - aTile, yt1, unit).mayPass());
@@ -568,6 +572,8 @@ public abstract class Sprite extends Entity {
         } else if (W_MAP * ES - ES <= x + dx + width && 
                 x + dx + width < W_MAP * ES) {
             return temp2;
+        } else if (rightStopped) { // If there is a wall on right, check below.
+            return temp1;
         } else {
             return temp1 || (((x + dx) % ES != 0) && temp2);
         }

@@ -151,9 +151,9 @@ public class Player extends Sprite {
                 } // Once topped to a tile 
                 else if (topped) {    
                     ds = ySpeed;        // Start falling.
-                } // If going beyond the bottom end of the screen
+                } // If falling to the bottom end of the screen
                 else if (y + height + ds < Commons.BOARD_HEIGHT) {
-                    ds = ds + 0.5;      // Accelerate vertically.
+                    ds = ds + 0.5;      // Accelerate vertically.                                    
                 }
 
                 // If the user clicked jump key
@@ -176,6 +176,7 @@ public class Player extends Sprite {
                         dy -= backoff;  // Adjust dy so that it doesn't go over
                     }                   // the ground.
                 }
+                
 
                 // Ending of the game: When reached the flag. 
                 reachedEnd = x + width >= Commons.X_MAX + ES / 2;
