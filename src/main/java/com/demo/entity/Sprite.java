@@ -362,11 +362,11 @@ public abstract class Sprite extends Entity {
         } else if (y + height > Commons.GROUND) { 
             // The tile at the most upper-right determines the right stop.
             double ytFall = Commons.GROUND / Math.pow(2, unit);
-            rightStopped = !(level.getTile(xt1, ytFall, unit).mayPass());
+            rightStopped = !(level.getTile(xto1, ytFall, unit).mayPass());
         } else {
-            rightStopped = !(level.getTile(xt1, yt1 - aTile, unit).mayPass())|| 
+            rightStopped = !(level.getTile(xto1, yt1 - aTile, unit).mayPass())|| 
                     (((y + dy) % ES != 0) && 
-                    !(level.getTile(xt1, yt1, unit).mayPass()));
+                    !(level.getTile(xto1, yt1, unit).mayPass()));
         }
 
         
@@ -448,7 +448,8 @@ public abstract class Sprite extends Entity {
 
         if (dx < 0) {
 //            xto0 = Math.ceil((x - Math.min(ES, width)) / (double) width);            
-            xt0 = Math.ceil((x - Math.min(ES, width) + dx) / (double) width);
+//            xt0 = Math.ceil((x + dx - Math.min(ES, width)) / (double) width);
+            xt0 =(x + dx - Math.min(ES, width)) / (double) width + aTile;
         }
        
         
@@ -458,7 +459,7 @@ public abstract class Sprite extends Entity {
         if (x <= 0) {       
             leftStopped = true;
         // When in between one tile to the left end of the map
-        } else if (0 < x && x <= 0 + ES) {        
+        } else if (0 < x  && x  <= 0 + ES) {        
             leftStopped = false;
         // When going beyond the bottom end of the map
         } else if (y + dy > Commons.BOARD_HEIGHT) {        
