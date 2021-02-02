@@ -13,7 +13,7 @@ public interface Commons {
     int BOARD_WIDTH = 300;
     int GROUND = 208;       // Height of the overground of the map.
     int GROUND_TILE = GROUND / ENTITY_SIZE;
-    int NUM_GBLOCK_ROW = 2; // Number of rows of ground blocks.
+    int NUM_GBLOCK_ROW = 3; // Number of rows of ground blocks.
     int BOARD_HEIGHT = GROUND + NUM_GBLOCK_ROW * ENTITY_SIZE;        
     
     int PLAYER_XI = 42;     // Initial x-position of the player.

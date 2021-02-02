@@ -181,11 +181,11 @@ public class SuperPusheen extends JPanel implements Runnable {
         pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
         // Load background image.
-        String bgPath = "src/main/resources/bg_1-1.png";
+        String bgPath = "src/main/resources/bg_1-1_surfaceOnly.png";
         source = ImageIO.read(new File(bgPath));
         sourcePixels = ImageTool.convertTo2D(source);
         numTileX = source.getWidth() / ES;  // 224
-        numTileY = source.getHeight() / ES; // 15
+        numTileY = source.getHeight() / ES; // 13
 
         // Extract level numbers from the background image name.
         Scanner scan = new Scanner(bgPath);
@@ -251,7 +251,7 @@ public class SuperPusheen extends JPanel implements Runnable {
         }
 
         // Create and add blocks to the background.
-        int y1 = (B_HEIGHT - 48);
+        int y1 = (source.getHeight() - ES); // y of bottom layer
         /// Ascending blocks
         int[][] BPOS_A = Commons.BPOS_A;
         blocks = new ArrayList<>(BPOS_A.length);
@@ -330,7 +330,8 @@ public class SuperPusheen extends JPanel implements Runnable {
         numCoins = 0;
 
         // Create the map.     
-        level = new Level(numTileX, numTileY, levelNum, Commons.GAME_TIME);
+        level = new Level(numTileX, numTileY + Commons.NUM_GBLOCK_ROW, levelNum, 
+                Commons.GAME_TIME);
         tiles = level.tileIds;
         player = new Player(input, level, this);
         player.initPlayer();
@@ -363,7 +364,8 @@ public class SuperPusheen extends JPanel implements Runnable {
         hasWon = false;
 
         // Create the map.
-        level = new Level(numTileX, numTileY, levelNum, Commons.GAME_TIME);
+        level = new Level(numTileX, numTileY + Commons.NUM_GBLOCK_ROW, levelNum,
+                Commons.GAME_TIME);
         player.level = level;
         player.initPlayer();
         level.add(player);

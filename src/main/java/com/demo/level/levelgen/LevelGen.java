@@ -17,7 +17,8 @@ public class LevelGen {
         
     private static final int ES = Commons.ENTITY_SIZE; // Tile size [pixel]
     private static final int W_S = 3584 / ES;// Width of the level's map [tile]
-    private static final int H_S = 240 / ES; // Height of the level's map [tile]    
+    private static final int H_S = Commons.GROUND_TILE + 
+            Commons.NUM_GBLOCK_ROW;          // Height of the level's map [tile]    
     private final int W, H;        // Width and Height of the level's map [tile]
     private static Tile[] tileMap;
 
@@ -67,8 +68,9 @@ public class LevelGen {
 
         // Add ground.
         int bh = Commons.BOARD_HEIGHT;
+        int ng = Commons.NUM_GBLOCK_ROW;
         int[][] GPOS = Commons.GPOS;
-        for (int y = H - 2; y < H; y++) {// Loops through the height of the map.
+        for (int y = H - ng; y < H; y++) {// Loops through the height of the map
             for (int[] a : GPOS) {
                 int beg = a[0] / ES;
                 int end = a[1] / ES;
@@ -87,7 +89,7 @@ public class LevelGen {
             int xLeft = a[1] / ES;              // x tile position
             for (int x = xLeft; x <= xLeft + 1; x++) {
                 int yTop = a[2] / ES;           // y tile position
-                for (int y = yTop; y < H - 2; y++) {
+                for (int y = yTop; y < Commons.GROUND_TILE; y++) {
                     int i = x + y * W;          // Current tile being edited.
                     idMap[i] = Tile.pipe.ID;    // Add tile ID to the ID array.
                     tileMap[i] = Tile.pipe;     // Add tile to the map array.
@@ -96,7 +98,7 @@ public class LevelGen {
         }
 
         // Add ascending blocks.
-        int y1 = (bh - 48) / ES;
+        int y1 = Commons.GROUND_TILE - 1;    // y of bottom layer
         int[][] BPOS_A = Commons.BPOS_A;
         for (int[] blocks : BPOS_A) {           // Loops through the BPOS_A list                
             int x0 = blocks[0] / ES;            // x tile position
