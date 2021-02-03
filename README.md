@@ -24,3 +24,5 @@ Basic structures of the program are based on Miniventure codes (https://github.c
 ## Minor features to be added:
 - Add acceleration effect in x direction.
 - Fire ball bounces up and down as it travels while rotating.
+- Add turtle enemy.
+- Add music.
