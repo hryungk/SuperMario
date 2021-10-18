@@ -27,8 +27,8 @@ public class BrokenBrick extends Sprite {
         setX(x);        
         setY(y);  
         width = height = ES / 2;        
-        xS = 8;
-        yS = 2;
+        xS = 10;
+        yS = 0;
                
         // Initialize variables from Sprite class.
         wS = width / PPS;

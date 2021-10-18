@@ -26,8 +26,8 @@ public class Enemy extends Sprite {
         setX(x);
         setY(y); 
         width = height = ES;
-        xS = 4;
-        yS = 2;
+        xS = 12;
+        yS = 0;
         
         // Initialize variables from Sprite class.
         xSpeed = 1; 

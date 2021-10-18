@@ -21,8 +21,8 @@ public class Shot extends Sprite {
      */
     private void initShot() {
         // Variables from Entity class.
-        xS = 10;
-        yS = 2;
+        xS = 8;
+        yS = 6;
         width = height = ES / 2;
         // Variables from Sprite class.  
         wS = width / PPS;

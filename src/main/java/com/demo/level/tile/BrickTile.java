@@ -60,7 +60,8 @@ public class BrickTile extends InteractiveTile {
                 // Change it to static question brick after there is no more
                 // hidden sprite.
                 if (numHS <= 0) { // If there is no more hidden sprites left
-                    xS = 16;// x square location of static brick on sprite sheet
+                    xS = 10;// x square location of static brick on sprite sheet
+                    yS = 2; // y square location of static brick on sprite sheet
                 } else {    // If there is still hidden sprites to be withdrawn
                     level.add(new Coin(x, initY, level)); // Add more coin.
                     numHS--; 

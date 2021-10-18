@@ -50,9 +50,9 @@ public class OptionMenu extends Menu {
 
         /* Display the Super Pusheen title logo. */
         int h = 11;         // Height of the logo on the sprite sheet [square]
-        int w = 14;         // Width of the logo on the sprite sheet [square]
+        int w = 16;         // Width of the logo on the sprite sheet [square]
 
-        int xS = 18;        // x coordinate in the sprite sheet [square]
+        int xS = 16;        // x coordinate in the sprite sheet [square]
         int yS = 0;         // y coordinate in the sprite sheet [square]
         int xo = (screen.W - w * PPS) / 2; // x location of the title on screen
         int yo = 3 * PPS;   // y location of the title on screen       

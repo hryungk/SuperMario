@@ -5,8 +5,8 @@
         <group>
             <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/entity/Player.java</file>
             <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/entity/Sprite.java</file>
-            <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/Commons.java</file>
-            <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/SuperPusheen.java</file>
+            <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/level/Level.java</file>
+            <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/level/levelgen/LevelGen.java</file>
             <file>file:/Users/HRK/GitHub/SuperPusheen/src/main/java/com/demo/GameLauncher.java</file>
         </group>
     </open-files>
