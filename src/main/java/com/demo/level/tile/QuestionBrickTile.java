@@ -24,8 +24,8 @@ public class QuestionBrickTile extends InteractiveTile {
     public QuestionBrickTile(int id, int xt, int yt) {
         super(id, xt, yt);
 
-        xS = 10;
-        yS = 0;
+        xS = 4;
+        yS = 2;
 
         bNum = 0;
         bCounter = tickCount;
